@@ -1,5 +1,6 @@
 <script lang="ts">
     import { MultiSelect, Label, Tags, Card, Button} from "flowbite-svelte";
+    import CDNCard from "../lib/CDNCard/CDNCard.svelte";
     import { TrashBinSolid } from 'flowbite-svelte-icons';
     import ServicesData from "$lib/sevices_ex.json";
     import web_filter from "$lib/web_filter_ex.json";
@@ -69,15 +70,8 @@
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-7xl">
         
-        {#each Array(4) as _}
-            <Card size="lg" class="p-4 text-center sm:p-8 md:p-10">
-                <h5 class="mb-2 text-3xl font-bold text-gray-900 dark:text-white">Work fast from anywhere</h5>
-                <p class="mb-5 text-base text-gray-500 sm:text-lg dark:text-gray-400">Stay up to date and move work forward with Flowbite on iOS & Android. Download the app today.</p>
-                <div class="items-center justify-center space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse">
-                    <Button>Download it</Button>
-                    <Button>Get it on</Button>
-                </div>
-            </Card>
+        {#each Array(7) as _}
+            <CDNCard />
         {/each}
 
     </div>
