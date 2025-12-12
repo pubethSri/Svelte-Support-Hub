@@ -1,0 +1,12 @@
+{
+    "services": [
+        "On:learn",
+        "No:learn",
+        "J:learn",
+        "DB:learn",
+        "<E>judge",
+        "<U>judge",
+        "<I>judge",
+        "Secspace"
+    ]
+}

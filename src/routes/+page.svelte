@@ -1,9 +1,14 @@
 <script lang="ts">
-    import { Label, Select } from "flowbite-svelte";
-    import interfacesData from "$lib/interfaces_ex.json";
-    let srcIntf: string = "";
-
-    let interfaces = interfacesData.results;
+    import { MultiSelect, Label, Tags, Card, Button} from "flowbite-svelte";
+    import { TrashBinSolid } from 'flowbite-svelte-icons';
+    import ServicesData from "$lib/sevices_ex.json";
+    import web_filter from "$lib/web_filter_ex.json";
+    
+    let selectedService: string[] = [];
+    let internalServices: { value: string; name: string }[] = ServicesData.services.map(
+        (service) => ({ value: service, name: service })
+    );
+    let allowedWebsites: string[] = [];
 </script>
 
 <header
@@ -48,11 +53,32 @@
     </div>
 </header>
 
-<div>
-    <Label>
-        Select an option
-        <Select class="mt-2" items={interfaces.map((inf) => ({
-            value: inf.q_origin_key, name: inf.name
-        }))} bind:value={srcIntf} />
-    </Label>
+<div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 gap-6">
+    <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <h2 class="mb-4 text-xl font-bold dark:text-white">Create Policy</h2>
+        <h3 class="mb-4 text-m dark:text-white">Select ITKMITL Services</h3>
+        <MultiSelect class="mt-2" items={internalServices} bind:value={selectedService} />
+        <Label class="mb-2">Allowed Websites (Type & Enter)</Label>
+        <Tags 
+            bind:value={allowedWebsites} 
+            placeholder="Add website (e.g. google.com)..." 
+            class="mt-2"
+        />
+        <p class="text-xs text-gray-500 mt-1">Press Enter to add a website.</p>
+        <strong>Websites to Allow:</strong> {JSON.stringify(selectedService.concat(allowedWebsites))}
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-7xl">
+        
+        {#each Array(4) as _}
+            <Card size="lg" class="p-4 text-center sm:p-8 md:p-10">
+                <h5 class="mb-2 text-3xl font-bold text-gray-900 dark:text-white">Work fast from anywhere</h5>
+                <p class="mb-5 text-base text-gray-500 sm:text-lg dark:text-gray-400">Stay up to date and move work forward with Flowbite on iOS & Android. Download the app today.</p>
+                <div class="items-center justify-center space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse">
+                    <Button>Download it</Button>
+                    <Button>Get it on</Button>
+                </div>
+            </Card>
+        {/each}
+
+    </div>
 </div>

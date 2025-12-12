@@ -1,0 +1,19 @@
+{
+    "web-filter":[
+        { 
+            "name": "Google Services", 
+            "value": "google",
+            "domains": ["google.com", "gstatic.com", "googleusercontent.com"] 
+        },
+        { 
+            "name": "Microsoft Office 365", 
+            "value": "o365",
+            "domains": ["office.com", "microsoft.com", "live.com"] 
+        },
+        {
+            "name": "Canvas LMS",
+            "value": "canvas",
+            "domains": ["canvas.instructure.com", "instructure-uploads.s3.amazonaws.com"]
+        }
+    ]
+}

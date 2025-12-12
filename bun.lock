@@ -16,6 +16,7 @@
         "@tailwindcss/vite": "^4.1.17",
         "flowbite": "^4.0.1",
         "flowbite-svelte": "^1.30.0",
+        "flowbite-svelte-icons": "^3.0.1",
         "svelte": "^5.43.8",
         "svelte-check": "^4.3.4",
         "tailwindcss": "^4.1.17",
@@ -258,6 +259,8 @@
     "flowbite-datepicker": ["flowbite-datepicker@2.0.0", "", { "dependencies": { "@rollup/plugin-node-resolve": "^15.2.3", "@tailwindcss/postcss": "^4.1.17" } }, "sha512-m81hl0Bimq45MUg4maJLOnXrX+C9lZ0AkjMb9uotuVUSr729k/YiymWDfVAm63AYDH7g7y3rI3ke3XaBzWWqLw=="],
 
     "flowbite-svelte": ["flowbite-svelte@1.30.0", "", { "dependencies": { "@floating-ui/dom": "^1.7.4", "@floating-ui/utils": "^0.2.10", "apexcharts": "^5.3.6", "clsx": "^2.1.1", "date-fns": "^4.1.0", "esm-env": "^1.2.2", "flowbite": "^3.1.2", "tailwind-merge": "^3.4.0", "tailwind-variants": "^3.2.2" }, "peerDependencies": { "svelte": "^5.40.0", "tailwindcss": "^4.1.4" } }, "sha512-zwU9IUiKfNv5sGZAsrUqyeZZCcT/RkdUJxhXnpN5us+mH4S9aWh9siJhcByEaCsK9uk0VPWRhstNd1cyfnNzRw=="],
+
+    "flowbite-svelte-icons": ["flowbite-svelte-icons@3.0.1", "", { "dependencies": { "clsx": "^2.1.1", "tailwind-merge": "^3.4.0" }, "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-fz6OEueSoNau0IZdHHuvDro+iYTeG6o7pYpGk+2jc3Z+/r4MN++M6mAaApp566h56WYY6dFGCApgf7j+8Q9XVA=="],
 
     "fsevents": ["fsevents@2.3.3", "", { "os": "darwin" }, "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw=="],
 

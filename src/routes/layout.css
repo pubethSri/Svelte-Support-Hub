@@ -1,4 +1,8 @@
 @import 'tailwindcss';
+@plugin 'flowbite/plugin';
+@custom-variant dark (&:where(.dark, .dark *));
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 @import '@fortawesome/fontawesome-free/css/all.min.css';
+@source "../../node_modules/flowbite-svelte/dist";
+@source "../../node_modules/flowbite-svelte-icons/dist";
