@@ -55,7 +55,7 @@
 </header>
 
 <div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 gap-6">
-    <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
+    <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-md dark:bg-gray-800 dark:text-white">
         <h2 class="mb-4 text-xl font-bold dark:text-white">Create Policy</h2>
         <h3 class="mb-4 text-m dark:text-white">Select ITKMITL Services</h3>
         <MultiSelect class="mt-2" items={internalServices} bind:value={selectedService} />

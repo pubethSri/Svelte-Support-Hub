@@ -17,15 +17,15 @@
 </script>
 
 <Card size="lg" class="p-4 text-center sm:p-8 md:p-10">
-    <h1 class="text-3xl">Calculator site</h1>
-    <div class="board">
+    <h1 class="text-3xl dark:text-white">Calculator site</h1>
+    <div class="board dark:text-white">
         <div class="done">
             <h2>Pass</h2>
-            <TodoList todos={todos.filter((t) => t.done)} {remove} />
+            <TodoList todos={todos.filter((t) => t.done)}/>
 	    </div>
         <div class="todo">
             <h2>Block</h2>
-            <TodoList todos={todos.filter((t) => !t.done)} {remove} />
+            <TodoList todos={todos.filter((t) => !t.done)}/>
         </div>
 </div>
 </Card>

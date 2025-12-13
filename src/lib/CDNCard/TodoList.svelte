@@ -2,7 +2,7 @@
 	import { flip } from 'svelte/animate';
 	import { send, receive } from './transition.ts';
 
-	let { todos, remove } = $props();
+	let { todos } = $props();
 </script>
 
 <ul class="todos">
@@ -15,7 +15,7 @@
 		>
 			<label>
 				<input type="checkbox" bind:checked={todo.done}/>
-				<span>{todo.description}</span>
+				<span class="ml-2">{todo.description}</span>
 			</label>
 		</li>
 	{/each}

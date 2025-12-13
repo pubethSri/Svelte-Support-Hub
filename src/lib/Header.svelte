@@ -1,6 +1,7 @@
 <script lang="ts">
     import { page } from "$app/stores";
     import { slide, fade } from "svelte/transition";
+    import { DarkMode } from "flowbite-svelte";
     import itkmitlLogo from "$lib/assets/img/itkmitl.svg";
 
     // 1. State for Menus
@@ -63,7 +64,7 @@
                     <i class="fa-solid fa-bars"></i>
                 </button>
             </div>
-
+            <DarkMode/>
             <div class="hidden md:flex items-center">
                 <div
                     class="relative"
