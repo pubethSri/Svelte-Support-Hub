@@ -14,14 +14,14 @@
         <div class="flex gap-4 w-full dark:text-white text-left">
             
             <div class="flex-1 basis-0 min-w-0">
-                <h2 class="text-2xl font-light text-center mb-4 text-green-500">Pass</h2>
+                <h2 class="text-2xl font-normal text-center mb-4 text-green-800 dark:text-green-500">Pass</h2>
                 <div class="break-words">
                     <CDNList cdn={items.filter((t: { done: boolean }) => t.done)}/>
                 </div>
             </div>
 
             <div class="flex-1 basis-0 min-w-0">
-                <h2 class="text-2xl font-light text-center mb-4 text-red-500">Block</h2>
+                <h2 class="text-2xl font-normal text-center mb-4 text-red-800 dark:text-red-500">Block</h2>
                 <div class="break-words">
                     <CDNList cdn={items.filter((t: { done: boolean }) => !t.done)}/>
                 </div>
