@@ -31,6 +31,17 @@
         }));
 
         console.log("Current Active Policy:", JSON.stringify(finalPolicy, null, 2));
+
+        // let counter = 1;
+
+        // console.log(policyCards.flatMap(group =>
+        //     group.items.map(item => ({
+        //         id: counter++,
+        //         url: item.description,
+        //         type: "wildcard",
+        //         action: item.done ? "allow" : "block"
+        //     }))
+        // ));
     }
 </script>
 
