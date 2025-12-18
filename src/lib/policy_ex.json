@@ -1,1 +1,257 @@
-{"http_method":"GET","size":6,"matched_count":6,"next_idx":5,"revision":"929b99d4430fd8f63d01f0614668b41d","results":[{"policyid":1,"q_origin_key":1,"status":"enable","name":"[Allow] Internet-LoadBalancer","srcintf":[{"name":"port1","q_origin_key":"port1"}],"dstintf":[{"name":"port2","q_origin_key":"port2"}],"action":"accept","srcaddr":[{"name":"all","q_origin_key":"all"}],"dstaddr":[{"name":"DCS-LB-1","q_origin_key":"DCS-LB-1"}],"schedule":"always","service":[{"name":"ALL","q_origin_key":"ALL"}]},{"policyid":2,"q_origin_key":2,"status":"enable","name":"[Allow] Webserver-Internet","srcintf":[{"name":"port2","q_origin_key":"port2"}],"dstintf":[{"name":"port1","q_origin_key":"port1"}],"action":"accept","srcaddr":[{"name":"all","q_origin_key":"all"}],"dstaddr":[{"name":"all","q_origin_key":"all"}],"schedule":"always","service":[{"name":"ALL","q_origin_key":"ALL"}]},{"policyid":3,"q_origin_key":3,"status":"enable","name":"[Allow] LB","srcintf":[{"name":"port1","q_origin_key":"port1"}],"dstintf":[{"name":"port2","q_origin_key":"port2"}],"action":"accept","srcaddr":[{"name":"all","q_origin_key":"all"}],"dstaddr":[{"name":"all","q_origin_key":"all"}],"schedule":"always","service":[{"name":"ALL","q_origin_key":"ALL"}]},{"policyid":4,"q_origin_key":4,"status":"disable","name":"TestCreatePolicyAPI","srcintf":[{"name":"port2","q_origin_key":"port2"}],"dstintf":[{"name":"port1","q_origin_key":"port1"}],"action":"accept","srcaddr":[{"name":"all","q_origin_key":"all"}],"dstaddr":[{"name":"gmail.com","q_origin_key":"gmail.com"},{"name":"wildcard.google.com","q_origin_key":"wildcard.google.com"}],"schedule":"always","service":[{"name":"ALL","q_origin_key":"ALL"}]},{"policyid":6,"q_origin_key":6,"status":"disable","name":"TestCreatePolicyAPI3","srcintf":[{"name":"port2","q_origin_key":"port2"}],"dstintf":[{"name":"port1","q_origin_key":"port1"}],"action":"accept","srcaddr":[{"name":"all","q_origin_key":"all"}],"dstaddr":[{"name":"gmail.com","q_origin_key":"gmail.com"},{"name":"wildcard.google.com","q_origin_key":"wildcard.google.com"}],"schedule":"always","service":[{"name":"ALL","q_origin_key":"ALL"}]},{"policyid":7,"q_origin_key":7,"status":"disable","name":"TestCreatePolicyAPI4","srcintf":[{"name":"port2","q_origin_key":"port2"}],"dstintf":[{"name":"port1","q_origin_key":"port1"}],"action":"accept","srcaddr":[{"name":"all","q_origin_key":"all"}],"dstaddr":[{"name":"gmail.com","q_origin_key":"gmail.com"},{"name":"wildcard.google.com","q_origin_key":"wildcard.google.com"}],"schedule":"always","service":[{"name":"ALL","q_origin_key":"ALL"}]}],"vdom":"root","path":"firewall","name":"policy","status":"success","http_status":200,"serial":"FGVM324W1TKLO3DZ","version":"v7.2.4","build":1396}
+{
+    "http_method": "GET",
+    "size": 6,
+    "matched_count": 6,
+    "next_idx": 5,
+    "revision": "929b99d4430fd8f63d01f0614668b41d",
+    "results": [
+        {
+            "policyid": 1,
+            "q_origin_key": 1,
+            "status": "enable",
+            "name": "[Allow] Internet-LoadBalancer",
+            "srcintf": [
+                {
+                    "name": "port1",
+                    "q_origin_key": "port1"
+                }
+            ],
+            "dstintf": [
+                {
+                    "name": "port2",
+                    "q_origin_key": "port2"
+                }
+            ],
+            "action": "accept",
+            "srcaddr": [
+                {
+                    "name": "all",
+                    "q_origin_key": "all"
+                }
+            ],
+            "dstaddr": [
+                {
+                    "name": "DCS-LB-1",
+                    "q_origin_key": "DCS-LB-1"
+                }
+            ],
+            "schedule": "always",
+            "service": [
+                {
+                    "name": "ALL",
+                    "q_origin_key": "ALL"
+                }
+            ]
+        },
+        {
+            "policyid": 2,
+            "q_origin_key": 2,
+            "status": "enable",
+            "name": "[Allow] Webserver-Internet",
+            "srcintf": [
+                {
+                    "name": "port2",
+                    "q_origin_key": "port2"
+                }
+            ],
+            "dstintf": [
+                {
+                    "name": "port1",
+                    "q_origin_key": "port1"
+                }
+            ],
+            "action": "accept",
+            "srcaddr": [
+                {
+                    "name": "all",
+                    "q_origin_key": "all"
+                }
+            ],
+            "dstaddr": [
+                {
+                    "name": "all",
+                    "q_origin_key": "all"
+                }
+            ],
+            "schedule": "always",
+            "service": [
+                {
+                    "name": "ALL",
+                    "q_origin_key": "ALL"
+                }
+            ]
+        },
+        {
+            "policyid": 3,
+            "q_origin_key": 3,
+            "status": "enable",
+            "name": "[Allow] LB",
+            "srcintf": [
+                {
+                    "name": "port1",
+                    "q_origin_key": "port1"
+                }
+            ],
+            "dstintf": [
+                {
+                    "name": "port2",
+                    "q_origin_key": "port2"
+                }
+            ],
+            "action": "accept",
+            "srcaddr": [
+                {
+                    "name": "all",
+                    "q_origin_key": "all"
+                }
+            ],
+            "dstaddr": [
+                {
+                    "name": "all",
+                    "q_origin_key": "all"
+                }
+            ],
+            "schedule": "always",
+            "service": [
+                {
+                    "name": "ALL",
+                    "q_origin_key": "ALL"
+                }
+            ]
+        },
+        {
+            "policyid": 4,
+            "q_origin_key": 4,
+            "status": "disable",
+            "name": "TestCreatePolicyAPI",
+            "srcintf": [
+                {
+                    "name": "port2",
+                    "q_origin_key": "port2"
+                }
+            ],
+            "dstintf": [
+                {
+                    "name": "port1",
+                    "q_origin_key": "port1"
+                }
+            ],
+            "action": "accept",
+            "srcaddr": [
+                {
+                    "name": "all",
+                    "q_origin_key": "all"
+                }
+            ],
+            "dstaddr": [
+                {
+                    "name": "gmail.com",
+                    "q_origin_key": "gmail.com"
+                },
+                {
+                    "name": "wildcard.google.com",
+                    "q_origin_key": "wildcard.google.com"
+                }
+            ],
+            "schedule": "always",
+            "service": [
+                {
+                    "name": "ALL",
+                    "q_origin_key": "ALL"
+                }
+            ]
+        },
+        {
+            "policyid": 6,
+            "q_origin_key": 6,
+            "status": "disable",
+            "name": "TestCreatePolicyAPI3",
+            "srcintf": [
+                {
+                    "name": "port2",
+                    "q_origin_key": "port2"
+                }
+            ],
+            "dstintf": [
+                {
+                    "name": "port1",
+                    "q_origin_key": "port1"
+                }
+            ],
+            "action": "accept",
+            "srcaddr": [
+                {
+                    "name": "all",
+                    "q_origin_key": "all"
+                }
+            ],
+            "dstaddr": [
+                {
+                    "name": "gmail.com",
+                    "q_origin_key": "gmail.com"
+                },
+                {
+                    "name": "wildcard.google.com",
+                    "q_origin_key": "wildcard.google.com"
+                }
+            ],
+            "schedule": "always",
+            "service": [
+                {
+                    "name": "ALL",
+                    "q_origin_key": "ALL"
+                }
+            ]
+        },
+        {
+            "policyid": 7,
+            "q_origin_key": 7,
+            "status": "disable",
+            "name": "TestCreatePolicyAPI4",
+            "srcintf": [
+                {
+                    "name": "port2",
+                    "q_origin_key": "port2"
+                }
+            ],
+            "dstintf": [
+                {
+                    "name": "port1",
+                    "q_origin_key": "port1"
+                }
+            ],
+            "action": "accept",
+            "srcaddr": [
+                {
+                    "name": "all",
+                    "q_origin_key": "all"
+                }
+            ],
+            "dstaddr": [
+                {
+                    "name": "gmail.com",
+                    "q_origin_key": "gmail.com"
+                },
+                {
+                    "name": "wildcard.google.com",
+                    "q_origin_key": "wildcard.google.com"
+                }
+            ],
+            "schedule": "always",
+            "service": [
+                {
+                    "name": "ALL",
+                    "q_origin_key": "ALL"
+                }
+            ]
+        }
+    ],
+    "vdom": "root",
+    "path": "firewall",
+    "name": "policy",
+    "status": "success",
+    "http_status": 200,
+    "serial": "FGVM324W1TKLO3DZ",
+    "version": "v7.2.4",
+    "build": 1396
+}

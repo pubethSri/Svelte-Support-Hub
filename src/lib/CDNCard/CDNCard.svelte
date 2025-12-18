@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Card, Button } from "flowbite-svelte";
+    import { Card } from "flowbite-svelte";
     import CDNList from './CDNList.svelte';
     let { title, items = $bindable() } = $props<{ 
         title: string, 
@@ -16,14 +16,14 @@
             <div class="flex-1 basis-0 min-w-0">
                 <h2 class="text-2xl font-normal text-center mb-4 text-green-800 dark:text-green-500">Pass</h2>
                 <div class="break-words">
-                    <CDNList cdn={items.filter((t: { done: boolean }) => t.done)}/>
+                    <CDNList cdn={items.filter((t: { done: boolean }) => t.done)} parentId={title} />
                 </div>
             </div>
 
             <div class="flex-1 basis-0 min-w-0">
                 <h2 class="text-2xl font-normal text-center mb-4 text-red-800 dark:text-red-500">Block</h2>
                 <div class="break-words">
-                    <CDNList cdn={items.filter((t: { done: boolean }) => !t.done)}/>
+                    <CDNList cdn={items.filter((t: { done: boolean }) => !t.done)} parentId={title} />
                 </div>
             </div>
 

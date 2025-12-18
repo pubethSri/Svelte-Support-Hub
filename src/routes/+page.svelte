@@ -2,7 +2,7 @@
     import { MultiSelect, Label, Tags, Card, Button} from "flowbite-svelte";
     import CDNCard from "../lib/CDNCard/CDNCard.svelte";
     import ServicesData from "$lib/sevices_ex.json";
-    import policyData from "$lib/web_filter_ex.json";
+    import webFilterData from "$lib/web_filter_ex.json";
     
     let selectedService: string[] = $state([]);
     let internalServices: { value: string; name: string }[] = ServicesData.services.map(
@@ -10,38 +10,79 @@
     );
     let allowedWebsites: string[] = $state([]);
 
+    type UrlEntry = {
+        id: number;
+        url: string;
+        type: string;
+        action: "allow" | "block";
+    };
+
+    type UrlFilterList = {
+        id: number;
+        name: string;
+        comment: string;
+        entries: UrlEntry[];
+    };
+
     let policyCards = $state(
-        policyData["web-filter"].map((service, sIndex) => ({
+        webFilterData["web-filter"].map((service, sIndex) => ({
             name: service.name,
-            items: service.domains.map((d, dIndex) => ({
+            items: service.domains.map((domain, dIndex) => ({
                 id: `${sIndex}-${dIndex}`, // Unique ID
                 done: true,                // Default to Pass
-                description: d
+                description: domain
             }))
         }))
     );
 
-    function handleLogSelection() {
-        // Loop through all cards and find the "done" (Pass) items
-        const finalPolicy = policyCards.map(card => ({
-            serviceName: card.name,
-            allowedDomains: card.items
-                .filter(item => item.done) // Only take the ones in "Pass" column
-                .map(item => item.description)
-        }));
+    async function handleLogSelection() {
+        let counter = 1;
+        const urlFilterList: UrlFilterList = {
+            id: 0,
+            name: "[Exam] {Placeholder}",
+            comment: "This {Placeholder} Url Filter is created via API",
+            entries: []
+        };
 
-        console.log("Current Active Policy:", JSON.stringify(finalPolicy, null, 2));
+        const payload: UrlEntry[] = [];
+        for (const group of policyCards) {
+            for (const item of group.items) {
+                payload.push({
+                    id: counter++,
+                    url: item.description,
+                    type: "wildcard",
+                    action: item.done ? "allow" : "block"
+                });
+            }
+        }
 
-        // let counter = 1;
+        urlFilterList.entries = payload;
+        console.log(urlFilterList);
 
-        // console.log(policyCards.flatMap(group =>
-        //     group.items.map(item => ({
-        //         id: counter++,
-        //         url: item.description,
-        //         type: "wildcard",
-        //         action: item.done ? "allow" : "block"
-        //     }))
-        // ));
+        // This will call backend API
+        // try {
+        //     const response = await fetch('http://localhost:3000/firewall/webfilter/create', { 
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //         },
+        //         body: JSON.stringify(urlFilterList)
+        //     });
+
+        //     const result = await response.json();
+        //     console.log(result);
+
+        //     if (response.ok) {
+        //         alert(`Success! Policy Created. (Name: ${result.mkey || 'N/A'})`);
+        //     } else {
+        //         console.error("Server Error:", result);
+        //         alert(`Error: ${result.error || "Failed to create policy"}`);
+        //     }
+
+        // } catch (error) {
+        //     console.error("Network Error:", error);
+        //     alert("Failed to connect to backend.");
+        // }
     }
 </script>
 
