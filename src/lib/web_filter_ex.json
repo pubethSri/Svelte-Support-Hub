@@ -14,6 +14,50 @@
             "name": "Canvas LMS",
             "value": "canvas",
             "domains": ["canvas.instructure.com", "instructure-uploads.s3.amazonaws.com"]
+        },
+        {
+            "name": "Onlearn",
+            "value": "itkmitl-onlearn",
+            "domains": [
+                "onlearn.it.kmitl.ac.th",
+                "portal.it.kmitl.ac.th",
+                "login.it.kmitl.ac.th",
+                "cdn.jsdelivr.net",
+                "vjs.zencdn.net",
+                "*.bootstrapcdn.com",
+                "unpkg.com",
+                "*.alicdn.com",
+                "*.sectigostore.com",
+                "*.sectigo.com",
+                "fonts.googleapis.com",
+                "gstatic.com",
+                "www.gstatic.com",
+                "connectivitycheck.gstatic.com",
+                "clients3.google.com",
+                "msftconnecttest.com",
+                "msftncsi.com",
+                "edge-http.microsoft.com"
+            ]
+        },
+        {
+            "name": "Nolearn",
+            "value": "itkmitl-onlearn",
+            "domains": [
+                "onlearn.it.kmitl.ac.th",
+                "portal.it.kmitl.ac.th",
+                "login.it.kmitl.ac.th",
+                "*.alicdn.com",
+                "*.sectigostore.com",
+                "*.sectigo.com",
+                "fonts.googleapis.com",
+                "gstatic.com",
+                "www.gstatic.com",
+                "connectivitycheck.gstatic.com",
+                "clients3.google.com",
+                "msftconnecttest.com",
+                "msftncsi.com",
+                "edge-http.microsoft.com"
+            ]
         }
     ]
 }

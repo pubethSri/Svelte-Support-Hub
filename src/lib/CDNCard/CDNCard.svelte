@@ -7,7 +7,7 @@
     }>();
 </script>
 
-<div class="flex-grow basis-[22%] min-w-[300px]">
+<div class="flex-grow basis-[22%] min-w-[400px]">
     <Card class="p-4 text-center sm:p-8 md:p-10 min-h-[24rem]">
         <h1 class="text-3xl dark:text-white mb-6">{ title }</h1>
         
