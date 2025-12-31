@@ -6,7 +6,18 @@
     import * as Card from "$lib/components/ui/card/index.js";
     import { Eye, EyeOff } from "@lucide/svelte/icons";
 
-    let showPassword = false;
+    let revealPassword = $state(false);
+    let usernameValue = $state('');
+	let passwordValue = $state('');
+	$effect(() => {
+		if (!passwordValue) {
+			revealPassword = false;
+		}
+	});
+
+    let handleLogin = () => {
+        console.log(`Username: ${usernameValue}, Password: ${passwordValue}`);
+    }
 </script>
  
 <Card.Root class="-my-4 w-full max-w-sm">
@@ -23,17 +34,33 @@
   <form>
    <div class="flex flex-col gap-6">
     <div class="grid gap-2">
-     <Input class="h-12" id="email" type="email" placeholder="Username" required />
+     <Input class="h-12" id="username" type="text" placeholder="Username" bind:value={usernameValue} required />
     </div>
     <div class="grid gap-2">
-     <Input class="h-12" id="password" type="password" placeholder="Password" required />
-     <Button><Eye/></Button>
+     <Input class="h-12" id="password" type={revealPassword ? 'text' : 'password'} placeholder="Password" bind:value={passwordValue} required />
+     <button
+        type="button"
+        title="Toggle Password Visibility"
+        tabindex={5}
+        class="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-neutral-400 transition-colors hover:text-neutral-500 disabled:cursor-not-allowed disabled:text-neutral-300"
+        onclick={() => {
+            if (passwordValue) {
+                revealPassword = !revealPassword;
+            }
+        }}
+    >
+        {#if revealPassword}
+            <EyeOff size="18" />
+        {:else}
+            <Eye size="18" />
+        {/if}
+    </button>
     </div>
    </div>
   </form>
  </Card.Content>
  <Card.Footer class="flex-col gap-2">
-  <Button type="submit" class="w-full">Login</Button>
+  <Button type="submit" class="w-full" onclick={handleLogin}>Login</Button>
   <Button variant="outline" class="w-full">Login with Google</Button>
  </Card.Footer>
 </Card.Root>
