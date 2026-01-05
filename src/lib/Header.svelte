@@ -1,216 +1,74 @@
 <script lang="ts">
     import { page } from "$app/stores";
-    import { slide, fade } from "svelte/transition";
-
     import SunIcon from "@lucide/svelte/icons/sun";
     import MoonIcon from "@lucide/svelte/icons/moon";
+    import UserIcon from "@lucide/svelte/icons/user"; // Add this icon
+    import LogOutIcon from "@lucide/svelte/icons/log-out"; // Add this icon
     
     import { toggleMode } from "mode-watcher";
     import { Button } from "$lib/components/ui/button/index.js";
-
+    import * as DropdownMenu from "$lib/components/ui/dropdown-menu"; // Optional: For Logout menu
     import itkmitlLogo from "$lib/assets/img/itkmitl.svg";
 
-    // 1. State for Menus
-    let isMobileMenuOpen: boolean = false;
-    let isProfileDropdownOpen: boolean = false;
+    // 1. Receive User Data & Emit Events
+    let { currentUser, onLoginClick, onLogoutClick } = $props<{ 
+        currentUser: { name: string; role: string } | null,
+        onLoginClick: () => void,
+        onLogoutClick: () => void
+    }>();
 
-    // 2. Data
-    let userName: string = "{Placeholder User}";
-    let userRole: string = "{Placeholder Role}";
-
-    // 3. Helper to check if a link is active
-    // FIX: Added ': string' type annotation
-    $: isActive = (path: string) => {
-        return (
-            $page.url.pathname === path ||
-            (path !== "/" && $page.url.pathname.startsWith(path))
-        );
-    };
-
-    // 4. Close menus when clicking outside
-    // FIX: Added ': MouseEvent' and cast target to HTMLElement
-    function handleClickOutside(event: MouseEvent) {
-        const target = event.target as HTMLElement;
-
-        // We check if target exists and if it is NOT inside the mobile menu container
-        if (
-            isMobileMenuOpen &&
-            target &&
-            !target.closest(".mobile-menu-container")
-        ) {
-            isMobileMenuOpen = false;
-        }
-    }
 </script>
 
-<svelte:window on:click={handleClickOutside} />
-
-
-<nav class="bg-white shadow-md stick top-0 left-0 w-full z-50">
+<nav class="bg-white dark:bg-gray-900 shadow-md sticky top-0 left-0 w-full z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20">
         <div class="h-full flex justify-between items-center py-4">
+            
             <div class="flex items-center space-x-3">
                 <a href="/" class="flex items-center group">
                     <img
                         src={itkmitlLogo}
-                        class="h-10 w-auto transition-transform duration-300 group-hover:scale-110 bg-transparent"
+                        class="h-10 w-auto transition-transform duration-300 group-hover:scale-110"
                         alt="IT KMITL Logo"
-                        style="background: transparent !important;"
                     />
                 </a>
             </div>
 
-            <div class="md:hidden flex items-center mobile-menu-container">
-                <button
-                    on:click|stopPropagation={() =>
-                        (isMobileMenuOpen = !isMobileMenuOpen)}
-                    class="text-gray-700 hover:text-blue-600 text-2xl focus:outline-none transition-colors duration-200"
-                    aria-label="Toggle Menu"
-                >
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-            </div>
+            <div class="flex items-center gap-4">
+                
+                <Button onclick={toggleMode} variant="outline" size="icon" class="cursor-pointer dark:bg-gray-800 dark:text-gray-300">
+                    <SunIcon class="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+                    <MoonIcon class="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+                    <span class="sr-only">Toggle theme</span>
+                </Button>
 
-            <Button onclick={toggleMode} variant="outline" size="icon" class="cursor-pointer">
-            <SunIcon
-                class="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 !transition-all dark:scale-0 dark:-rotate-90"
-            />
-            <MoonIcon
-                class="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 !transition-all dark:scale-100 dark:rotate-0"
-            />
-            </Button>
-            
-            <div class="hidden md:flex items-center">
-                <div
-                    class="relative"
-                    on:mouseenter={() => (isProfileDropdownOpen = true)}
-                    on:mouseleave={() => (isProfileDropdownOpen = false)}
-                    role="group"
-                >
-                    <button
-                        class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 focus:outline-none transition-colors duration-200 py-2"
-                    >
-                        <span class="font-medium">{userName}</span>
-                        <i
-                            class="fa-solid fa-chevron-down text-xs transition-transform duration-300"
-                            class:rotate-180={isProfileDropdownOpen}
-                        ></i>
-                    </button>
+                {#if currentUser}
+                    <DropdownMenu.Root>
+                        <DropdownMenu.Trigger>
+                            <Button variant="ghost" class="flex items-center gap-2">
+                                <UserIcon class="h-4 w-4" />
+                                <span class="hidden sm:inline font-medium">
+                                    {currentUser.name}
+                                </span>
+                            </Button>
+                        </DropdownMenu.Trigger>
+                        <DropdownMenu.Content align="end">
+                            <DropdownMenu.Label>{currentUser.role.toUpperCase()}</DropdownMenu.Label>
+                            <DropdownMenu.Separator />
+                            <DropdownMenu.Item onclick={onLogoutClick} class="text-red-600 cursor-pointer">
+                                <LogOutIcon class="mr-2 h-4 w-4" />
+                                <span>Log out</span>
+                            </DropdownMenu.Item>
+                        </DropdownMenu.Content>
+                    </DropdownMenu.Root>
+                {:else}
+                    <Button onclick={onLoginClick} variant="default" class="bg-blue-600 hover:bg-blue-700 text-white">
+                        Sign In
+                    </Button>
+                {/if}
 
-                    {#if isProfileDropdownOpen}
-                        <div
-                            transition:fade={{ duration: 100 }}
-                            class="absolute right-0 mt-0 w-56 bg-white rounded-lg shadow-xl py-2 z-10 border border-gray-100"
-                        >
-                            <div class="px-4 py-3 border-b border-gray-100">
-                                <p
-                                    class="text-sm font-semibold text-gray-700"
-                                >
-                                    {userName}
-                                </p>
-                                <p class="text-xs text-gray-500">
-                                    {userRole}
-                                </p>
-                            </div>
-
-                            <a
-                                href="/request/history"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700"
-                            >
-                                <i
-                                    class="fa-solid fa-history mr-2 w-5 text-center"
-                                ></i> ประวัติคำร้อง
-                            </a>
-
-                            <a
-                                href="/backoffice"
-                                class="block px-4 py-2 text-sm hover:bg-indigo-50 hover:text-indigo-800 bg-blue-50 text-blue-600"
-                            >
-                                <i
-                                    class="fa-solid fa-shield mr-2 w-5 text-center"
-                                ></i> แผงควบคุมผู้ดูแล
-                            </a>
-
-                            <div
-                                class="border-t border-gray-100 my-1"
-                            ></div>
-
-                            <a
-                                href="/api/member/logout"
-                                class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                            >
-                                <i
-                                    class="fa-solid fa-sign-out mr-2 w-5 text-center"
-                                ></i> ออกจากระบบ
-                            </a>
-                        </div>
-                    {/if}
-                </div>
             </div>
         </div>
     </div>
-
-    {#if isMobileMenuOpen}
-        <div
-            transition:slide={{ duration: 300 }}
-            class="mobile-menu-container fixed top-20 left-0 w-full bg-white shadow-lg md:hidden border-t border-gray-100"
-        >
-            <div class="px-4 py-4 flex flex-col space-y-3">
-                <div
-                    class="flex items-center space-x-3 py-3 border-b border-gray-200"
-                >
-                    <div>
-                        <div class="font-medium text-gray-800">
-                            {userName}
-                        </div>
-                        <div class="text-sm text-gray-500">{userRole}</div>
-                    </div>
-                </div>
-
-                <a
-                    href="/"
-                    class="flex items-center py-3 px-4 rounded-lg transition-colors duration-200 {isActive(
-                        '/',
-                    )
-                        ? 'bg-blue-50 text-blue-600'
-                        : 'text-gray-700 hover:bg-gray-50'}"
-                >
-                    <i class="fa-solid fa-home mr-3 w-6 text-center"></i> หน้าหลัก
-                </a>
-
-                <a
-                    href="/request/history"
-                    class="flex items-center py-3 px-4 rounded-lg transition-colors duration-200 {isActive(
-                        '/request/history',
-                    )
-                        ? 'bg-blue-50 text-blue-600'
-                        : 'text-gray-700 hover:bg-gray-50'}"
-                >
-                    <i class="fa-solid fa-history mr-3 w-6 text-center"></i>
-                    ประวัติคำร้อง
-                </a>
-
-                <a
-                    href="/backoffice"
-                    class="flex items-center py-3 px-4 rounded-lg transition-colors duration-200 {isActive(
-                        '/backoffice',
-                    )
-                        ? 'bg-blue-50 text-blue-600'
-                        : 'text-gray-700 hover:bg-gray-50'}"
-                >
-                    <i class="fa-solid fa-shield mr-3 w-6 text-center"></i> แผงควบคุมผู้ดูแล
-                </a>
-
-                <div class="border-t border-gray-200 my-2"></div>
-
-                <a
-                    href="/api/member/logout"
-                    class="flex items-center justify-center bg-red-500 text-white px-4 py-3 rounded-lg shadow-md hover:bg-red-600 transition duration-200 mt-3"
-                >
-                    <i class="fa-solid fa-sign-out mr-2"></i> ออกจากระบบ
-                </a>
-            </div>
-        </div>
-    {/if}
 </nav>
-<marquee direction="">🚨🚧This Server is currently in maintenance🚧🚨</marquee>
+
+<marquee class="bg-yellow-300 dark:text-black font-bold">🚨🚧 This Server is currently in maintenance 🚧🚨</marquee>
