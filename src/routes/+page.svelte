@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { MultiSelect, Label, Tags, Card, Button} from "flowbite-svelte";
+    import { MultiSelect, Label, Tags, Card} from "flowbite-svelte";
+    import { Button } from "$lib/components/ui/button/index.js";
     import CDNCard from "../lib/CDNCard/CDNCard.svelte";
     import ServicesData from "$lib/sevices_ex.json";
     import webFilterData from "$lib/web_filter_ex.json";
-    import LoginCard from "$lib/LoginCard.svelte";
     import { userState } from "$lib/userState.svelte";
 
     
@@ -12,6 +12,9 @@
         (service) => ({ value: service, name: service })
     );
     let allowedWebsites: string[] = $state([]);
+    
+    let apiImage: string = $state("https://www.shutterstock.com/image-vector/default-ui-image-placeholder-wireframes-600nw-1037719192.jpg");
+    let isLoading = $state(false);
 
     type UrlEntry = {
         id: number;
@@ -87,11 +90,43 @@
         //     alert("Failed to connect to backend.");
         // }
     }
+
+    async function getWaifu() {
+        isLoading = true;
+        const token = localStorage.getItem("authToken");
+
+        try{
+            const res = await fetch('http://localhost:3000/waifu', {
+                method: 'GET',
+                headers: {
+                    // 👇 This matches the backend code above
+                    'Authorization': `Bearer ${token}` 
+                }
+            });
+            if (res.status === 401) {
+                apiImage = "https://http.cat/401";
+                return;
+            }
+            apiImage = (await res.json()).image || "https://http.cat/404";
+        } catch (error) {
+            console.error(error);
+            return "https://http.cat/404";
+        } finally{
+            isLoading = false;
+        }
+    }
 </script>
 
-<!-- <div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 gap-6">
-    <LoginCard bind:currentUser={currentUser}/>
-</div> -->
+<div class="flex flex-col items-center bg-gray-50 dark:bg-gray-900 p-10 gap-6">
+    <Button onclick={getWaifu}
+    disabled={isLoading}
+    variant="outline" class="cursor-pointer dark:bg-gray-800 dark:text-gray-300"
+    >
+
+        {isLoading ? "Loading..." : "Get Image"}
+    </Button>
+    <img class="content-center h-150" src={apiImage} alt="">
+</div>
 
 {#if userState.value && (userState.value.role.toLowerCase() === 'student')}
     <div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 gap-6">
@@ -127,5 +162,10 @@
     <div class="text-center p-10 text-gray-500">
         <h2 class="text-xl">Access Restricted</h2>
         <p>You do not have permission to configure firewall policies.</p>
+    </div>
+{:else}
+    <div class="text-center p-10 text-gray-500">
+        <h2 class="text-xl">Nothing to be shown here</h2>
+        <p>You need to be signed in to access something.</p>
     </div>
 {/if}

@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { page } from "$app/stores";
     import SunIcon from "@lucide/svelte/icons/sun";
     import MoonIcon from "@lucide/svelte/icons/moon";
     import UserIcon from "@lucide/svelte/icons/user"; // Add this icon
@@ -8,7 +7,7 @@
     import { toggleMode } from "mode-watcher";
     import { Button } from "$lib/components/ui/button/index.js";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu"; // Optional: For Logout menu
-    import itkmitlLogo from "$lib/assets/img/itkmitl.svg";
+    import ITkmitlLogo from "$lib/assets/img/itkmitl.svg.svelte";
 
     // 1. Receive User Data & Emit Events
     let { currentUser, onLoginClick, onLogoutClick } = $props<{ 
@@ -25,11 +24,7 @@
             
             <div class="flex items-center space-x-3">
                 <a href="/" class="flex items-center group">
-                    <img
-                        src={itkmitlLogo}
-                        class="h-10 w-auto transition-transform duration-300 group-hover:scale-110"
-                        alt="IT KMITL Logo"
-                    />
+                    <ITkmitlLogo/>
                 </a>
             </div>
 
@@ -70,5 +65,6 @@
         </div>
     </div>
 </nav>
+
 
 <marquee class="bg-yellow-300 dark:text-black font-bold">🚨🚧 This Server is currently in maintenance 🚧🚨</marquee>

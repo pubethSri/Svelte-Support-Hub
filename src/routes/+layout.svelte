@@ -26,7 +26,7 @@
     size="xs" 
     autoclose={false} 
     class="!p-0 !rounded-[24px] overflow-hidden" 
-    bodyClass="p-0"
+    classes={{ body: "p-0" }}
 >
     <LoginCard 
         onSuccess={(userData) => {

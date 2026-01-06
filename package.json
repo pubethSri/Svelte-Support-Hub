@@ -36,6 +36,7 @@
 	},
 	"dependencies": {
 		"@fortawesome/fontawesome-free": "^7.1.0",
+		"@sveltejs/enhanced-img": "^0.9.2",
 		"mode-watcher": "^1.1.0"
 	}
 }
