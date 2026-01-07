@@ -91,12 +91,12 @@
         // }
     }
 
-    async function getWaifu() {
+    async function getImage() {
         isLoading = true;
         const token = localStorage.getItem("authToken");
 
         try{
-            const res = await fetch('http://localhost:3000/waifu', {
+            const res = await fetch('http://localhost:3000/image', {
                 method: 'GET',
                 headers: {
                     // 👇 This matches the backend code above
@@ -108,9 +108,10 @@
                 return;
             }
             apiImage = (await res.json()).image || "https://http.cat/404";
+            console.log(apiImage);
         } catch (error) {
             console.error(error);
-            return "https://http.cat/404";
+            apiImage = "https://http.cat/404";
         } finally{
             isLoading = false;
         }
@@ -118,7 +119,7 @@
 </script>
 
 <div class="flex flex-col items-center bg-gray-50 dark:bg-gray-900 p-10 gap-6">
-    <Button onclick={getWaifu}
+    <Button onclick={getImage}
     disabled={isLoading}
     variant="outline" class="cursor-pointer dark:bg-gray-800 dark:text-gray-300"
     >
