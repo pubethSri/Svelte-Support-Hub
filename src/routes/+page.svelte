@@ -1,10 +1,17 @@
 <script lang="ts">
-    import { MultiSelect, Label, Tags, Card} from "flowbite-svelte";
+    import { MultiSelect, Tags, Card} from "flowbite-svelte";
     import { Button } from "$lib/components/ui/button/index.js";
+    import Calendar from "$lib/components/ui/calendar/calendar.svelte";
+    import * as Popover from "$lib/components/ui/popover/index.js";
+    import { Label } from "$lib/components/ui/label/index.js";
+    import { Input } from "$lib/components/ui/input/index.js";
     import CDNCard from "../lib/CDNCard/CDNCard.svelte";
     import ServicesData from "$lib/sevices_ex.json";
     import webFilterData from "$lib/web_filter_ex.json";
     import { userState } from "$lib/userState.svelte";
+    import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
+    import { getLocalTimeZone } from "@internationalized/date";
+    import type { CalendarDate } from "@internationalized/date";
 
     
     let selectedService: string[] = $state([]);
@@ -15,6 +22,13 @@
     
     let apiImage: string = $state("https://www.shutterstock.com/image-vector/default-ui-image-placeholder-wireframes-600nw-1037719192.jpg");
     let isLoading = $state(false);
+
+    const id = $props.id();
+    let schedulerName = $state("");
+    let startTime = $state("");
+    let endTime = $state("");
+    let open = $state(false);
+    let value = $state<CalendarDate | undefined>();
 
     type UrlEntry = {
         id: number;
@@ -91,6 +105,51 @@
         // }
     }
 
+    async function handleDateTimeLog() {
+        if (!value) {
+            alert("Please select a date first.");
+            return;
+        }
+        if (!startTime || !endTime) {
+            alert("Please select both Start and End times.");
+            return;
+        }
+
+        if (startTime >= endTime) {
+            alert("Invalid Time: Start time must be earlier than End time.");
+            return;
+        }
+
+        // Convert CalendarDate to string (YYYY-MM-DD)
+        const dateStr = value.toString();
+
+        const logData = {
+            name: schedulerName,
+            "start-utc": Math.floor(Date.parse(`${dateStr}T${startTime}:00+07:00`) / 1000),
+            "end-utc": Math.floor(Date.parse(`${dateStr}T${endTime}:00+07:00`) / 1000)
+        };
+        const token = localStorage.getItem("authToken");
+        try{
+            const res = await fetch('http://localhost:3000/firewall/schedule/onetime/create', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify(logData)
+            });
+            console.log(res)
+            if (res.status === 401) {
+                return;
+            }
+        } catch (error) {
+            console.error(error);
+        } finally{
+            isLoading = false;
+        }
+
+        console.log("Captured Schedule:", logData);
+    }
+
     async function getImage() {
         isLoading = true;
         const token = localStorage.getItem("authToken");
@@ -130,7 +189,7 @@
 </div>
 
 {#if userState.value && (userState.value.role.toLowerCase() === 'student')}
-    <div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 gap-6">
+    <div class="min-h-screen flex flex-col items-center bg-gray-50 dark:bg-gray-900 gap-6">
         <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-md dark:bg-gray-800 dark:text-white">
             <h2 class="mb-4 text-xl font-bold dark:text-white">Create Policy</h2>
             <h3 class="mb-4 text-m dark:text-white">Select ITKMITL Services</h3>
@@ -147,7 +206,70 @@
                 Log Selected CDNs
             </Button>
         </div>
+        
+        <div class="flex gap-4">
+            <div class="flex flex-col gap-3">
+                <Label for="{id}-scheduler-name" class="px-1">Scheduler Name</Label>
+                <Input
+                type="text"
+                placeholder="Enter scheduler name"
+                id="{id}-scheduler-name"
+                bind:value={schedulerName}
+                />
+            </div>
+            <div class="flex flex-col gap-3">
+                <Label for="{id}-date" class="px-1">Date</Label>
+                <Popover.Root bind:open>
+                <Popover.Trigger id="{id}-date">
+                    {#snippet child({ props })}
+                    <Button
+                        {...props}
+                        variant="outline"
+                        class="w-32 justify-between font-normal"
+                    >
+                        {value
+                        ? value.toDate(getLocalTimeZone()).toLocaleDateString()
+                        : "Select date"}
+                        <ChevronDownIcon />
+                    </Button>
+                    {/snippet}
+                </Popover.Trigger>
+                <Popover.Content class="w-auto overflow-hidden p-0" align="start">
+                    <Calendar
+                    type="single"
+                    bind:value
+                    onValueChange={() => {
+                        open = false;
+                    }}
+                    captionLayout="dropdown"
+                    />
+                </Popover.Content>
+                </Popover.Root>
+            </div>
+            <div class="flex flex-col gap-3">
+                <Label for="{id}-time" class="px-1">Start</Label>
+                <Input
+                type="time"
+                id="{id}-time"
+                bind:value={startTime}
+                class="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                />
+            </div>
+            <div class="flex flex-col gap-3">
+                <Label for="{id}-time" class="px-1">End</Label>
+                <Input
+                type="time"
+                id="{id}-time"
+                bind:value={endTime}
+                class="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                />
+            </div>
+            <Button onclick={handleDateTimeLog} size="sm" color="blue" class="h-15">
+                Log Date&Time
+            </Button>
+        </div>
 
+        {#if userState.value && (userState.value.role.toLowerCase() === 'lecturer')}
         <div class="flex flex-wrap md:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-7xl">
             
             {#each policyCards as service}
@@ -158,6 +280,7 @@
             {/each}
 
         </div>
+        {/if}
     </div>
 {:else if userState.value}
     <div class="text-center p-10 text-gray-500">
