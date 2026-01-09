@@ -7,9 +7,6 @@
     // Icons for Social Login (Lucide doesn't have brand icons, using placeholders or similar)
     // You can replace these with actual SVGs later
     import Globe from "@lucide/svelte/icons/globe"; 
-    import Apple from "@lucide/svelte/icons/apple";
-    import Facebook from "@lucide/svelte/icons/facebook";
-    import Twitter from "@lucide/svelte/icons/twitter";
 
     let revealPassword = $state(false);
     let usernameValue = $state('');

@@ -126,14 +126,16 @@
         const logData = {
             name: schedulerName,
             "start-utc": Math.floor(Date.parse(`${dateStr}T${startTime}:00+07:00`) / 1000),
-            "end-utc": Math.floor(Date.parse(`${dateStr}T${endTime}:00+07:00`) / 1000)
+            "end-utc": Math.floor(Date.parse(`${dateStr}T${endTime}:00+07:00`) / 1000),
+            "expiration-days": 0
         };
         const token = localStorage.getItem("authToken");
         try{
             const res = await fetch('http://localhost:3000/firewall/schedule/onetime/create', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}` 
+                    'Authorization': `Bearer ${token}`,
+                    "content-type": "application/json"
                 },
                 body: JSON.stringify(logData)
             });
@@ -265,7 +267,7 @@
                 />
             </div>
             <Button onclick={handleDateTimeLog} size="sm" color="blue" class="h-15">
-                Log Date&Time
+                Create Schedule
             </Button>
         </div>
 

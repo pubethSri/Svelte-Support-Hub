@@ -1,4 +1,5 @@
 import { browser } from '$app/environment'; // <--- Import this
+import { decodeJwt, isExpired } from '$lib/jwt'
 
 type User = {
     name: string;
@@ -11,10 +12,15 @@ class UserState {
     constructor() {
         // Only run this if we are in the browser!
         if (browser) {
-            const saved = localStorage.getItem("user");
-            if (saved) {
+            const savedUser = localStorage.getItem("user");
+            const savedToken = localStorage.getItem('authToken')
+            if (!savedToken || isExpired(savedToken)) {
+                this.logout()
+                return
+            }
+            if (savedUser) {
                 try {
-                    this.value = JSON.parse(saved);
+                    this.value = JSON.parse(savedUser);
                 } catch { }
             }
         }
