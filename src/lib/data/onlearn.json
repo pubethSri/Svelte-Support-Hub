@@ -1,0 +1,34 @@
+{
+    "urlfilter": [
+        {
+            "id": null,
+            "url": "onlearn.it.kmitl.ac.th/message/",
+            "type": "simple",
+            "action": "monitor"
+        },
+        {
+            "id": null,
+            "url": "onlearn.it.kmitl.ac.th/user/files.php",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "onlearn.it.kmitl.ac.th/user/profile.php",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "onlearn.it.kmitl.ac.th",
+            "type": "simple",
+            "action": "monitor"
+        },
+        {
+            "id": null,
+            "url": "*onlearn.it.kmitl.ac.th*",
+            "type": "wildcard",
+            "action": "monitor"
+        }
+    ]
+}

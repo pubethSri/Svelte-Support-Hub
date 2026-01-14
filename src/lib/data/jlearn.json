@@ -1,0 +1,10 @@
+{
+    "urlfilter": [
+        {
+            "id": null,
+            "url": "*jlearn.it.kmitl.ac.th*",
+            "type": "wildcard",
+            "action": "monitor"
+        }
+    ]
+}

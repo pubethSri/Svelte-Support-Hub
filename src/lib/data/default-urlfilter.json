@@ -1,0 +1,118 @@
+{
+    "urlfilter": [
+        {
+            "id": 100,
+            "url": "portal.it.kmitl.ac.th",
+            "type": "simple",
+            "action": "monitor"
+        },
+        {
+            "id": 101,
+            "url": "login.it.kmitl.ac.th",
+            "type": "simple",
+            "action": "monitor"
+        },
+        {
+            "id": 102,
+            "url": "cdn.jsdelivr.net",
+            "type": "simple",
+            "action": "monitor"
+        },
+        {
+            "id": 103,
+            "url": "vjs.zencdn.net",
+            "type": "simple",
+            "action": "monitor"
+        },
+        {
+            "id": 104,
+            "url": "*.bootstrapcdn.com",
+            "type": "wildcard",
+            "action": "monitor"
+        },
+        {
+            "id": 105,
+            "url": "unpkg.com",
+            "type": "simple",
+            "action": "monitor"
+        },
+        {
+            "id": 106,
+            "url": "*.alicdn.com",
+            "type": "wildcard",
+            "action": "monitor"
+        },
+        {
+            "id": 107,
+            "url": "*sectigostore.com",
+            "type": "wildcard",
+            "action": "monitor"
+        },
+        {
+            "id": 108,
+            "url": "*sectigo.com",
+            "type": "wildcard",
+            "action": "monitor"
+        },
+        {
+            "id": 109,
+            "url": "*/favicon.ico",
+            "type": "wildcard",
+            "action": "monitor"
+        },
+        {
+            "id": 110,
+            "url": "fonts.googleapis.com",
+            "type": "simple",
+            "action": "monitor"
+        },
+        {
+            "id": 111,
+            "url": "msftconnecttest.com",
+            "type": "simple",
+            "action": "monitor"
+        },
+        {
+            "id": 112,
+            "url": "edge-http.microsoft.com",
+            "type": "simple",
+            "action": "monitor"
+        },
+        {
+            "id": 113,
+            "url": "msftncsi.com",
+            "type": "simple",
+            "action": "monitor"
+        },
+        {
+            "id": 114,
+            "url": "gstatic.com",
+            "type": "simple",
+            "action": "monitor"
+        },
+        {
+            "id": 115,
+            "url": "www.gstatic.com",
+            "type": "simple",
+            "action": "monitor"
+        },
+        {
+            "id": 116,
+            "url": "clients3.google.com",
+            "type": "simple",
+            "action": "monitor"
+        },
+        {
+            "id": 117,
+            "url": "connectivitycheck.gstatic.com",
+            "type": "simple",
+            "action": "monitor"
+        },
+        {
+            "id": 118,
+            "url": "*",
+            "type": "wildcard",
+            "action": "block"
+        }
+    ]
+}

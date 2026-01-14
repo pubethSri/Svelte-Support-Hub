@@ -1,0 +1,22 @@
+{
+    "urlfilter": [
+        {
+            "id": null,
+            "url": "lh3.google*",
+            "type": "wildcard",
+            "action": "monitor"
+        },
+        {
+            "id": null,
+            "url": "accounts.google.co*",
+            "type": "wildcard",
+            "action": "monitor"
+        },
+        {
+            "id": null,
+            "url": "*.googleapis.com",
+            "type": "wildcard",
+            "action": "monitor"
+        }
+    ]
+}
