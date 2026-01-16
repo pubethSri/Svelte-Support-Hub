@@ -1,9 +1,11 @@
 {
     "services": [
         "On:learn",
-        "No:learn",
         "J:learn",
+        "WebDev",
+        "KITS",
         "DB:learn",
+        "No:learn",
         "<E>judge",
         "<U>judge",
         "<I>judge",

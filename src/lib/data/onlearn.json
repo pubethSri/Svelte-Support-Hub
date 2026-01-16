@@ -4,7 +4,7 @@
             "id": null,
             "url": "onlearn.it.kmitl.ac.th/message/",
             "type": "simple",
-            "action": "monitor"
+            "action": "block"
         },
         {
             "id": null,
@@ -22,12 +22,6 @@
             "id": null,
             "url": "onlearn.it.kmitl.ac.th",
             "type": "simple",
-            "action": "monitor"
-        },
-        {
-            "id": null,
-            "url": "*onlearn.it.kmitl.ac.th*",
-            "type": "wildcard",
             "action": "monitor"
         }
     ]

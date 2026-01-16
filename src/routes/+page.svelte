@@ -10,11 +10,21 @@
     import { getLocalTimeZone, type CalendarDate } from "@internationalized/date";
     import { userState } from "$lib/userState.svelte";
     import ServicesData from "$lib/services_ex.json";
+    import Loader2 from "@lucide/svelte/icons/loader-2";
     import onlearn from '$lib/data/onlearn.json';
+    import defaultUrlFilter from '$lib/data/default-urlfilter.json';
     import jlearn from '$lib/data/jlearn.json';
     import googleLogin from '$lib/data/google-login.json';
-    import defaultUrlFilter from '$lib/data/default-urlfilter.json';
-    import Loader2 from "@lucide/svelte/icons/loader-2";
+    import dblearn from '$lib/data/dblearn.json';
+    import nolearn from '$lib/data/nolearn.json';
+    import ujudge from '$lib/data/ujudge.json';
+    import ejudge from '$lib/data/secspace.json';
+    import ijudge from '$lib/data/ijudge.json';
+    import secspace from '$lib/data/secspace.json';
+    import kits from '$lib/data/kits.json';
+    import webdev from '$lib/data/webdev.json';
+
+
 
     type UrlFilterEntry = {
     id: number | null;
@@ -27,23 +37,18 @@
     urlfilter: UrlFilterEntry[];
     };
 
-    type Profile = 'onlearn' | 'jlearn' | 'googleLogin' | 'default';
-
     let isDeploying = $state(false);
 
     // --- 1. STATE: FORM DATA ---
     let policyName = $state("");
     let srcRooms = $state<string[]>([]);
     
-    // URL Filter Selection
-    let selectedUrlFilters = $state<string[]>([]);
-    
     // Schedule State
     let dateValue = $state<CalendarDate | undefined>();
     let startTime = $state("");
     let endTime = $state("");
 
-    let selectedProfiles = $state<Profile[]>([]);
+    let selectedProfiles = $state<string[]>([]);
 
     // --- 2. STATE: DROPDOWN OPTIONS (Mocked or Fetched) ---
     let interfaces = $state<{value: string, name: string}[]>([]);
@@ -103,21 +108,21 @@
                     "srcaddr": srcRooms.map(room => ({
                         name: `VLAN ${room} address`
                     })),
-                    "dstaddr": [{ "name": "all" }]
-                },
-                "service": [
-                {
-                    "name": "ALL"
+                    "dstaddr": [{ "name": "all" }],
+                    "service": [
+                    {
+                        "name": "ALL"
+                    }
+                    ],
+                    "action": "accept",
+                    "schedule": "",
+                    "inspection-mode": "proxy",
+                    "webfilter-profile": "",
+                    "utm-status": "enable",
+                    "ssl-ssh-profile": "certificate-inspection",
+                    "logtraffic": "all",
+                    "status": "enable"
                 }
-                ],
-                "action": "accept",
-                "schedule": "",
-                "inspection-mode": "proxy",
-                "webfilter-profile": "",
-                "utm-status": "enable",
-                "ssl-ssh-profile": "certificate-inspection",
-                "logtraffic": "all",
-                "status": "enable"
             },
             "urlfilter": {
                 "id": 0,
@@ -136,10 +141,11 @@
         console.log("Submitting Payload:", JSON.stringify(finalPayload, null, 2));
 
         try{
-            const response = await fetch('http://localhost:3000/firewall/policy/create/fullhouse', {
+            const response = await fetch('http://10.30.23.13:3000/firewall/policy/create/fullhouse', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'authorization': `Bearer ${localStorage.getItem("authToken")}`
                 },
                 body: JSON.stringify(finalPayload)
             });
@@ -158,18 +164,46 @@
         }
     }
 
-    function buildUrlFilterPayload(profiles: Profile[]): UrlFilterPayload {
+    function buildUrlFilterPayload(profiles: string[]): UrlFilterPayload {
         let entries: UrlFilterEntry[] = [];
 
         for (const profile of profiles) {
-            if (profile === 'onlearn') {
-            entries.push(...(onlearn.urlfilter as UrlFilterEntry[]));
+            switch (profile) {
+                case 'On:learn':
+                    entries.push(...(onlearn.urlfilter as UrlFilterEntry[]));
+                    break;
+                case 'J:learn':
+                    entries.push(...(jlearn.urlfilter as UrlFilterEntry[]));
+                    break;
+                case 'DB:learn':
+                    entries.push(...(dblearn.urlfilter as UrlFilterEntry[]));
+                    break;
+                case 'No:learn':
+                    entries.push(...(nolearn.urlfilter as UrlFilterEntry[]));
+                    break;
+                case 'U:judge':
+                    entries.push(...(ujudge.urlfilter as UrlFilterEntry[]));
+                    break;
+                case 'E:judge':
+                    entries.push(...(ejudge.urlfilter as UrlFilterEntry[]));
+                    break;
+                case 'I:judge':
+                    entries.push(...(ijudge.urlfilter as UrlFilterEntry[]));
+                    break;
+                case 'Secspace':
+                    entries.push(...(secspace.urlfilter as UrlFilterEntry[]));
+                    break;
+                case 'KITS':
+                    entries.push(...(kits.urlfilter as UrlFilterEntry[]));
+                    break;
+                case 'WebDev':
+                    entries.push(...(webdev.urlfilter as UrlFilterEntry[]));
+                    break;
             }
+        }
 
-            if (profile === 'jlearn') {
-            entries.push(...(jlearn.urlfilter as UrlFilterEntry[]));
-            entries.push(...(googleLogin.urlfilter as UrlFilterEntry[])); // mandatory add-on
-            }
+        if (["J:learn", "DB:learn", "No:learn", "U:judge", "Secspace", "KITS"].some(p => profiles.includes(p))) {
+            entries.push(...(googleLogin.urlfilter as UrlFilterEntry[]));
         }
 
         // default filter must always be last
@@ -188,11 +222,11 @@
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 flex flex-col items-center gap-6">
     
     <div class="w-full max-w-4xl flex justify-between items-center">
-        <h1 class="text-2xl font-bold dark:text-white">Firewall Policy Configuration</h1>
+        <h1 class="text-2xl font-bold dark:text-white">Policy Creation</h1>
     </div>
 
     {#if userState.value} 
-        {#if userState.value.role.toLowerCase() === 'student'}
+        {#if userState.value.name === 'it66070030' || userState.value.role.toLowerCase() === 'lecturer' || userState.value.name.toLowerCase() === 'montree' }
         <div class="w-full max-w-4xl bg-white dark:bg-gray-800 p-6 rounded-lg shadow space-y-8">
             
             <div class="space-y-4">
@@ -201,7 +235,7 @@
                     
                     <div class="col-span-2">
                         <Label class="mb-2">Policy Name</Label>
-                        <Input type="text" placeholder="e.g. Allow-Web-Access" bind:value={policyName} />
+                        <Input type="text" placeholder="ex. [Exam] Some Exam Name" bind:value={policyName} />
                     </div>
 
                     <div class="col-span-2">
@@ -214,16 +248,16 @@
             </div>
 
             <div class="space-y-4">
-                <h3 class="text-lg font-semibold border-b pb-2 dark:text-white">2. URL Filter Profiles</h3>
+                <h3 class="text-lg font-semibold border-b pb-2 dark:text-white">2. Pass Services</h3>
                 <div>
-                    <Label class="mb-2">Select Profiles</Label>
-                    <MultiSelect items={urlTemplates} bind:value={selectedUrlFilters} />
-                    <p class="text-xs text-gray-500 mt-1">Select one or more templates to apply.</p>
+                    <Label class="mb-2">Select Services to let it passthrough</Label>
+                    <MultiSelect items={urlTemplates} bind:value={selectedProfiles} />
+                    <p class="text-xs text-gray-500 mt-1">Select one or more services to apply.</p>
                 </div>
             </div>
 
             <div class="space-y-4">
-                <h3 class="text-lg font-semibold border-b pb-2 dark:text-white">3. One-Time Schedule</h3>
+                <h3 class="text-lg font-semibold border-b pb-2 dark:text-white">3. Schedule</h3>
                 <div class="flex flex-wrap gap-4 items-end">
                     
                     <div class="flex flex-col gap-2">

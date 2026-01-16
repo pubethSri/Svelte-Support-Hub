@@ -29,7 +29,7 @@
         isLoading = true;
         errorMessage = "";
         try {
-            const response = await fetch('http://localhost:3000/auth/login', {
+            const response = await fetch('http://10.30.23.13:3000/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: usernameValue, password: passwordValue })
@@ -66,7 +66,7 @@
                 class="h-[50px] rounded-full bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-0 px-6 text-base" 
                 id="username" 
                 type="text" 
-                placeholder="Username/Email" 
+                placeholder="IT Username" 
                 bind:value={usernameValue} 
                 required 
             />
