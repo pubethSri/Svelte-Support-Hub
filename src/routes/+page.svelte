@@ -121,7 +121,8 @@
                     "utm-status": "enable",
                     "ssl-ssh-profile": "certificate-inspection",
                     "logtraffic": "all",
-                    "status": "enable"
+                    "status": "enable",
+                    "comments": "Created via API don't edit or delete"
                 }
             },
             "urlfilter": {
@@ -141,7 +142,7 @@
         console.log("Submitting Payload:", JSON.stringify(finalPayload, null, 2));
 
         try{
-            const response = await fetch('http://10.30.23.13:3000/firewall/policy/create/fullhouse', {
+            const response = await fetch('http://localhost:3000/firewall/policy/create/fullhouse', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -226,7 +227,7 @@
     </div>
 
     {#if userState.value} 
-        {#if userState.value.name === 'it66070030' || userState.value.role.toLowerCase() === 'lecturer' || userState.value.name.toLowerCase() === 'montree' }
+        {#if userState.value.name.toLowerCase() === 'mr.jirathip kapanya' || userState.value.role.toLowerCase() === 'lecturer' || userState.value.name.toLowerCase() === 'montree' }
         <div class="w-full max-w-4xl bg-white dark:bg-gray-800 p-6 rounded-lg shadow space-y-8">
             
             <div class="space-y-4">

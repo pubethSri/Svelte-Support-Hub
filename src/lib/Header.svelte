@@ -16,16 +16,34 @@
         onLogoutClick: () => void
     }>();
 
+    function canViewAdmin(user: any) {
+        if (!user) return false;
+        return user.name.toLowerCase() === 'mr.jirathip kapanya' || 
+               user.role.toLowerCase() === 'lecturer' || 
+               user.name.toLowerCase() === 'montree';
+    }
+
 </script>
 
 <nav class="bg-white dark:bg-gray-900 shadow-md sticky top-0 left-0 w-full z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20">
         <div class="h-full flex justify-between items-center py-4">
             
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center gap-8">
                 <a href="/" class="flex items-center group">
                     <ITkmitlLogo/>
                 </a>
+
+                {#if canViewAdmin(currentUser)}
+                    <div class="hidden md:flex items-center gap-6">
+                        <a href="/" class="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-200 dark:hover:text-blue-400">
+                            Create Policy
+                        </a>
+                        <a href="/active" class="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-200 dark:hover:text-blue-400">
+                            Active Policies
+                        </a>
+                    </div>
+                {/if}
             </div>
 
             <div class="flex items-center gap-4">
