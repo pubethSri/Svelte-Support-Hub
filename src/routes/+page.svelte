@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { goto } from '$app/navigation';
     import { onMount } from "svelte";
     import { Button } from "$lib/components/ui/button/index.js";
     import { Input } from "$lib/components/ui/input/index.js";
@@ -139,8 +140,6 @@
             }
         };
 
-        console.log("Submitting Payload:", JSON.stringify(finalPayload, null, 2));
-
         try{
             const response = await fetch('http://localhost:3000/firewall/policy/create/fullhouse', {
                 method: 'POST',
@@ -156,6 +155,8 @@
             }
 
             alert("Policy created successfully!");
+
+            goto('/active');
         } catch (error) {
             console.error("Error creating policy:", error);
             alert("Failed to create policy. Please try again.");

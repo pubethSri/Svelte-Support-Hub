@@ -61,7 +61,7 @@
         isDeleting = true;
         try {
             const token = localStorage.getItem("authToken");
-            const res = await fetch(`http://localhost:3000/firewall/schedule/onetime/${policyName}`, { // Adjust endpoint if needed
+            const res = await fetch(`http://localhost:3000/firewall/policies/fullhouse/delete/${policyName}`, { // Adjust endpoint if needed
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -117,8 +117,8 @@
                         <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
                                 <th scope="col" class="px-6 py-3">Policy Name</th>
-                                <th scope="col" class="px-6 py-3">Schedule</th>
                                 <th scope="col" class="px-6 py-3">Source Address</th>
+                                <th scope="col" class="px-6 py-3">Schedule</th>
                                 <th scope="col" class="px-6 py-3">Status</th>
                                 <th scope="col" class="px-6 py-3 text-right">Actions</th>
                             </tr>
