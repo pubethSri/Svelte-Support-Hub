@@ -27,8 +27,6 @@
     import googleClassroom from '$lib/data/google-classroom.json';
     import googleDrive from '$lib/data/google-drive.json';
 
-
-
     type UrlFilterEntry = {
     id: number | null;
     url: string;
@@ -54,7 +52,6 @@
     let selectedProfiles = $state<string[]>([]);
 
     // --- 2. STATE: DROPDOWN OPTIONS (Mocked or Fetched) ---
-    let interfaces = $state<{value: string, name: string}[]>([]);
     let addresses = $state<{value: string, name: string}[]>([]);
     let urlTemplates = $state<{value: string, name: string}[]>([]);
 
@@ -81,6 +78,14 @@
 
     // --- 4. SUBMIT HANDLER ---
     async function handleMasterSubmit() {
+        if (policyName.trim() === "") {
+            alert("Please enter a valid policy name.");
+            return;
+        }
+        if (!policyName.startsWith("Midterm ")) {
+            alert('Policy name must start with "Midterm ".');
+            return;
+        }
         if (!dateValue || !startTime || !endTime) {
             alert("Please complete the schedule fields.");
             return;
@@ -154,7 +159,6 @@
             }
 
             alert("Policy created successfully!");
-            console.log("Policy creation response:", await response.json());
 
             goto('/active');
         } catch (error) {
@@ -183,13 +187,13 @@
                 case 'No:learn':
                     entries.push(...(nolearn.urlfilter as UrlFilterEntry[]));
                     break;
-                case 'U:judge':
+                case '<U>judge':
                     entries.push(...(ujudge.urlfilter as UrlFilterEntry[]));
                     break;
-                case 'E:judge':
+                case '<E>judge':
                     entries.push(...(ejudge.urlfilter as UrlFilterEntry[]));
                     break;
-                case 'I:judge':
+                case '<I>judge':
                     entries.push(...(ijudge.urlfilter as UrlFilterEntry[]));
                     break;
                 case 'Secspace':
@@ -244,7 +248,8 @@
                     
                     <div class="col-span-2">
                         <Label class="mb-2">Policy Name</Label>
-                        <Input type="text" placeholder="ex. [Exam] Some Exam Name" bind:value={policyName} />
+                        <Input type="text" placeholder="ex. Midterm <name>" bind:value={policyName} />
+                        <p class="text-xs text-gray-500 mt-1">Please include "Midterm" followed by the exam name.</p>
                     </div>
 
                     <div class="col-span-2">
