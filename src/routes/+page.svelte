@@ -27,6 +27,8 @@
     import googleClassroom from '$lib/data/google-classroom.json';
     import googleDrive from '$lib/data/google-drive.json';
 
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+
     type UrlFilterEntry = {
     id: number | null;
     url: string;
@@ -145,7 +147,7 @@
         };
 
         try{
-            const response = await fetch('http://localhost:3000/firewall/policy/create/fullhouse', {
+            const response = await fetch(`${BACKEND_URL}/firewall/policy/create/fullhouse`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -239,7 +241,7 @@
     </div>
 
     {#if userState.value} 
-        {#if userState.value.name.toLowerCase() === 'mr.jirathip kapanya' || userState.value.role.toLowerCase() === 'lecturer' || userState.value.name.toLowerCase() === 'montree' }
+        {#if userState.value.name.toLowerCase() === 'mr.jirathip kapanya' || userState.value.role.toLowerCase() === 'lecturer' || userState.value.name.toLowerCase() === 'montree kingkaew' || userState.value.name.toLowerCase() === 'mr.pubeth sriwattana' || userState.value.name.toLowerCase() === 'นายจารุกิตติ์ ศรีพาเพลิน' || userState.value.name.toLowerCase() === 'นายชญานนท์ สุภากิจ'}
         <div class="w-full max-w-4xl bg-white dark:bg-gray-800 p-6 rounded-lg shadow space-y-8">
             
             <div class="space-y-4">

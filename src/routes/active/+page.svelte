@@ -4,7 +4,8 @@
     import { Button } from "$lib/components/ui/button/index.js";
     import Loader2 from "@lucide/svelte/icons/loader-2";
     import RefreshCw from "@lucide/svelte/icons/refresh-cw";
-    import Trash2 from "@lucide/svelte/icons/trash-2";
+
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
     // 1. Update Type to include start/end times
     type Policy = {
@@ -49,7 +50,7 @@
             const headers = { 'Authorization': `Bearer ${token}` };
 
             // A. Fetch Policies
-            const res = await fetch('http://localhost:3000/firewall/policies', { headers });
+            const res = await fetch(`${BACKEND_URL}/firewall/policies`, { headers });
             if (!res.ok) throw new Error("Failed to fetch");
             const data = await res.json();
             
@@ -63,7 +64,7 @@
                 // 1. Fetch Schedule (Existing Logic)
                 if (policy.schedule) {
                     try {
-                        const schedRes = await fetch(`http://localhost:3000/firewall/schedule/onetime/${encodeURIComponent(policy.schedule)}`, { headers });
+                        const schedRes = await fetch(`${BACKEND_URL}/firewall/schedule/onetime/${encodeURIComponent(policy.schedule)}`, { headers });
                         if (schedRes.ok) {
                             const schedData = await schedRes.json();
                             if (schedData.results?.[0]) {
@@ -81,7 +82,7 @@
                     try {
                         // We assume the URL Filter Name matches the WebFilter Profile Name 
                         // (Based on your "Fullhouse" creation logic)
-                        const wfRes = await fetch(`http://localhost:3000/firewall/webfilter/urlfilter/${encodeURIComponent(wfName)}`, { headers });
+                        const wfRes = await fetch(`${BACKEND_URL}/firewall/webfilter/urlfilter/${encodeURIComponent(wfName)}`, { headers });
                         
                         if (wfRes.ok) {
                             const wfData = await wfRes.json();
@@ -114,7 +115,7 @@
         try {
             const token = localStorage.getItem("authToken");
             const res = await fetch(
-                `http://localhost:3000/firewall/policies/fullhouse/delete/${policyName}`,
+                `${BACKEND_URL}/firewall/policies/fullhouse/delete/${policyName}`,
                 {
                     method: "DELETE",
                     headers: { Authorization: `Bearer ${token}` },
@@ -228,7 +229,7 @@
         </Button>
     </div>
 
-    {#if userState.value && (userState.value.name.toLowerCase() === "mr.jirathip kapanya" || userState.value.role.toLowerCase() === "lecturer" || userState.value.name.toLowerCase() === "montree")}
+    {#if userState.value && (userState.value.name.toLowerCase() === 'mr.jirathip kapanya' || userState.value.role.toLowerCase() === 'lecturer' || userState.value.name.toLowerCase() === 'montree kingkaew' || userState.value.name.toLowerCase() === 'mr.pubeth sriwattana' || userState.value.name.toLowerCase() === 'นายจารุกิตติ์ ศรีพาเพลิน' || userState.value.name.toLowerCase() === 'นายชญานนท์ สุภากิจ')}
         <div
             class="w-full max-w-6xl bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden"
         >

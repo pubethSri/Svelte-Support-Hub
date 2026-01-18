@@ -8,6 +8,8 @@
     // You can replace these with actual SVGs later
     import Globe from "@lucide/svelte/icons/globe"; 
 
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+
     let revealPassword = $state(false);
     let usernameValue = $state('');
     let passwordValue = $state('');
@@ -29,7 +31,7 @@
         isLoading = true;
         errorMessage = "";
         try {
-            const response = await fetch('http://localhost:3000/auth/login', {
+            const response = await fetch(`${BACKEND_URL}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: usernameValue, password: passwordValue })
