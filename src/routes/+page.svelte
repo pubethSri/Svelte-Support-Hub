@@ -24,6 +24,8 @@
     import secspace from '$lib/data/secspace.json';
     import kits from '$lib/data/kits.json';
     import webdev from '$lib/data/webdev.json';
+    import googleClassroom from '$lib/data/google-classroom.json';
+    import googleDrive from '$lib/data/google-drive.json';
 
 
 
@@ -62,9 +64,6 @@
 
     // --- 3. FETCH OPTIONS ON LOAD ---
     onMount(async () => {
-        const token = localStorage.getItem("authToken");
-        const headers = { 'Authorization': `Bearer ${token}` };
-
         try {
             const addrData = [203, 205, 207, 304, 306, 308, 428, 434];
             if (addrData && addrData.length > 0) {
@@ -107,7 +106,7 @@
                     "srcintf": [{ "name": "[Zone]Lab" }],
                     "dstintf": [{ "name": "any" }],
                     "srcaddr": srcRooms.map(room => ({
-                        name: `VLAN ${room} address`
+                        name: `[Subnet]Lab ${room} - VLAN ${room}`
                     })),
                     "dstaddr": [{ "name": "all" }],
                     "service": [
@@ -155,6 +154,7 @@
             }
 
             alert("Policy created successfully!");
+            console.log("Policy creation response:", await response.json());
 
             goto('/active');
         } catch (error) {
@@ -201,11 +201,18 @@
                 case 'WebDev':
                     entries.push(...(webdev.urlfilter as UrlFilterEntry[]));
                     break;
+                case 'Google Classroom':
+                    entries.push(...(googleClassroom.urlfilter as UrlFilterEntry[]));
+                    break;
             }
         }
 
-        if (["J:learn", "DB:learn", "No:learn", "U:judge", "Secspace", "KITS"].some(p => profiles.includes(p))) {
+        if (["J:learn", "DB:learn", "No:learn", "U:judge", "Secspace", "KITS", "Google Classroom"].some(p => profiles.includes(p))) {
             entries.push(...(googleLogin.urlfilter as UrlFilterEntry[]));
+        }
+
+        if (["Google Classroom"].some(p => profiles.includes(p))) {
+            entries.push(...(googleDrive.urlfilter as UrlFilterEntry[]));
         }
 
         // default filter must always be last
@@ -254,7 +261,7 @@
                 <div>
                     <Label class="mb-2">Select Services to let it passthrough</Label>
                     <MultiSelect items={urlTemplates} bind:value={selectedProfiles} />
-                    <p class="text-xs text-gray-500 mt-1">Select one or more services to apply.</p>
+                    <p class="text-xs text-gray-500 mt-1">Select services to apply.</p>
                 </div>
             </div>
 

@@ -1,0 +1,16 @@
+{
+    "urlfilter": [
+        {
+            "id": null,
+            "url": "drive.usercontent.google.com",
+            "type": "simple",
+            "action": "monitor"
+        },
+        {
+            "id": null,
+            "url": "drive.google.com",
+            "type": "simple",
+            "action": "monitor"
+        }
+    ]
+}

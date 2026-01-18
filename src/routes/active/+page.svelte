@@ -14,6 +14,7 @@
         srcaddr: { name: string }[];
         dstaddr: { name: string }[];
         status: string;
+        comments: string;
     };
 
     let policies = $state<Policy[]>([]);
@@ -23,7 +24,17 @@
 
     // Helper to format Source Addresses (which is an array)
     function formatAddr(addrs: { name: string }[]) {
-        return addrs.map(a => a.name).join(", ");
+        return addrs.map(a => {
+            // 1. Remove the prefix tag like "[Subnet]"
+            let cleanName = a.name.replace(/^\[.*?\]/, '').trim();
+            
+            // 2. Remove the suffix starting with " -" (e.g., " - VLAN 304")
+            if (cleanName.includes(' -')) {
+                cleanName = cleanName.split(' -')[0].trim();
+            }
+            
+            return cleanName;
+        }).join(", ");
     }
 
     async function fetchPolicies() {
@@ -44,7 +55,7 @@
             // Handle different API response structures (e.g., { results: [...] } vs [...])
             const rawList: Policy[] = data.results || (Array.isArray(data) ? data : []);
 
-            policies = rawList;
+            policies = rawList.filter(p => p.comments === "Created via API don't edit or delete");
 
         } catch (err) {
             console.error(err);
@@ -117,7 +128,7 @@
                         <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
                                 <th scope="col" class="px-6 py-3">Policy Name</th>
-                                <th scope="col" class="px-6 py-3">Source Address</th>
+                                <th scope="col" class="px-6 py-3">Room</th>
                                 <th scope="col" class="px-6 py-3">Schedule</th>
                                 <th scope="col" class="px-6 py-3">Status</th>
                                 <th scope="col" class="px-6 py-3 text-right">Actions</th>

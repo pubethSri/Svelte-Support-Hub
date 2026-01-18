@@ -2,26 +2,20 @@
     "urlfilter": [
         {
             "id": null,
-            "url": "lh3.google*",
+            "url": "classroom.google.com",
             "type": "wildcard",
             "action": "monitor"
         },
         {
             "id": null,
-            "url": "accounts.google.co*",
+            "url": "clients6.google.com",
             "type": "wildcard",
             "action": "monitor"
         },
         {
             "id": null,
-            "url": "*.googleapis.com",
-            "type": "wildcard",
-            "action": "monitor"
-        },
-        {
-            "id": null,
-            "url": "ogs.google.com",
-            "type": "wildcard",
+            "url": "edu.google.com",
+            "type": "simple",
             "action": "monitor"
         }
     ]
