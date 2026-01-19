@@ -1,0 +1,256 @@
+{
+    "urlfilter": [
+        {
+            "id": null,
+            "url": "*openai*",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*.chatgpt.*",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*.ai",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "cdn.oaistatic.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "gemini.google.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "aistudio.google.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "copilot.microsoft.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*githubcopilot.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*copilot-proxy.githubusercontent.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*deepseek.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*tabnine.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "t3.chat",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*codeium.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*.groq.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "sydney.bing.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "edgeservices.bing.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "www.bing.com/chat",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "www.bing.com/new",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "bing.com/new",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "cloudflareclient.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*.cloudflareclient.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "openvpn.net",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*wireguard.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "proton.me",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*phind.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*poe.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "you.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "default.exp-tas.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "github.com/copilot",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "github.com/github-copilot*",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "chatlyai.app",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*aichat*",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*claila.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "bing.com/chat",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "protonvpn.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "nordvpn.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "expressvpn.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*.vpn*",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*.proxy*",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*.chat",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "chat.*",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*.it.kmitl.ac.th",
+            "type": "wildcard",
+            "action": "monitor"
+        }
+    ]
+}

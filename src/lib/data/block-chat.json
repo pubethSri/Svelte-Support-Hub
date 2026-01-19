@@ -1,0 +1,142 @@
+{
+    "urlfilter": [
+        {
+            "id": null,
+            "url": "*.y8.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*discord*",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*facebook.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "x.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*messenger.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*instagram.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*telegram*",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "whatsapp.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "twitter.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "t.me",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "tiktok.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*.line.naver.jp",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "www2.it.kmitl.ac.th",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "www3.it.kmitl.ac.th",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "m.me",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "messenger.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*.whatsapp.net",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*.whatsapp.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "wechat.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "wx.qq.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "slack.com",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*chatapp*",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "mail.google.com",
+            "type": "simple",
+            "action": "block"
+        }
+    ]
+}
