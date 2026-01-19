@@ -6,4 +6,7 @@ import { enhancedImages } from '@sveltejs/enhanced-img';
 
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit(), enhancedImages()],
+	server: {
+		allowedHosts: ['netblocker.it.kmitl.ac.th']
+	}
 });

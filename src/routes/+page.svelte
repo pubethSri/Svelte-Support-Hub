@@ -26,8 +26,9 @@
     import webdev from '$lib/data/webdev.json';
     import googleClassroom from '$lib/data/google-classroom.json';
     import googleDrive from '$lib/data/google-drive.json';
+    import { env } from "$env/dynamic/public";
 
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+    const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
     type UrlFilterEntry = {
     id: number | null;
@@ -84,8 +85,8 @@
             alert("Please enter a valid policy name.");
             return;
         }
-        if (!policyName.startsWith("Midterm ")) {
-            alert('Policy name must start with "Midterm ".');
+        if (policyName.length > 22){
+            alert("Policy name must not exceed 22 characters.");
             return;
         }
         if (!dateValue || !startTime || !endTime) {
@@ -109,7 +110,7 @@
         const finalPayload = {
             "policies": {
                 "json": {
-                    "name": policyName,
+                    "name": `[EXAM][API] ${policyName}`,
                     "srcintf": [{ "name": "[Zone]Lab" }],
                     "dstintf": [{ "name": "any" }],
                     "srcaddr": srcRooms.map(room => ({
@@ -123,10 +124,11 @@
                     ],
                     "action": "accept",
                     "schedule": "",
-                    "inspection-mode": "proxy",
+                    "inspection-mode": "flow",
                     "webfilter-profile": "",
                     "utm-status": "enable",
-                    "ssl-ssh-profile": "certificate-inspection",
+                    "ssl-ssh-profile": "full-deep-inspection",
+                    "application-list": "allow-web-only",
                     "logtraffic": "all",
                     "status": "enable",
                     "comments": "Created via API don't edit or delete"
@@ -134,12 +136,12 @@
             },
             "urlfilter": {
                 "id": 0,
-                "name": policyName,
+                "name": `[EXAM][API] ${policyName}`,
                 "comment": "This WebFilter is created via API",
                 "entries": buildUrlFilterPayload(selectedProfiles).urlfilter
             },
             "onetime_schedule": {
-                "name": policyName,
+                "name": `[EXAM][API] ${policyName}`,
                 "start-utc": startUnix,
                 "end-utc": endUnix,
                 "expiration-days": 0

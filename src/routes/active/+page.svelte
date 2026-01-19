@@ -4,8 +4,9 @@
     import { Button } from "$lib/components/ui/button/index.js";
     import Loader2 from "@lucide/svelte/icons/loader-2";
     import RefreshCw from "@lucide/svelte/icons/refresh-cw";
+    import { env } from "$env/dynamic/public";
 
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+    const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
     // 1. Update Type to include start/end times
     type Policy = {
@@ -88,6 +89,7 @@
                             const wfData = await wfRes.json();
                             // Access results[0].entries based on your JSON structure
                             if (wfData.results?.[0]?.entries) {
+                                console.log(`Detecting template for policy ${policy.name} using webfilter ${wfName}`);
                                 updates.templateName = detectTemplate(wfData.results[0].entries);
                             }
                         }

@@ -26,6 +26,7 @@
 		"flowbite-svelte": "^1.30.0",
 		"flowbite-svelte-icons": "^3.0.1",
 		"svelte": "^5.43.8",
+		"svelte-adapter-bun": "^1.0.1",
 		"svelte-check": "^4.3.4",
 		"tailwind-merge": "^3.4.0",
 		"tailwind-variants": "^3.2.2",

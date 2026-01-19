@@ -3,12 +3,13 @@
     import { Button } from "$lib/components/ui/button/index.js";
     import { Input } from "$lib/components/ui/input/index.js";
     import { Eye, EyeOff, X } from "@lucide/svelte/icons";
+    import { env } from "$env/dynamic/public";
 
     // Icons for Social Login (Lucide doesn't have brand icons, using placeholders or similar)
     // You can replace these with actual SVGs later
     import Globe from "@lucide/svelte/icons/globe"; 
 
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+    const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
     let revealPassword = $state(false);
     let usernameValue = $state('');

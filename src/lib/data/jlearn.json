@@ -5,6 +5,24 @@
             "url": "jlearn.it.kmitl.ac.th",
             "type": "wildcard",
             "action": "monitor"
+        },
+        {
+            "id": null,
+            "url": "netbeans.apache.org/tutorial",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "netbeans.apache.org/front",
+            "type": "simple",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "netbeans.apache.org",
+            "type": "wildcard",
+            "action": "monitor"
         }
     ]
 }
