@@ -18,9 +18,12 @@
 
     function canViewAdmin(user: any) {
         if (!user) return false;
-        return user.name.toLowerCase() === 'mr.jirathip kapanya' || 
-               user.role.toLowerCase() === 'lecturer' || 
-               user.name.toLowerCase() === 'montree';
+        return user.value.name.toLowerCase() === 'mr.jirathip kapanya'
+            || user.value.role.toLowerCase() === 'lecturer'
+            || user.value.name.toLowerCase() === 'montree kingkaew'
+            || user.value.name.toLowerCase() === 'mr.pubeth sriwattana'
+            || user.value.name.toLowerCase() === 'นายจารุกิตติ์ ศรีพาเพลิน'
+            || user.value.name.toLowerCase() === 'นายชญานนท์ สุภากิจ';
     }
 
 </script>

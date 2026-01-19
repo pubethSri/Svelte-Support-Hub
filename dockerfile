@@ -7,7 +7,9 @@ RUN bun install
 
 COPY . .
 
-# Vite dev server OR preview server
+ARG VITE_BACKEND_URL
+ENV VITE_BACKEND_URL=${VITE_BACKEND_URL}
+
 EXPOSE 5173
 
 CMD ["bun", "run", "dev", "--host"]
