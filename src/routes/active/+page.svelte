@@ -23,7 +23,7 @@
         // Enriched Data
         start?: string;
         end?: string;
-        templateName?: string; // e.g. "Google Classroom"
+        templateNames?: string[]; // e.g. "Google Classroom"
     };
 
     let policies = $state<Policy[]>([]);
@@ -87,10 +87,8 @@
                         
                         if (wfRes.ok) {
                             const wfData = await wfRes.json();
-                            // Access results[0].entries based on your JSON structure
                             if (wfData.results?.[0]?.entries) {
-                                console.log(`Detecting template for policy ${policy.name} using webfilter ${wfName}`);
-                                updates.templateName = detectTemplate(wfData.results[0].entries);
+                                updates.templateNames = detectTemplate(wfData.results[0].entries);
                             }
                         }
                     } catch (e) { console.error(`Webfilter fetch failed for ${policy.name}`); }
@@ -185,7 +183,7 @@
         return 'Active';                    // Currently running
     }
 
-    function detectTemplate(entries: any[]): string | undefined {
+    function detectTemplate(entries: any[]): string[] | undefined {
         if (!entries || entries.length === 0) return undefined;
 
         // Map of Unique URL signatures to Readable Names
@@ -195,7 +193,7 @@
             "jlearn.it.kmitl.ac.th": "J:Learn",
             "ujudge.it.kmitl.ac.th": "<U>Judge",
             "ijudge.it.kmitl.ac.th": "<I>Judge",
-            "ejudge.it.kmitl.ac.th": "<E>Judge", // Often SecSpace/Ejudge share similar patterns, verify if distinct
+            "ejudge.it.kmitl.ac.th": "<E>Judge",
             "dblearning.it.kmitl.ac.th": "DB:Learn",
             "kits.it.kmitl.ac.th": "KITS",
             "webdev.it.kmitl.ac.th": "WebDev",
@@ -203,16 +201,16 @@
             "ctf.it.kmitl.ac.th": "SecSpace (CTF)"
         };
 
+        const detected: string[] = [];
+
         // Loop through our known signatures
         for (const [url, name] of Object.entries(signatures)) {
-            // Check if ANY entry in the webfilter matches this URL
-            // We use .includes() in case the API returns "wildcard" prefixes like *.
             if (entries.some(e => e.url === url || e.url.includes(url))) {
-                return name;
+                detected.push(name);
             }
         }
 
-        return undefined; // No known template matched
+        return detected; // No known template matched
     }
 </script>
 
@@ -281,7 +279,17 @@
                                     </th>
 
                                     <td class="px-6 py-4">
-                                        {formatAddr(policy.templateName ? [{ name: policy.templateName }] : [])}
+                                        <div class="flex flex-wrap gap-2">
+                                            {#if policy.templateNames && policy.templateNames.length > 0}
+                                                {#each policy.templateNames as service_usage}
+                                                    <div class="flex items-center gap-1 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
+                                                        {service_usage}
+                                                    </div>
+                                                {/each}
+                                            {:else}
+                                                <span class="text-gray-400 italic">--</span>
+                                            {/if}
+                                        </div>
                                     </td>
 
                                     <td class="px-6 py-4">
