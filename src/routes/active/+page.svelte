@@ -4,11 +4,9 @@
     import Loader2 from "@lucide/svelte/icons/loader-2";
     import RefreshCw from "@lucide/svelte/icons/refresh-cw";
     import { invalidateAll } from "$app/navigation"; // Used to re-run the load function
-    import { env } from "$env/dynamic/public";
     import { enhance } from '$app/forms';
     import { fade } from 'svelte/transition';
-
-    const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:3000';
+    import loaderWebm from '$lib/loader/loader.webm';
 
     // 1. Receive Data from Server
     let { data } = $props();
@@ -70,29 +68,22 @@
     {#if deletingPolicyName}
         <div 
             transition:fade={{ duration: 200 }}
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm"
         >
-            <div class="flex flex-col items-center gap-4 rounded-xl bg-white p-6 shadow-2xl dark:bg-gray-800 border dark:border-gray-700">
-                
-                <div class="overflow-hidden rounded-lg">
-                    <iframe 
-                        width="300" 
-                        height="200" 
-                        src="https://www.youtube.com/embed/xjJt1dKPKwY?autoplay=1&mute=1&controls=0&loop=1&playlist=xjJt1dKPKwY&modestbranding=1&showinfo=0" 
-                        title="Deleting Animation" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen
-                        class="aspect-video"
-                    ></iframe>
-                </div>
+            <video 
+                src={loaderWebm}
+                autoplay 
+                loop 
+                muted 
+                playsinline 
+                class="object-contain pointer-events-none w-300px"
+            ></video>
 
-                <div class="text-center">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Deleting Policy...</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                        Say goodbye to <span class="font-mono font-bold text-red-600 dark:text-red-400">{deletingPolicyName}</span>
-                    </p>
-                </div>
+            <div class="mt-4 text-center">
+                <h3 class="text-xl font-bold text-white tracking-wide">Deleting Policy...</h3>
+                <p class="text-gray-200 mt-2">
+                    Say goodbye to <span class="font-mono font-bold text-red-400">{deletingPolicyName}</span>
+                </p>
             </div>
         </div>
     {/if}
