@@ -198,7 +198,9 @@
             "kits.it.kmitl.ac.th": "KITS",
             "webdev.it.kmitl.ac.th": "WebDev",
             "nolearn.it.kmitl.ac.th": "No:Learn",
-            "ctf.it.kmitl.ac.th": "SecSpace (CTF)"
+            "ctf.it.kmitl.ac.th": "SecSpace (CTF)",
+            "*.chatgpt.*": "Block AI",
+            "*discord*": "Block Chat",
         };
 
         const detected: string[] = [];
