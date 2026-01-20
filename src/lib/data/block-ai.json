@@ -254,6 +254,18 @@
         },
         {
             "id": null,
+            "url": "*.google.com/*udm=50*",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*google.com/async/*",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
             "url": "*.it.kmitl.ac.th",
             "type": "wildcard",
             "action": "monitor"
