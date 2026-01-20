@@ -41,6 +41,7 @@
 
             if (response.ok && data.success) {
                 localStorage.setItem("authToken", data.accessToken);
+                document.cookie = `authToken=${data.accessToken}; path=/; max-age=86400; SameSite=Strict`;
                 if (onSuccess) onSuccess(data.user);
             } else {
                 errorMessage = data.message || "Login failed";
