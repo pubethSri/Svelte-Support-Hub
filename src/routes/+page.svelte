@@ -87,8 +87,8 @@
             alert("Please enter a valid policy name.");
             return;
         }
-        if (policyName.length > 22){
-            alert("Policy name must not exceed 22 characters.");
+        if (policyName.length > 17){
+            alert("Policy name must not exceed 17 characters.");
             return;
         }
         if (!dateValue || !startTime || !endTime) {
