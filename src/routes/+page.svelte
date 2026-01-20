@@ -26,6 +26,8 @@
     import webdev from '$lib/data/webdev.json';
     import googleClassroom from '$lib/data/google-classroom.json';
     import googleDrive from '$lib/data/google-drive.json';
+    import blockAI from '$lib/data/block-ai.json';
+    import blockChat from '$lib/data/block-chat.json';
     import { env } from "$env/dynamic/public";
 
     const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:3000';
@@ -212,6 +214,12 @@
                 case 'Google Classroom':
                     entries.push(...(googleClassroom.urlfilter as UrlFilterEntry[]));
                     break;
+                case 'Block AI':
+                    entries.push(...(blockAI.urlfilter as UrlFilterEntry[]));
+                    break;
+                case 'Block Chat':
+                    entries.push(...(blockChat.urlfilter as UrlFilterEntry[]));
+                    break;
             }
         }
 
@@ -223,8 +231,10 @@
             entries.push(...(googleDrive.urlfilter as UrlFilterEntry[]));
         }
 
-        // default filter must always be last
-        entries.push(...(defaultUrlFilter.urlfilter as UrlFilterEntry[]));
+        if (["Block AI", "Block Chat"].some(p => profiles.includes(p)) === false) {
+            entries.push(...(defaultUrlFilter.urlfilter as UrlFilterEntry[]));
+        }
+        
 
         // assign IDs based on final size
         return {
