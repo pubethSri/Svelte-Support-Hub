@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { onMount } from "svelte";
     import { userState } from "$lib/userState.svelte";
     import { Button } from "$lib/components/ui/button/index.js";
     import Loader2 from "@lucide/svelte/icons/loader-2";
@@ -8,7 +7,6 @@
     import { enhance } from '$app/forms';
     import { fade } from 'svelte/transition';
     import loaderWebm from '$lib/loader/loader.webm';
-    import loaderMov from '$lib/loader/loader.mov';
 
     // 1. Receive Data from Server
     let { data } = $props();
@@ -24,20 +22,6 @@
 
     let isLoading = $state(false);
     let deletingPolicyName = $state<string | null>(null);
-
-    let currentLoaderSrc = $state(loaderWebm);
-
-    onMount(() => {
-        const ua = navigator.userAgent.toLowerCase();
-        
-        // Detect Safari (It contains "safari" but NOT "chrome" or "android")
-        const isSafari = ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android');
-
-        if (isSafari) {
-            // Only Safari gets the MOV file (for transparency)
-            currentLoaderSrc = loaderMov;
-        }
-    });
 
     // Helper: Format Address (View Logic stays here)
     function formatAddr(addrs: { name: string }[]) {
@@ -87,12 +71,12 @@
             class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm"
         >
             <video 
-                src={currentLoaderSrc}
+                src={loaderWebm}
                 autoplay 
                 loop 
                 muted 
                 playsinline 
-                class="w-150 object-contain pointer-events-none"
+                class="object-contain pointer-events-none w-300px"
             ></video>
 
             {#if deletingPolicyName}
