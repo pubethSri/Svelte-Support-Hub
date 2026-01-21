@@ -76,7 +76,7 @@
                 loop 
                 muted 
                 playsinline 
-                class="object-contain pointer-events-none w-300px"
+                class="object-contain pointer-events-none w-150"
             ></video>
 
             {#if deletingPolicyName}

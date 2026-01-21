@@ -5,6 +5,12 @@
             "url": "ijudge.it.kmitl.ac.th",
             "type": "wildcard",
             "action": "monitor"
+        },
+        {
+            "id": null,
+            "url": "ejudge.it.kmitl.ac.th",
+            "type": "wildcard",
+            "action": "monitor"
         }
     ]
 }
