@@ -65,7 +65,7 @@
 
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 flex flex-col items-center gap-6">
 
-    {#if deletingPolicyName}
+    {#if deletingPolicyName || isLoading}
         <div 
             transition:fade={{ duration: 200 }}
             class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm"
@@ -79,12 +79,14 @@
                 class="object-contain pointer-events-none w-300px"
             ></video>
 
+            {#if deletingPolicyName}
             <div class="mt-4 text-center">
                 <h3 class="text-xl font-bold text-white tracking-wide">Deleting Policy...</h3>
                 <p class="text-gray-200 mt-2">
                     Say goodbye to <span class="font-mono font-bold text-red-400">{deletingPolicyName}</span>
                 </p>
             </div>
+            {/if}
         </div>
     {/if}
 
