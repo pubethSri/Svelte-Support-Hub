@@ -87,6 +87,10 @@
             alert("Please enter a valid policy name.");
             return;
         }
+        if (!/^[A-Za-z0-9 ]+$/.test(policyName)) {
+            alert("Policy name must contain only English letters, numbers, and spaces.");
+            return;
+        }
         if (policyName.length > 17){
             alert("Policy name must not exceed 17 characters.");
             return;
