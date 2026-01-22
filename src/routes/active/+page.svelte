@@ -75,6 +75,10 @@
     }
 </script>
 
+<svelte:head>
+    <link rel="preload" as="image" href={loaderFull} />
+</svelte:head>
+
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 flex flex-col items-center gap-6">
 
     {#if deletingPolicyName || isLoading}
@@ -91,7 +95,11 @@
                 class="object-contain pointer-events-none w-150"
             ></video> -->
 
-            <img src={loader65} alt="Loading..." class="hidden md:block pointer-events-none w-150" />
+            <img 
+                src={loaderFull} 
+                alt="Loading..." 
+                class="pointer-events-none object-contain w-[80vw] md:w-96 h-auto max-h-[80vh]"
+            />
 
             {#if deletingPolicyName}
             <div class="mt-4 text-center">
