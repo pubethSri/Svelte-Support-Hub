@@ -7,6 +7,10 @@
     import { enhance } from '$app/forms';
     import { fade } from 'svelte/transition';
     import loaderWebm from '$lib/loader/loader.webm';
+    import loaderWebP from '$lib/loader/loader.webp';
+    import loaderFull from '$lib/loader/loader_full.webp';
+    import loader65 from '$lib/loader/loader_65.webp';
+
 
     // 1. Receive Data from Server
     let { data } = $props();
@@ -40,6 +44,14 @@
         isLoading = false;
     }
 
+    // Helper: Simulate Loading for 3 seconds
+    function triggerLoadingForThreeSeconds() {
+        isLoading = true;
+        setTimeout(() => {
+            isLoading = false;
+        }, 3000);
+    }
+
     // Date & Status Helpers
     function formatDate(raw: string | undefined) {
         if (!raw) return "--";
@@ -70,14 +82,16 @@
             transition:fade={{ duration: 200 }}
             class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm"
         >
-            <video 
+            <!-- <video 
                 src={loaderWebm}
                 autoplay 
                 loop 
                 muted 
                 playsinline 
                 class="object-contain pointer-events-none w-150"
-            ></video>
+            ></video> -->
+
+            <img src={loader65} alt="Loading..." class="hidden md:block pointer-events-none w-150" />
 
             {#if deletingPolicyName}
             <div class="mt-4 text-center">
@@ -92,14 +106,19 @@
 
     <div class="w-full max-w-6xl flex justify-between items-center">
         <h1 class="text-2xl font-bold dark:text-white">Active Policies</h1>
-        <Button variant="outline" onclick={handleRefresh} disabled={isLoading}>
-            {#if isLoading}
-                <Loader2 class="h-4 w-4 animate-spin" />
-            {:else}
-                <RefreshCw class="h-4 w-4 mr-2" />
-                Refresh
-            {/if}
-        </Button>
+        <div class="flex items-center gap-2">
+            <Button variant="secondary" onclick={triggerLoadingForThreeSeconds} disabled={isLoading}>
+                Trigger Loading (3s)
+            </Button>
+            <Button variant="outline" onclick={handleRefresh} disabled={isLoading}>
+                {#if isLoading}
+                    <Loader2 class="h-4 w-4 animate-spin" />
+                {:else}
+                    <RefreshCw class="h-4 w-4 mr-2" />
+                    Refresh
+                {/if}
+            </Button>
+        </div>
     </div>
 
     {#if userState.value && (userState.value.name.toLowerCase() === 'mr.jirathip kapanya' || userState.value.role.toLowerCase() === 'lecturer' || userState.value.name.toLowerCase() === 'montree kingkaew' || userState.value.name.toLowerCase() === 'mr.pubeth sriwattana' || userState.value.name.toLowerCase() === 'นายจารุกิตติ์ ศรีพาเพลิน' || userState.value.name.toLowerCase() === 'นายชญานนท์ สุภากิจ')}
