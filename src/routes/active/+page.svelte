@@ -6,10 +6,7 @@
     import { invalidateAll } from "$app/navigation"; // Used to re-run the load function
     import { enhance } from '$app/forms';
     import { fade } from 'svelte/transition';
-    import loaderWebm from '$lib/loader/loader.webm';
-    import loaderWebP from '$lib/loader/loader.webp';
     import loaderFull from '$lib/loader/loader_full.webp';
-    import loader65 from '$lib/loader/loader_65.webp';
 
 
     // 1. Receive Data from Server
@@ -92,15 +89,6 @@
             transition:fade={{ duration: 200 }}
             class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm"
         >
-            <!-- <video 
-                src={loaderWebm}
-                autoplay 
-                loop 
-                muted 
-                playsinline 
-                class="object-contain pointer-events-none w-150"
-            ></video> -->
-
             <img 
                 src={loaderFull} 
                 alt="Loading..." 
@@ -122,7 +110,7 @@
         <h1 class="text-2xl font-bold dark:text-white">Active Policies</h1>
         <div class="flex items-center gap-2">
             <Button variant="secondary" onclick={triggerLoadingForThreeSeconds} disabled={isLoading}>
-                Trigger Loading (3s)
+                Trigger Loading Animation (3s)
             </Button>
             <Button variant="outline" onclick={handleRefresh} disabled={isLoading}>
                 {#if isLoading}
