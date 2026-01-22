@@ -83,7 +83,7 @@
     <img 
         src={loaderFull} 
         alt="Loading..." 
-        aria-hidden="true"
+        aria-hidden="false"
         class="absolute w-0 h-0 opacity-0 pointer-events-none overflow-hidden" 
     />
 
