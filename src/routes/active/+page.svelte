@@ -80,6 +80,12 @@
 </svelte:head>
 
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 flex flex-col items-center gap-6">
+    <img 
+        src={loaderFull} 
+        alt="Loading..." 
+        aria-hidden="true"
+        class="absolute w-0 h-0 opacity-0 pointer-events-none overflow-hidden" 
+    />
 
     {#if deletingPolicyName || isLoading}
         <div 
