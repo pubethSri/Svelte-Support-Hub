@@ -35,6 +35,7 @@ function detectTemplate(entries: any[]): string[] {
         "ctf.it.kmitl.ac.th": "SecSpace (CTF)",
         "*.chatgpt.*": "Block AI",
         "*discord*": "Block Chat",
+        "*microsoft.com": "Microsoft Services",
     };
 
     const detected: string[] = [];
