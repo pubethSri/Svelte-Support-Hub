@@ -28,6 +28,7 @@
     import googleDrive from '$lib/data/google-drive.json';
     import blockAI from '$lib/data/block-ai.json';
     import blockChat from '$lib/data/block-chat.json';
+    import microsoftServices from '$lib/data/microsoft-services.json';
     import { env } from "$env/dynamic/public";
 
     const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:3000';
@@ -224,10 +225,13 @@
                 case 'Block Chat':
                     entries.push(...(blockChat.urlfilter as UrlFilterEntry[]));
                     break;
+                case 'Microsoft Services':
+                    entries.push(...(microsoftServices.urlfilter as UrlFilterEntry[]));
+                    break;
             }
         }
 
-        if (["J:learn", "DB:learn", "No:learn", "U:judge", "Secspace", "KITS", "Google Classroom"].some(p => profiles.includes(p))) {
+        if (["J:learn", "DB:learn", "No:learn", "U:judge", "Secspace", "KITS", "Google Classroom", "Microsoft Services"].some(p => profiles.includes(p))) {
             entries.push(...(googleLogin.urlfilter as UrlFilterEntry[]));
         }
 

@@ -1,0 +1,154 @@
+{
+    "urlfilter": [
+        {
+            "id": null,
+            "url": "*.microsoftonline.com",
+            "type": "wildcard",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "*.office.net",
+            "type": "wildcard",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "*.msauth.net",
+            "type": "wildcard",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "login.live.com",
+            "type": "simple",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "*.msftauth.net",
+            "type": "wildcard",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "*.msauthimages.net",
+            "type": "wildcard",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "*.msftauthimages.net",
+            "type": "wildcard",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "*.suite.office.com",
+            "type": "wildcard",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "*.office.com",
+            "type": "wildcard",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "*.sharepoint.com",
+            "type": "wildcard",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "*.onenote.com",
+            "type": "wildcard",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "reflect.microsoft.com",
+            "type": "simple",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "*.forms.cloud.microsoft",
+            "type": "wildcard",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "forms.microsoft.com",
+            "type": "simple",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "*.sharepointonline.com",
+            "type": "wildcard",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "*.static.microsoft",
+            "type": "wildcard",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "*microsoftonline.com",
+            "type": "wildcard",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "*officeapps.live.com",
+            "type": "wildcard",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "*microsoft.com",
+            "type": "wildcard",
+            "action": "allow"
+        },
+        {
+            "id": null,
+            "url": "*copilot.microsoft.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*learn.microsoft.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*apps.microsoft.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*support.microsoft.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*appsource.microsoft.com",
+            "type": "wildcard",
+            "action": "block"
+        },
+        {
+            "id": null,
+            "url": "*techcommunity.microsoft.com",
+            "type": "wildcard",
+            "action": "block"
+        }
+    ]
+}
