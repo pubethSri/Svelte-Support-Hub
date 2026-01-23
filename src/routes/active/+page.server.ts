@@ -85,7 +85,7 @@ export const load = async ({ cookies, fetch }) => {
             // 2. Fetch WebFilter
             if (policy["webfilter-profile"]) {
                 try {
-                    const wfRes = await fetch(`${BACKEND_URL}/firewall/webfilter/urlfilter/${encodeURIComponent(policy["webfilter-profile"])}`, { headers });
+                    const wfRes = await fetch(`${BACKEND_URL}/firewall/webfilter/urlfilter/name/${encodeURIComponent(policy["webfilter-profile"])}`, { headers });
                     if (wfRes.ok) {
                         const wfData = await wfRes.json();
                         if (wfData.results?.[0]?.entries) {
