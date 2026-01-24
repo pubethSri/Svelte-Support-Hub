@@ -1,12 +1,13 @@
 <script lang="ts">
     import { userState } from "$lib/userState.svelte";
-    import { Button } from "$lib/components/ui/button/index.js";
+    import { Button, buttonVariants } from "$lib/components/ui/button/index.js";
     import Loader2 from "@lucide/svelte/icons/loader-2";
     import RefreshCw from "@lucide/svelte/icons/refresh-cw";
     import { invalidateAll } from "$app/navigation"; // Used to re-run the load function
     import { enhance } from '$app/forms';
     import { fade } from 'svelte/transition';
     import loaderFull from '$lib/loader/loader_full.webp';
+    import Eye from "@lucide/svelte/icons/eye";
 
 
     // 1. Receive Data from Server
@@ -203,33 +204,13 @@
                                         {/if}
                                     </td>
                                     <td class="px-6 py-4 text-right">
-                                        <form 
-                                            method="POST" 
-                                            action="?/delete" 
-                                            use:enhance={({ cancel }) => {
-                                                if (!confirm(`Are you sure you want to delete policy: ${policy.name}?`)) {
-                                                    cancel();
-                                                }
-                                                // Trigger Overlay
-                                                deletingPolicyName = policy.name;
-
-                                                return async ({ update }) => {
-                                                    await update(); 
-                                                    // Hide Overlay
-                                                    deletingPolicyName = null;
-                                                };
-                                            }}
+                                        <a 
+                                            href={`/details/${encodeURIComponent(policy.name)}`} 
+                                            class={buttonVariants({ variant: "outline", size: "sm" })}
+                                            aria-label={`View details for ${policy.name}`}
                                         >
-                                            <input type="hidden" name="policyName" value={policy.name} />
-                                            
-                                            <button 
-                                                type="submit"
-                                                class="font-medium text-red-600 dark:text-red-500 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-                                                disabled={deletingPolicyName !== null} 
-                                            >
-                                                Delete
-                                            </button>
-                                        </form>
+                                            <Eye class="h-4 w-4" /> More Details
+                                        </a>
                                     </td>
                                 </tr>
                             {/each}
