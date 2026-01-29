@@ -92,5 +92,72 @@ export const actions = {
             console.error('Delete Error:', err);
             return fail(500, { error: 'Connection error' });
         }
+    },
+    
+    updateSchedule: async ({ cookies, request, fetch }) => {
+        const token = cookies.get("authToken");
+        
+        if (!token) return fail(401, { error: "Unauthorized" });
+
+        try {
+            const formData = await request.formData();
+            const scheduleName = formData.get('scheduleName') as string;
+            const startUtc = formData.get('startUtc') as string;
+            const endUtc = formData.get('endUtc') as string;
+
+            // Validate inputs
+            if (!scheduleName || !startUtc || !endUtc) {
+                return fail(400, { error: "Missing required fields" });
+            }
+
+            const startTimestamp = parseFloat(startUtc);
+            const endTimestamp = parseFloat(endUtc);
+
+            // Validate that start time is before end time
+            if (startTimestamp >= endTimestamp) {
+                return fail(400, { error: "Start time must be before end time" });
+            }
+
+            // Prepare the payload
+            const schedulePayload = {
+                name: scheduleName,
+                "start-utc": startTimestamp,
+                "end-utc": endTimestamp,
+                "expiration-days": 0
+            };
+
+            // Update schedule
+            const updateRes = await fetch(
+                `${BACKEND_URL}/firewall/schedule/onetime/change/${encodeURIComponent(scheduleName)}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(schedulePayload)
+                }
+            );
+
+            if (!updateRes.ok) {
+                return fail(updateRes.status, { error: "Failed to update schedule" });
+            }
+
+            // Save configuration
+            const saveRes = await fetch(`${BACKEND_URL}/firewall/save`, {
+                method: "POST",
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (!saveRes.ok) {
+                return fail(saveRes.status, { error: "Failed to save configuration" });
+            }
+
+            return { success: true, message: "Schedule updated successfully" };
+
+        } catch (err) {
+            console.error('Update Schedule Error:', err);
+            return fail(500, { error: 'Failed to update schedule' });
+        }
     }
 };
