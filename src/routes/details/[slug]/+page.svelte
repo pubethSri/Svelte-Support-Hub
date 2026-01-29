@@ -3,6 +3,7 @@
   import { fade } from "svelte/transition";
   import { onMount } from "svelte";
   import { Button } from "$lib/components/ui/button/index.js";
+  import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
   import ArrowLeft from "@lucide/svelte/icons/arrow-left";
   import Calendar from "@lucide/svelte/icons/calendar";
   import ShieldAlert from "@lucide/svelte/icons/shield-alert";
@@ -11,6 +12,7 @@
   import FloppyDisk from "@lucide/svelte/icons/save";
   import Maximize from "@lucide/svelte/icons/maximize";
   import Minimize from "@lucide/svelte/icons/minimize";
+  import MoreVertical from "@lucide/svelte/icons/more-vertical";
 
   // Import your loaders
   import loaderFull from "$lib/loader/loader_full.webp";
@@ -94,41 +96,53 @@
           {policy.status.toUpperCase()}
         </span>
       </div>
-      <Button
-        size="lg"
-        type="submit"
-        class="ml-auto cursor-pointer dark:bg-blue-900 text-white dark:hover:bg-blue-800 hover:bg-blue-600 bg-blue-700"
-      >
-        <FloppyDisk class="w-5 h-5" />
-        Save Changes
-      </Button>
-      <form
-        class="ml-auto"
-        method="POST"
-        action="?/delete"
-        use:enhance={({ cancel }) => {
-          if (!confirm(`Permanently delete policy ${policy.name}?`)) {
-            cancel();
-            return;
-          }
-          isDeleting = true;
-          return async ({ update }) => {
-            await update();
-            isDeleting = false;
-          };
-        }}
-      >
+      <div class="ml-auto flex items-center gap-2">
         <Button
-          variant="destructive"
           size="lg"
-          disabled={isDeleting}
           type="submit"
-          class="cursor-pointer"
+          class="cursor-pointer dark:bg-blue-900 text-white dark:hover:bg-blue-800 hover:bg-blue-600 bg-blue-700"
         >
-          <Trash class="w-5 h-5" />
-          Delete Policy
+          <FloppyDisk class="w-5 h-5" />
+          Save Changes
         </Button>
-      </form>
+
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger
+            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10"
+          >
+            <MoreVertical class="h-5 w-5" />
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Content align="end">
+            <form
+              method="POST"
+              action="?/delete"
+              use:enhance={({ cancel }) => {
+                if (!confirm(`Permanently delete policy ${policy.name}?`)) {
+                  cancel();
+                  return;
+                }
+                isDeleting = true;
+                return async ({ update }) => {
+                  await update();
+                  isDeleting = false;
+                };
+              }}
+            >
+              <DropdownMenu.Item
+                class="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950 cursor-pointer"
+                disabled={isDeleting}
+                onclick={(e) => {
+                  e.preventDefault();
+                  e.currentTarget.closest("form")?.requestSubmit();
+                }}
+              >
+                <Trash class="w-4 h-4 mr-2" />
+                Delete Policy
+              </DropdownMenu.Item>
+            </form>
+          </DropdownMenu.Content>
+        </DropdownMenu.Root>
+      </div>
     </div>
 
     <div class="grid gap-6 md:grid-cols-2">
