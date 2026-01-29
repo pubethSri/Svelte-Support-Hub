@@ -19,7 +19,7 @@
     import dblearn from '$lib/data/dblearn.json';
     import nolearn from '$lib/data/nolearn.json';
     import ujudge from '$lib/data/ujudge.json';
-    import ejudge from '$lib/data/secspace.json';
+    import ejudge from '$lib/data/ejudge.json';
     import ijudge from '$lib/data/ijudge.json';
     import secspace from '$lib/data/secspace.json';
     import kits from '$lib/data/kits.json';
