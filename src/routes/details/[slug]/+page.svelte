@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { invalidateAll } from "$app/navigation";
   import { fade } from "svelte/transition";
   import { onMount } from "svelte";
   import { Button } from "$lib/components/ui/button/index.js";
@@ -17,6 +18,8 @@
   import MoreVertical from "@lucide/svelte/icons/more-vertical";
   import Edit from "@lucide/svelte/icons/edit";
   import AlertCircle from "@lucide/svelte/icons/alert-circle";
+  import RefreshCw from "@lucide/svelte/icons/refresh-cw";
+  import Loader2 from "@lucide/svelte/icons/loader-2";
 
   // Import your loaders
   import loaderFull from "$lib/loader/loader_full.webp";
@@ -28,6 +31,7 @@
   // --- LOADER LOGIC ---
   let isDeleting = $state(false);
   let isSaving = $state(false);
+  let isRefreshing = $state(false);
 
   // --- EXPAND/COLLAPSE LOGIC ---
   let isExpanded = $state(false);
@@ -118,6 +122,13 @@
     editedStartTime = "";
     editedEndTime = "";
   }
+
+  // Handle Refresh
+  async function handleRefresh() {
+    isRefreshing = true;
+    await invalidateAll();
+    isRefreshing = false;
+  }
 </script>
 
 <img
@@ -130,7 +141,7 @@
 <div
   class="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 flex flex-col items-center gap-8 relative"
 >
-  {#if isDeleting || isSaving}
+  {#if isDeleting || isSaving || isRefreshing}
     <div
       transition:fade={{ duration: 200 }}
       class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm"
@@ -159,6 +170,15 @@
               class="font-mono font-bold text-blue-400">{policy.name}</span
             >
           </p>
+        {:else if isRefreshing}
+          <h3 class="text-xl font-bold text-white tracking-wide">
+            Refreshing Data...
+          </h3>
+          <p class="text-gray-200 mt-2">
+            Loading latest information for <span
+              class="font-mono font-bold text-green-400">{policy.name}</span
+            >
+          </p>
         {/if}
       </div>
     </div>
@@ -180,6 +200,21 @@
         </span>
       </div>
       <div class="ml-auto flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onclick={handleRefresh}
+          disabled={isRefreshing || isSaving}
+          class="flex items-center gap-2"
+        >
+          {#if isRefreshing}
+            <Loader2 class="h-4 w-4 animate-spin" />
+          {:else}
+            <RefreshCw class="h-4 w-4" />
+          {/if}
+          Refresh
+        </Button>
+
         {#if hasUnsavedChanges}
           <div
             class="flex items-center gap-2 text-orange-600 dark:text-orange-400 text-sm"
