@@ -43,10 +43,14 @@
   let isEditingSchedule = $state(false);
   let editedStartTime = $state("");
   let editedEndTime = $state("");
+  let originalStartTime = $state("");
+  let originalEndTime = $state("");
 
-  // Track if schedule has been modified
+  // Track if schedule has been modified from original values
   const hasUnsavedChanges = $derived(
-    isEditingSchedule && (editedStartTime !== "" || editedEndTime !== ""),
+    isEditingSchedule &&
+      (editedStartTime !== originalStartTime ||
+        editedEndTime !== originalEndTime),
   );
 
   // Validate schedule times
@@ -110,8 +114,15 @@
   // Handle Edit button click
   function handleEditSchedule() {
     if (schedule) {
-      editedStartTime = scheduleToDatetimeLocal(schedule.start);
-      editedEndTime = scheduleToDatetimeLocal(schedule.end);
+      const startLocal = scheduleToDatetimeLocal(schedule.start);
+      const endLocal = scheduleToDatetimeLocal(schedule.end);
+
+      editedStartTime = startLocal;
+      editedEndTime = endLocal;
+
+      // Store originals for change detection
+      originalStartTime = startLocal;
+      originalEndTime = endLocal;
     }
     isEditingSchedule = true;
   }
@@ -121,11 +132,29 @@
     isEditingSchedule = false;
     editedStartTime = "";
     editedEndTime = "";
+    originalStartTime = "";
+    originalEndTime = "";
   }
 
   // Handle Refresh
   async function handleRefresh() {
+    // Warn if there are unsaved changes
+    if (hasUnsavedChanges) {
+      const confirmed = confirm(
+        "You have unsaved schedule changes.\n\nRefreshing will discard your changes. Continue?",
+      );
+      if (!confirmed) return;
+    }
+
     isRefreshing = true;
+
+    // Exit edit mode if currently editing
+    if (isEditingSchedule) {
+      isEditingSchedule = false;
+      editedStartTime = "";
+      editedEndTime = "";
+    }
+
     await invalidateAll();
     isRefreshing = false;
   }
