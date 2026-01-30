@@ -7,6 +7,7 @@
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
+  import { MultiSelect } from "flowbite-svelte";
   import ArrowLeft from "@lucide/svelte/icons/arrow-left";
   import Calendar from "@lucide/svelte/icons/calendar";
   import ShieldAlert from "@lucide/svelte/icons/shield-alert";
@@ -39,27 +40,42 @@
   // --- SCHEDULE STATUS ---
   const scheduleStatus = $derived(getTimelyStatus(schedule));
 
-  // --- EDIT SCHEDULE LOGIC ---
-  let isEditingSchedule = $state(false);
+  // --- EDIT LOGIC ---
+  let isEditing = $state(false);
+
+  // Schedule editing
   let editedStartTime = $state("");
   let editedEndTime = $state("");
   let originalStartTime = $state("");
   let originalEndTime = $state("");
 
-  // Track if schedule has been modified from original values
+  // Source address editing
+  let editedSrcRooms = $state<string[]>([]);
+  let originalSrcRooms = $state<string[]>([]);
+
+  // Available room options
+  const availableRooms = [203, 205, 207, 304, 306, 308, 428, 434].map(
+    (room) => ({
+      value: room.toString(),
+      name: room.toString(),
+    }),
+  );
+
+  // Track if anything has been modified from original values
   const hasUnsavedChanges = $derived(
-    isEditingSchedule &&
+    isEditing &&
       (editedStartTime !== originalStartTime ||
-        editedEndTime !== originalEndTime),
+        editedEndTime !== originalEndTime ||
+        JSON.stringify([...editedSrcRooms].sort()) !==
+          JSON.stringify([...originalSrcRooms].sort())),
   );
 
   // Validate schedule times
-  const isScheduleValid = $derived(() => {
-    if (!editedStartTime || !editedEndTime) return true; // Don't show error if empty
-    const start = new Date(editedStartTime);
-    const end = new Date(editedEndTime);
-    return start < end;
-  });
+  const isScheduleValid = $derived(
+    !editedStartTime ||
+      !editedEndTime ||
+      new Date(editedStartTime) < new Date(editedEndTime),
+  );
 
   // Helper to format dates
   function formatDate(dateStr: string) {
@@ -112,7 +128,7 @@
   }
 
   // Handle Edit button click
-  function handleEditSchedule() {
+  function handleEdit() {
     if (schedule) {
       const startLocal = scheduleToDatetimeLocal(schedule.start);
       const endLocal = scheduleToDatetimeLocal(schedule.end);
@@ -124,16 +140,31 @@
       originalStartTime = startLocal;
       originalEndTime = endLocal;
     }
-    isEditingSchedule = true;
+
+    // Extract room numbers from srcaddr names
+    // Format: "[Subnet]Lab 304 - VLAN 304" -> "304"
+    const roomNumbers = policy.srcaddr
+      .map((addr: { name: string }) => {
+        const match = addr.name.match(/Lab (\d+)/);
+        return match ? match[1] : null;
+      })
+      .filter((room: string | null): room is string => room !== null);
+
+    editedSrcRooms = roomNumbers;
+    originalSrcRooms = [...roomNumbers];
+
+    isEditing = true;
   }
 
   // Handle Cancel edit
   function handleCancelEdit() {
-    isEditingSchedule = false;
+    isEditing = false;
     editedStartTime = "";
     editedEndTime = "";
     originalStartTime = "";
     originalEndTime = "";
+    editedSrcRooms = [];
+    originalSrcRooms = [];
   }
 
   // Handle Refresh
@@ -149,8 +180,8 @@
     isRefreshing = true;
 
     // Exit edit mode if currently editing
-    if (isEditingSchedule) {
-      isEditingSchedule = false;
+    if (isEditing) {
+      isEditing = false;
       editedStartTime = "";
       editedEndTime = "";
     }
@@ -192,10 +223,10 @@
           </p>
         {:else if isSaving}
           <h3 class="text-xl font-bold text-white tracking-wide">
-            Saving Schedule...
+            Saving Policy...
           </h3>
           <p class="text-gray-200 mt-2">
-            Updating schedule for <span
+            Updating configuration for <span
               class="font-mono font-bold text-blue-400">{policy.name}</span
             >
           </p>
@@ -256,7 +287,7 @@
         {#if hasUnsavedChanges}
           <form
             method="POST"
-            action="?/updateSchedule"
+            action="?/updatePolicy"
             use:enhance={({ cancel }) => {
               // Validate that start time is before end time
               const startDate = new Date(editedStartTime);
@@ -276,6 +307,15 @@
                 return;
               }
 
+              // Validate source addresses
+              if (!editedSrcRooms || editedSrcRooms.length === 0) {
+                alert(
+                  "Error: At least one source address (room) must be selected.\n\nPlease select one or more rooms.",
+                );
+                cancel();
+                return;
+              }
+
               // Check if start time is in the past
               const now = new Date();
               if (startDate < now) {
@@ -290,7 +330,7 @@
 
               if (
                 !confirm(
-                  `Save schedule changes for policy "${policy.name}"?\n\nStart: ${startDate.toLocaleString()}\nEnd: ${endDate.toLocaleString()}`,
+                  `Save policy changes for "${policy.name}"?\n\nStart: ${startDate.toLocaleString()}\nEnd: ${endDate.toLocaleString()}\nRooms: ${editedSrcRooms.join(", ")}`,
                 )
               ) {
                 cancel();
@@ -302,17 +342,20 @@
                 isSaving = false;
 
                 if (result.type === "success") {
-                  alert("Schedule updated successfully!");
-                  isEditingSchedule = false;
+                  alert("Policy updated successfully!");
+                  isEditing = false;
                   editedStartTime = "";
                   editedEndTime = "";
+                  editedSrcRooms = [];
+                  originalSrcRooms = [];
                   window.location.reload();
                 } else if (result.type === "failure") {
-                  alert(result.data?.error || "Failed to update schedule");
+                  alert(result.data?.error || "Failed to update policy");
                 }
               };
             }}
           >
+            <input type="hidden" name="policyName" value={policy.name} />
             <input
               type="hidden"
               name="scheduleName"
@@ -328,11 +371,18 @@
               name="endUtc"
               value={datetimeToUnix(editedEndTime).toString()}
             />
+            <input
+              type="hidden"
+              name="srcRooms"
+              value={JSON.stringify(editedSrcRooms)}
+            />
 
             <Button
               size="lg"
               type="submit"
-              disabled={isSaving || !isScheduleValid}
+              disabled={isSaving ||
+                !isScheduleValid ||
+                editedSrcRooms.length === 0}
               class="cursor-pointer dark:bg-blue-900 text-white dark:hover:bg-blue-800 hover:bg-blue-600 bg-blue-700"
             >
               {#if isSaving}
@@ -359,14 +409,14 @@
                 Saving...
               {:else}
                 <FloppyDisk class="w-5 h-5" />
-                Save Schedule
+                Save Changes
               {/if}
             </Button>
           </form>
         {:else}
           <Button
             size="lg"
-            disabled={isEditingSchedule}
+            disabled={isEditing}
             class="cursor-pointer dark:bg-blue-900 text-white dark:hover:bg-blue-800 hover:bg-blue-600 bg-blue-700 opacity-50"
           >
             <FloppyDisk class="w-5 h-5" />
@@ -381,16 +431,13 @@
             <MoreVertical class="h-5 w-5" />
           </DropdownMenu.Trigger>
           <DropdownMenu.Content align="end">
-            {#if schedule && !isEditingSchedule}
-              <DropdownMenu.Item
-                class="cursor-pointer"
-                onclick={handleEditSchedule}
-              >
-                <Edit class="w-4 h-4 mr-2" />
-                Edit Schedule
+            {#if schedule && !isEditing}
+              <DropdownMenu.Item class="cursor-pointer" onclick={handleEdit}>
+                <Edit class="w-4 w-4 mr-2" />
+                Edit Policy
               </DropdownMenu.Item>
             {/if}
-            {#if isEditingSchedule}
+            {#if isEditing}
               <DropdownMenu.Item
                 class="cursor-pointer"
                 onclick={handleCancelEdit}
@@ -448,7 +495,23 @@
           </div>
           <div class="flex justify-between">
             <dt class="text-gray-500">Source Address</dt>
-            {#if policy.srcaddr.length > 0}
+            {#if isEditing}
+              <dd class="font-medium dark:text-white w-full ml-4">
+                <MultiSelect
+                  items={availableRooms}
+                  bind:value={editedSrcRooms}
+                />
+                {#if editedSrcRooms.length === 0}
+                  <p class="text-xs text-red-600 dark:text-red-400 mt-1">
+                    ⚠️ At least one room must be selected
+                  </p>
+                {:else}
+                  <p class="text-xs text-gray-500 mt-1">
+                    Select one or more rooms
+                  </p>
+                {/if}
+              </dd>
+            {:else if policy.srcaddr.length > 0}
               <dd class="font-medium dark:text-white">
                 {formatAddr(policy.srcaddr)}
               </dd>
@@ -523,7 +586,7 @@
           {/if}
         </div>
         {#if schedule}
-          {#if isEditingSchedule}
+          {#if isEditing}
             <div class="space-y-4 text-sm">
               <div class="border-t pt-3 mt-2 dark:border-gray-700">
                 <Label

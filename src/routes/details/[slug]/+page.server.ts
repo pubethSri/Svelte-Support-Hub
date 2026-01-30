@@ -107,16 +107,18 @@ export const actions = {
         }
     },
     
-    updateSchedule: async ({ cookies, request, fetch }) => {
+    updatePolicy: async ({ cookies, request, fetch }) => {
         const token = cookies.get("authToken");
         
         if (!token) return fail(401, { error: "Unauthorized" });
 
         try {
             const formData = await request.formData();
+            const policyName = formData.get('policyName') as string;
             const scheduleName = formData.get('scheduleName') as string;
             const startUtc = formData.get('startUtc') as string;
             const endUtc = formData.get('endUtc') as string;
+            const srcRooms = formData.get('srcRooms') as string; // JSON string array
 
             // Validate inputs
             if (!scheduleName || !startUtc || !endUtc) {
@@ -131,7 +133,7 @@ export const actions = {
                 return fail(400, { error: "Start time must be before end time" });
             }
 
-            // Prepare the payload
+            // Prepare the schedule payload
             const schedulePayload = {
                 name: scheduleName,
                 "start-utc": startTimestamp,
@@ -156,6 +158,40 @@ export const actions = {
                 return fail(updateRes.status, { error: "Failed to update schedule" });
             }
 
+            // Update source addresses if provided
+            if (srcRooms && policyName) {
+                const roomsArray = JSON.parse(srcRooms);
+                
+                // Validate that at least one room is selected
+                if (!Array.isArray(roomsArray) || roomsArray.length === 0) {
+                    return fail(400, { error: "At least one source address must be selected" });
+                }
+                
+                const srcaddrPayload = {
+                    json: {
+                        srcaddr: roomsArray.map((room: string) => ({
+                            name: `[Subnet]Lab ${room} - VLAN ${room}`
+                        }))
+                    }
+                };
+
+                const srcAddrRes = await fetch(
+                    `${BACKEND_URL}/firewall/policy/srcaddress/change/${encodeURIComponent(policyName)}`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(srcaddrPayload)
+                    }
+                );
+
+                if (!srcAddrRes.ok) {
+                    return fail(srcAddrRes.status, { error: "Failed to update source addresses" });
+                }
+            }
+
             // Save configuration
             const saveRes = await fetch(`${BACKEND_URL}/firewall/save`, {
                 method: "POST",
@@ -166,11 +202,11 @@ export const actions = {
                 return fail(saveRes.status, { error: "Failed to save configuration" });
             }
 
-            return { success: true, message: "Schedule updated successfully" };
+            return { success: true, message: "Policy updated successfully" };
 
         } catch (err) {
-            console.error('Update Schedule Error:', err);
-            return fail(500, { error: 'Failed to update schedule' });
+            console.error('Update Policy Error:', err);
+            return fail(500, { error: 'Failed to update policy' });
         }
     }
 };
