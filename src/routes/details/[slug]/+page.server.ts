@@ -11,12 +11,19 @@ export const load = async ({ params, cookies, fetch }) => {
         throw redirect(302, '/login');
     }
 
-    const headers = { 'Authorization': `Bearer ${token}` };
+    const headers = { 
+        'Authorization': `Bearer ${token}`,
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache'
+    };
 
     try {
         // 1. Fetch All Policies to find the correct one
         // (API doesn't seem to support fetching single policy by name directly, so we filter)
-        const res = await fetch(`${BACKEND_URL}/firewall/policies`, { headers });
+        const res = await fetch(`${BACKEND_URL}/firewall/policies`, { 
+            headers,
+            cache: 'no-store'
+        });
         if (!res.ok) throw error(res.status, "Failed to fetch policies");
         
         const data = await res.json();
@@ -33,10 +40,16 @@ export const load = async ({ params, cookies, fetch }) => {
         // We use the fields from the policy object to be precise
         const [scheduleRes, webfilterRes] = await Promise.all([
             // Fetch Schedule (Use policy.schedule as the reference)
-            fetch(`${BACKEND_URL}/firewall/schedule/onetime/${encodeURIComponent(policy.schedule)}`, { headers }),
+            fetch(`${BACKEND_URL}/firewall/schedule/onetime/${encodeURIComponent(policy.schedule)}`, { 
+                headers,
+                cache: 'no-store'
+            }),
             
             // Fetch Webfilter (Use policy["webfilter-profile"] as the reference)
-            fetch(`${BACKEND_URL}/firewall/webfilter/urlfilter/name/${encodeURIComponent(policy["webfilter-profile"])}`, { headers })
+            fetch(`${BACKEND_URL}/firewall/webfilter/urlfilter/name/${encodeURIComponent(policy["webfilter-profile"])}`, { 
+                headers,
+                cache: 'no-store'
+            })
         ]);
 
         let schedule = null;
