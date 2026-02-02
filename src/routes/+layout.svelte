@@ -1,45 +1,61 @@
 <script lang="ts">
-	import './layout.css';
-	import icon from '$lib/assets/img/it-logo.png';
-	import { ModeWatcher } from "mode-watcher";
-	import Header from '$lib/Header.svelte';
-	import LoginCard from "$lib/LoginCard.svelte";
-    import { Modal } from 'flowbite-svelte';
-	import { userState } from "$lib/userState.svelte";
-	
-	let { children } = $props();
+  import "./layout.css";
+  import icon from "$lib/assets/img/it-logo.png";
+  import { ModeWatcher } from "mode-watcher";
+  import Header from "$lib/Header.svelte";
+  import LoginCard from "$lib/LoginCard.svelte";
+  import { Modal } from "flowbite-svelte";
+  import { userState } from "$lib/userState.svelte";
 
-	let showLoginModal = $state(false);
-	function handleLogout() {
-        userState.logout();
-    }
+  let { children, data } = $props();
+
+  // Directly sync server user data to prevent flash
+  // This runs immediately during component initialization
+  if (data?.user) {
+    userState.set(data.user);
+  } else {
+    userState.value = null;
+  }
+
+  let showLoginModal = $state(false);
+
+  function handleLogout() {
+    // Clear client state immediately
+    userState.logout();
+    // Submit to server to clear cookie
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/logout";
+    document.body.appendChild(form);
+    form.submit();
+  }
 </script>
 
 <Header
-	currentUser={userState.value} 
-    onLoginClick={() => showLoginModal = true}
-    onLogoutClick={handleLogout} 
+  currentUser={userState.value}
+  onLoginClick={() => (showLoginModal = true)}
+  onLogoutClick={handleLogout}
 />
 
-<Modal 
-    bind:open={showLoginModal} 
-    size="xs" 
-    autoclose={false} 
-    class="!p-0 !rounded-[24px] overflow-hidden" 
-    classes={{ body: "p-0" }}
+<Modal
+  bind:open={showLoginModal}
+  size="xs"
+  autoclose={false}
+  class="!p-0 !rounded-[24px] overflow-hidden"
+  classes={{ body: "p-0" }}
 >
-    <LoginCard 
-        onSuccess={(userData) => {
-            userState.set(userData);
-            showLoginModal = false;
-        }}
-        onClose={() => showLoginModal = false} 
-    />
+  <LoginCard
+    onSuccess={(userData) => {
+      userState.set(userData);
+      showLoginModal = false;
+    }}
+    onClose={() => (showLoginModal = false)}
+  />
 </Modal>
 
 <svelte:head>
-	<title>หน้าหลัก | ITSupportHub</title>
-	<link rel="icon" href={icon} />
+  <title>หน้าหลัก | ITSupportHub</title>
+  <link rel="icon" href={icon} />
 </svelte:head>
 
 <ModeWatcher />

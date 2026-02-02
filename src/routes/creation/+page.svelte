@@ -1,0 +1,409 @@
+<script lang="ts">
+  import { enhance } from "$app/forms";
+  import { onMount } from "svelte";
+  import { Button } from "$lib/components/ui/button/index.js";
+  import { Input } from "$lib/components/ui/input/index.js";
+  import { Label } from "$lib/components/ui/label/index.js";
+  import { A, MultiSelect } from "flowbite-svelte";
+  import Calendar from "$lib/components/ui/calendar/calendar.svelte";
+  import * as Popover from "$lib/components/ui/popover/index.js";
+  import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
+  import { getLocalTimeZone, type CalendarDate } from "@internationalized/date";
+  import { userState } from "$lib/userState.svelte";
+  import ServicesData from "$lib/services_ex.json";
+  import Loader2 from "@lucide/svelte/icons/loader-2";
+  import onlearn from "$lib/data/onlearn.json";
+  import defaultUrlFilter from "$lib/data/default-urlfilter.json";
+  import jlearn from "$lib/data/jlearn.json";
+  import googleLogin from "$lib/data/google-login.json";
+  import dblearn from "$lib/data/dblearn.json";
+  import nolearn from "$lib/data/nolearn.json";
+  import ujudge from "$lib/data/ujudge.json";
+  import ejudge from "$lib/data/ejudge.json";
+  import ijudge from "$lib/data/ijudge.json";
+  import secspace from "$lib/data/secspace.json";
+  import kits from "$lib/data/kits.json";
+  import webdev from "$lib/data/webdev.json";
+  import googleClassroom from "$lib/data/google-classroom.json";
+  import googleDrive from "$lib/data/google-drive.json";
+  import blockAI from "$lib/data/block-ai.json";
+  import blockChat from "$lib/data/block-chat.json";
+  import microsoftServices from "$lib/data/microsoft-services.json";
+
+  type UrlFilterEntry = {
+    id: number | null;
+    url: string;
+    type: "simple" | "wildcard";
+    action: "monitor" | "block";
+  };
+
+  type UrlFilterPayload = {
+    urlfilter: UrlFilterEntry[];
+  };
+
+  let isDeploying = $state(false);
+
+  // --- 1. STATE: FORM DATA ---
+  let policyName = $state("");
+  let srcRooms = $state<string[]>([]);
+
+  // Schedule State
+  let dateValue = $state<CalendarDate | undefined>();
+  let startTime = $state("");
+  let endTime = $state("");
+
+  let selectedProfiles = $state<string[]>([]);
+
+  // --- 2. STATE: DROPDOWN OPTIONS (Mocked or Fetched) ---
+  let addresses = $state<{ value: string; name: string }[]>([]);
+  let urlTemplates = $state<{ value: string; name: string }[]>([]);
+
+  let internalServices: { value: string; name: string }[] =
+    ServicesData.services.map((service) => ({ value: service, name: service }));
+
+  // --- 3. FETCH OPTIONS ON LOAD ---
+  onMount(async () => {
+    try {
+      const addrData = [203, 205, 207, 304, 306, 308, 428, 434];
+      if (addrData && addrData.length > 0) {
+        addresses = addrData.map((a: any) => ({
+          value: a.toString(),
+          name: a.toString(),
+        }));
+      }
+
+      // Fetch URL Filter Templates (if available)
+      // If you have a predefined list, you can hardcode it here instead
+      urlTemplates = internalServices;
+    } catch (err) {
+      console.error("Failed to load form options", err);
+    }
+  });
+
+  // --- 4. BUILD PAYLOAD FUNCTION ---
+  function buildPolicyPayload() {
+    const dateStr = dateValue!.toString();
+
+    // Calculate Unix Timestamps
+    const startUnix = Math.floor(
+      Date.parse(`${dateStr}T${startTime}:00+07:00`) / 1000,
+    );
+    const endUnix = Math.floor(
+      Date.parse(`${dateStr}T${endTime}:00+07:00`) / 1000,
+    );
+
+    // Construct the Payload
+    return {
+      policies: {
+        json: {
+          name: `[EXAM][API] ${policyName}`,
+          srcintf: [{ name: "[Zone]Lab" }],
+          dstintf: [{ name: "any" }],
+          srcaddr: srcRooms.map((room) => ({
+            name: `[Subnet]Lab ${room} - VLAN ${room}`,
+          })),
+          dstaddr: [{ name: "all" }],
+          service: [
+            {
+              name: "ALL",
+            },
+          ],
+          action: "accept",
+          schedule: "",
+          "inspection-mode": "flow",
+          "webfilter-profile": "",
+          "utm-status": "enable",
+          "ssl-ssh-profile": "full-deep-inspection",
+          "application-list": "allow-web-only",
+          logtraffic: "all",
+          status: "enable",
+          comments: "Created via API don't edit or delete",
+        },
+      },
+      urlfilter: {
+        id: 0,
+        name: `[EXAM][API] ${policyName}`,
+        comment: "This WebFilter is created via API",
+        entries: buildUrlFilterPayload(selectedProfiles).urlfilter,
+      },
+      onetime_schedule: {
+        name: `[EXAM][API] ${policyName}`,
+        "start-utc": startUnix,
+        "end-utc": endUnix,
+        "expiration-days": 0,
+      },
+    };
+  }
+
+  function buildUrlFilterPayload(profiles: string[]): UrlFilterPayload {
+    let entries: UrlFilterEntry[] = [];
+
+    for (const profile of profiles) {
+      switch (profile) {
+        case "On:learn":
+          entries.push(...(onlearn.urlfilter as UrlFilterEntry[]));
+          break;
+        case "J:learn":
+          entries.push(...(jlearn.urlfilter as UrlFilterEntry[]));
+          break;
+        case "DB:learn":
+          entries.push(...(dblearn.urlfilter as UrlFilterEntry[]));
+          break;
+        case "No:learn":
+          entries.push(...(nolearn.urlfilter as UrlFilterEntry[]));
+          break;
+        case "<U>judge":
+          entries.push(...(ujudge.urlfilter as UrlFilterEntry[]));
+          break;
+        case "<E>judge":
+          entries.push(...(ejudge.urlfilter as UrlFilterEntry[]));
+          break;
+        case "<I>judge":
+          entries.push(...(ijudge.urlfilter as UrlFilterEntry[]));
+          break;
+        case "Secspace":
+          entries.push(...(secspace.urlfilter as UrlFilterEntry[]));
+          break;
+        case "KITS":
+          entries.push(...(kits.urlfilter as UrlFilterEntry[]));
+          break;
+        case "WebDev":
+          entries.push(...(webdev.urlfilter as UrlFilterEntry[]));
+          break;
+        case "Google Classroom":
+          entries.push(...(googleClassroom.urlfilter as UrlFilterEntry[]));
+          break;
+        case "Block AI":
+          entries.push(...(blockAI.urlfilter as UrlFilterEntry[]));
+          break;
+        case "Block Chat":
+          entries.push(...(blockChat.urlfilter as UrlFilterEntry[]));
+          break;
+        case "Microsoft Services":
+          entries.push(...(microsoftServices.urlfilter as UrlFilterEntry[]));
+          break;
+      }
+    }
+
+    if (
+      [
+        "J:learn",
+        "DB:learn",
+        "No:learn",
+        "U:judge",
+        "Secspace",
+        "KITS",
+        "Google Classroom",
+        "Microsoft Services",
+      ].some((p) => profiles.includes(p))
+    ) {
+      entries.push(...(googleLogin.urlfilter as UrlFilterEntry[]));
+    }
+
+    if (["Google Classroom"].some((p) => profiles.includes(p))) {
+      entries.push(...(googleDrive.urlfilter as UrlFilterEntry[]));
+    }
+
+    if (
+      ["Block AI", "Block Chat"].some((p) => profiles.includes(p)) === false
+    ) {
+      entries.push(...(defaultUrlFilter.urlfilter as UrlFilterEntry[]));
+    }
+
+    // assign IDs based on final size
+    return {
+      urlfilter: entries.map((entry, index) => ({
+        ...entry,
+        id: index + 1,
+      })),
+    };
+  }
+</script>
+
+<div
+  class="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 flex flex-col items-center gap-6"
+>
+  <div class="w-full max-w-4xl flex justify-between items-center">
+    <h1 class="text-2xl font-bold dark:text-white">Policy Creation</h1>
+  </div>
+
+  {#if userState.value}
+    {#if userState.value.name.toLowerCase() === "mr.jirathip kapanya" || userState.value.role.toLowerCase() === "lecturer" || userState.value.name.toLowerCase() === "montree kingkaew" || userState.value.name.toLowerCase() === "mr.pubeth sriwattana" || userState.value.name.toLowerCase() === "นายจารุกิตติ์ ศรีพาเพลิน" || userState.value.name.toLowerCase() === "นายชญานนท์ สุภากิจ"}
+      <div
+        class="w-full max-w-4xl bg-white dark:bg-gray-800 p-6 rounded-lg shadow space-y-8"
+      >
+        <div class="space-y-4">
+          <h3 class="text-lg font-semibold border-b pb-2 dark:text-white">
+            1. Policy Details
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="col-span-2">
+              <Label class="mb-2">Policy Name</Label>
+              <Input
+                type="text"
+                placeholder="ex. Midterm <name>"
+                bind:value={policyName}
+              />
+              <p class="text-xs text-gray-500 mt-1">
+                Please include "Midterm" followed by the exam name.
+              </p>
+            </div>
+
+            <div class="col-span-2">
+              <Label class="mb-2">Room</Label>
+              <MultiSelect items={addresses} bind:value={srcRooms} />
+              {#if srcRooms.length === 0}
+                <p class="text-xs text-red-600 dark:text-red-400 mt-1">
+                  ⚠️ At least one room must be selected
+                </p>
+              {:else}
+                <p class="text-xs text-gray-500 mt-1">
+                  Select one or more rooms to apply.
+                </p>
+              {/if}
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-lg font-semibold border-b pb-2 dark:text-white">
+            2. Pass Services
+          </h3>
+          <div>
+            <Label class="mb-2">Select Services to let it passthrough</Label>
+            <MultiSelect items={urlTemplates} bind:value={selectedProfiles} />
+            <p class="text-xs text-gray-500 mt-1">Select services to apply.</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-lg font-semibold border-b pb-2 dark:text-white">
+            3. Schedule
+          </h3>
+          <div class="flex flex-wrap gap-4 items-end">
+            <div class="flex flex-col gap-2">
+              <Label>Date</Label>
+              <Popover.Root>
+                <Popover.Trigger>
+                  {#snippet child({ props })}
+                    <div
+                      {...props}
+                      class="inline-flex items-center justify-between w-[200px] h-10 px-3 py-2 text-sm font-normal rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground cursor-pointer"
+                    >
+                      {dateValue
+                        ? dateValue
+                            .toDate(getLocalTimeZone())
+                            .toLocaleDateString()
+                        : "Select date"}
+                      <ChevronDownIcon class="h-4 w-4 opacity-50" />
+                    </div>
+                  {/snippet}
+                </Popover.Trigger>
+                <Popover.Content class="w-auto p-0">
+                  <Calendar type="single" bind:value={dateValue} />
+                </Popover.Content>
+              </Popover.Root>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <Label>Start Time</Label>
+              <Input type="time" bind:value={startTime} class="w-32" />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <Label>End Time</Label>
+              <Input type="time" bind:value={endTime} class="w-32" />
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-6">
+          <form
+            method="POST"
+            action="?/createPolicy"
+            use:enhance={({ cancel, formData }) => {
+              // Client-side validation
+              if (policyName.trim() === "") {
+                alert("Please enter a valid policy name.");
+                cancel();
+                return;
+              }
+              if (!/^[A-Za-z0-9 ]+$/.test(policyName)) {
+                alert(
+                  "Policy name must contain only English letters, numbers, and spaces.",
+                );
+                cancel();
+                return;
+              }
+              if (policyName.length > 17) {
+                alert("Policy name must not exceed 17 characters.");
+                cancel();
+                return;
+              }
+              if (!srcRooms || srcRooms.length === 0) {
+                alert(
+                  "Please select at least one room.\n\nAt least one source address must be specified.",
+                );
+                cancel();
+                return;
+              }
+              if (!dateValue || !startTime || !endTime) {
+                alert("Please complete the schedule fields.");
+                cancel();
+                return;
+              }
+              if (startTime >= endTime) {
+                alert("Start time must be before end time.");
+                cancel();
+                return;
+              }
+
+              // Build and attach payload
+              const payload = buildPolicyPayload();
+              formData.set("policyData", JSON.stringify(payload));
+
+              isDeploying = true;
+
+              return async ({ result, update }) => {
+                await update();
+                isDeploying = false;
+
+                if (result.type === "redirect") {
+                  // Success - will redirect to /active
+                  alert("Policy created successfully!");
+                } else if (result.type === "failure") {
+                  alert(result.data?.error || "Failed to create policy");
+                } else if (result.type === "error") {
+                  alert("An unexpected error occurred. Please try again.");
+                }
+              };
+            }}
+          >
+            <Button
+              type="submit"
+              class="w-full text-lg h-12 bg-blue-600 hover:bg-blue-700"
+              disabled={isDeploying || srcRooms.length === 0}
+            >
+              {#if isDeploying}
+                <Loader2 class="mr-2 h-5 w-5 animate-spin" />
+                Deploying...
+              {:else}
+                Deploy Configuration
+              {/if}
+            </Button>
+          </form>
+        </div>
+      </div>
+    {:else}
+      <div class="text-center p-10 bg-white rounded shadow dark:bg-gray-800">
+        <h2 class="text-xl font-bold mb-2">Access Denied</h2>
+        <p>You do not have permission to access this page.</p>
+      </div>
+    {/if}
+  {:else}
+    <div class="text-center p-10 bg-white rounded shadow dark:bg-gray-800">
+      <h2 class="text-xl font-bold mb-2">Access Denied</h2>
+      <p>Please log in to configure firewall policies.</p>
+    </div>
+  {/if}
+</div>
