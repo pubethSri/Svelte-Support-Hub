@@ -5,17 +5,27 @@
   import { Modal } from "flowbite-svelte";
   import { Button } from "$lib/components/ui/button/index.js";
   import icon from "$lib/assets/img/it-logo.png";
+  import loaderFull from "$lib/loader/loader_full.webp";
   import Shield from "@lucide/svelte/icons/shield";
   import Clock from "@lucide/svelte/icons/clock";
   import Zap from "@lucide/svelte/icons/zap";
+  import { fade } from "svelte/transition";
 
   let showLoginModal = $state(false);
+  let isNavigating = $state(false);
 
   function handleLoginSuccess(userData: any) {
     userState.set(userData);
     showLoginModal = false;
     // Redirect to policy creation page after successful login
     goto("/creation");
+  }
+
+  async function handleGoToDashboard() {
+    isNavigating = true;
+    await goto("/active");
+    // Navigation complete (this might not execute if page unloads)
+    isNavigating = false;
   }
 </script>
 
@@ -53,13 +63,26 @@
       </p>
 
       <!-- CTA Button -->
-      <Button
-        size="lg"
-        onclick={() => (showLoginModal = true)}
-        class="text-lg px-8 py-6 h-auto bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-      >
-        Get Started - Login
-      </Button>
+      {#if userState.value}
+        <!-- User is logged in - go to active page -->
+        <Button
+          size="lg"
+          onclick={handleGoToDashboard}
+          disabled={isNavigating}
+          class="text-lg px-8 py-6 h-auto bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isNavigating ? "Loading..." : "Go to Dashboard"}
+        </Button>
+      {:else}
+        <!-- User not logged in - show login modal -->
+        <Button
+          size="lg"
+          onclick={() => (showLoginModal = true)}
+          class="text-lg px-8 py-6 h-auto bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+        >
+          Get Started - Login
+        </Button>
+      {/if}
 
       <!-- Features -->
       <div class="grid md:grid-cols-3 gap-8 mt-20">
@@ -128,3 +151,23 @@
     onClose={() => (showLoginModal = false)}
   />
 </Modal>
+
+<!-- Loading Overlay -->
+{#if isNavigating}
+  <div
+    transition:fade={{ duration: 200 }}
+    class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm"
+  >
+    <img
+      src={loaderFull}
+      alt="Loading..."
+      class="pointer-events-none object-contain w-[80vw] md:w-96 h-auto max-h-[80vh]"
+    />
+    <div class="mt-4 text-center">
+      <h3 class="text-xl font-bold text-white tracking-wide">
+        Loading Dashboard...
+      </h3>
+      <p class="text-gray-200 mt-2">Fetching active policies</p>
+    </div>
+  </div>
+{/if}
