@@ -3,7 +3,10 @@ import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
 
 const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
-export const load = async ({ params, cookies, fetch }) => {
+export const load = async ({ params, cookies, fetch, depends }) => {
+    // Add dependency to allow explicit invalidation
+    depends('policy:details');
+    
     const slug = decodeURIComponent(params.slug);
     const token = cookies.get("authToken");
 
@@ -11,16 +14,19 @@ export const load = async ({ params, cookies, fetch }) => {
         throw redirect(302, '/login');
     }
 
+    // Add timestamp to force cache busting
+    const timestamp = Date.now();
     const headers = { 
         'Authorization': `Bearer ${token}`,
         'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache'
+        'Pragma': 'no-cache',
+        'Expires': '0'
     };
 
     try {
         // 1. Fetch All Policies to find the correct one
-        // (API doesn't seem to support fetching single policy by name directly, so we filter)
-        const res = await fetch(`${BACKEND_URL}/firewall/policies`, { 
+        // Add timestamp query param to prevent caching
+        const res = await fetch(`${BACKEND_URL}/firewall/policies?t=${timestamp}`, { 
             headers,
             cache: 'no-store'
         });
@@ -37,16 +43,16 @@ export const load = async ({ params, cookies, fetch }) => {
         }
 
         // 3. Parallel Fetch for Schedule and Webfilter
-        // We use the fields from the policy object to be precise
+        // Add timestamp to URLs
         const [scheduleRes, webfilterRes] = await Promise.all([
             // Fetch Schedule (Use policy.schedule as the reference)
-            fetch(`${BACKEND_URL}/firewall/schedule/onetime/${encodeURIComponent(policy.schedule)}`, { 
+            fetch(`${BACKEND_URL}/firewall/schedule/onetime/${encodeURIComponent(policy.schedule)}?t=${timestamp}`, { 
                 headers,
                 cache: 'no-store'
             }),
             
             // Fetch Webfilter (Use policy["webfilter-profile"] as the reference)
-            fetch(`${BACKEND_URL}/firewall/webfilter/urlfilter/name/${encodeURIComponent(policy["webfilter-profile"])}`, { 
+            fetch(`${BACKEND_URL}/firewall/webfilter/urlfilter/name/${encodeURIComponent(policy["webfilter-profile"])}?t=${timestamp}`, { 
                 headers,
                 cache: 'no-store'
             })
@@ -69,7 +75,8 @@ export const load = async ({ params, cookies, fetch }) => {
             slug,
             policy,
             schedule,
-            webfilter
+            webfilter,
+            timestamp // Include timestamp to make data unique
         };
 
     } catch (err) {

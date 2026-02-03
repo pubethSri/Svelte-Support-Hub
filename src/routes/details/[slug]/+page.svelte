@@ -1,6 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
-  import { invalidateAll } from "$app/navigation";
+  import { invalidateAll, invalidate } from "$app/navigation";
   import { fade } from "svelte/transition";
   import { onMount } from "svelte";
   import { Button } from "$lib/components/ui/button/index.js";
@@ -27,7 +27,10 @@
 
   let { data } = $props(); // Data from server
 
-  const { policy, schedule, webfilter } = data;
+  // Use $derived to make these reactive to data changes
+  const policy = $derived(data.policy);
+  const schedule = $derived(data.schedule);
+  const webfilter = $derived(data.webfilter);
 
   // --- LOADER LOGIC ---
   let isDeleting = $state(false);
@@ -186,7 +189,8 @@
       editedEndTime = "";
     }
 
-    await invalidateAll();
+    // Invalidate specific dependency to force fresh fetch
+    await invalidate("policy:details");
     isRefreshing = false;
   }
 </script>
