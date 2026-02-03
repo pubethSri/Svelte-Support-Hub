@@ -75,13 +75,13 @@
 
         {#if currentUser}
           <DropdownMenu.Root>
-            <DropdownMenu.Trigger>
-              <Button variant="ghost" class="flex items-center gap-2">
-                <UserIcon class="h-4 w-4" />
-                <span class="hidden sm:inline font-medium">
-                  {currentUser.name}
-                </span>
-              </Button>
+            <DropdownMenu.Trigger
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+            >
+              <UserIcon class="h-4 w-4" />
+              <span class="hidden sm:inline font-medium">
+                {currentUser.name}
+              </span>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content align="end">
               <DropdownMenu.Label
@@ -111,6 +111,25 @@
   </div>
 </nav>
 
-<marquee class="bg-yellow-300 dark:text-black font-bold"
-  >🚨🚧 This Server is currently in maintenance 🚧🚨</marquee
+<div
+  class="bg-yellow-300 dark:text-black font-bold overflow-hidden whitespace-nowrap"
 >
+  <div class="animate-marquee inline-block px-4 py-1">
+    🚨🚧 This Server is currently in maintenance 🚧🚨
+  </div>
+</div>
+
+<style>
+  @keyframes marquee {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  .animate-marquee {
+    animation: marquee 15s linear infinite;
+  }
+</style>
