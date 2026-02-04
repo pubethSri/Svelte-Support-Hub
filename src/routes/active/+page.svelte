@@ -42,14 +42,6 @@
         isLoading = false;
     }
 
-    // Helper: Simulate Loading for 3 seconds
-    function triggerLoadingForThreeSeconds() {
-        isLoading = true;
-        setTimeout(() => {
-            isLoading = false;
-        }, 3000);
-    }
-
     // Date & Status Helpers
     function formatDate(raw: string | undefined) {
         if (!raw) return "--";
@@ -110,9 +102,6 @@
     <div class="w-full max-w-6xl flex justify-between items-center">
         <h1 class="text-2xl font-bold dark:text-white">Active Policies</h1>
         <div class="flex items-center gap-2">
-            <Button variant="secondary" onclick={triggerLoadingForThreeSeconds} disabled={isLoading}>
-                Trigger Loading Animation (3s)
-            </Button>
             <Button variant="outline" onclick={handleRefresh} disabled={isLoading}>
                 {#if isLoading}
                     <Loader2 class="h-4 w-4 animate-spin" />
