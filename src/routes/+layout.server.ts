@@ -13,13 +13,24 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
         throw redirect(302, '/');
     }
     
-    // If token exists, decode and return user info
+    // If token exists, decode and validate expiration
     if (token) {
         try {
             // Decode JWT to get user info
             const payloadBase64 = token.split('.')[1];
             const payloadJson = atob(payloadBase64);
             const payload = JSON.parse(payloadJson);
+            
+            // Check if token is expired
+            const now = Math.floor(Date.now() / 1000); // Current time in seconds
+            if (payload.exp && payload.exp < now) {
+                // Token is expired - clear it
+                cookies.delete('authToken', { path: '/' });
+                if (!isPublicRoute) {
+                    throw redirect(302, '/');
+                }
+                return { user: null };
+            }
             
             return {
                 user: {
@@ -29,10 +40,10 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
                 }
             };
         } catch (err) {
-            // Invalid token - clear it and redirect to login
+            // Invalid token - clear it and redirect
             cookies.delete('authToken', { path: '/' });
             if (!isPublicRoute) {
-                throw redirect(302, '/login');
+                throw redirect(302, '/');
             }
         }
     }

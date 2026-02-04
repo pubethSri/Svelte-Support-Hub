@@ -95,10 +95,10 @@
             </div>
           </div>
           <h3 class="text-xl font-semibold mb-2 dark:text-white">
-            Secure Policy Management
+            Easy Policy Creation
           </h3>
           <p class="text-gray-600 dark:text-gray-400">
-            Create and manage firewall policies with advanced security controls
+            Create firewall policies with prepared templates
           </p>
         </div>
 
@@ -127,10 +127,10 @@
             </div>
           </div>
           <h3 class="text-xl font-semibold mb-2 dark:text-white">
-            Real-time Monitoring
+            Almost Real-time Monitoring
           </h3>
           <p class="text-gray-600 dark:text-gray-400">
-            Monitor active policies and network status in real-time
+            Monitor active policies and network status in almost real-time
           </p>
         </div>
       </div>

@@ -6,6 +6,7 @@
   import LoginCard from "$lib/LoginCard.svelte";
   import { Modal } from "flowbite-svelte";
   import { userState } from "$lib/userState.svelte";
+  import { invalidateAll } from "$app/navigation";
 
   let { children, data } = $props();
 
@@ -29,6 +30,13 @@
     document.body.appendChild(form);
     form.submit();
   }
+
+  async function handleLoginSuccess(userData: any) {
+    userState.set(userData);
+    showLoginModal = false;
+    // Invalidate all data so pages reload with new auth
+    await invalidateAll();
+  }
 </script>
 
 <Header
@@ -45,10 +53,7 @@
   classes={{ body: "p-0" }}
 >
   <LoginCard
-    onSuccess={(userData) => {
-      userState.set(userData);
-      showLoginModal = false;
-    }}
+    onSuccess={handleLoginSuccess}
     onClose={() => (showLoginModal = false)}
   />
 </Modal>

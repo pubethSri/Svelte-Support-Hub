@@ -1,5 +1,4 @@
-import { browser } from '$app/environment'; // <--- Import this
-import { decodeJwt, isExpired } from '$lib/jwt'
+import { browser } from '$app/environment';
 
 type User = {
     name: string;
@@ -9,15 +8,19 @@ type User = {
 class UserState {
     value = $state<User>(null);
 
-    constructor() {
-        // Only run this if we are in the browser!
+    set(user: User) {
+        this.value = user;
+        // Store user info (not token) in localStorage for persistence
+        if (browser && user) {
+            localStorage.setItem("user", JSON.stringify(user));
+        }
+    }
+
+    loadFromStorage() {
+        // Load cached user info from localStorage
+        // This is just for display - actual auth is via HttpOnly cookie
         if (browser) {
             const savedUser = localStorage.getItem("user");
-            const savedToken = localStorage.getItem('authToken')
-            if (!savedToken || isExpired(savedToken)) {
-                this.logout()
-                return
-            }
             if (savedUser) {
                 try {
                     this.value = JSON.parse(savedUser);
@@ -26,20 +29,12 @@ class UserState {
         }
     }
 
-    set(user: User) {
-        this.value = user;
-        // Only save if in browser
-        if (browser && user) {
-            localStorage.setItem("user", JSON.stringify(user));
-        }
-    }
-
     logout() {
         this.value = null;
-        // Only clear if in browser
         if (browser) {
             localStorage.removeItem("user");
-            localStorage.removeItem("authToken");
+            // Note: HttpOnly cookie can only be cleared by server
+            // The /logout endpoint handles this
         }
     }
 }
