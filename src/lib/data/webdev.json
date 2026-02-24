@@ -3,7 +3,7 @@
         {
             "id": null,
             "url": "webdev.it.kmitl.ac.th",
-            "type": "wildcard",
+            "type": "simple",
             "action": "monitor"
         }
     ]

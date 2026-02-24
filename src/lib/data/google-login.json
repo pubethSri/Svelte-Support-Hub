@@ -21,7 +21,7 @@
         {
             "id": null,
             "url": "ogs.google.com",
-            "type": "wildcard",
+            "type": "simple",
             "action": "monitor"
         }
     ]

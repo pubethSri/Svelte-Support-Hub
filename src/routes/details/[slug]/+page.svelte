@@ -21,6 +21,9 @@
   import AlertCircle from "@lucide/svelte/icons/alert-circle";
   import RefreshCw from "@lucide/svelte/icons/refresh-cw";
   import Loader2 from "@lucide/svelte/icons/loader-2";
+  import Lock from "@lucide/svelte/icons/lock";
+
+  import defaultUrlFilter from "$lib/data/default-urlfilter.json";
 
   // Import your loaders
   import loaderFull from "$lib/loader/loader_full.webp";
@@ -76,7 +79,13 @@
   }
 
   function removeUrlEntry(idx: number) {
+    if (isDefaultUrl(pendingEntries[idx].url)) return;
     pendingEntries = pendingEntries.filter((_, i) => i !== idx);
+  }
+
+  function isDefaultUrl(url: string) {
+    // Treat any URL found in the default list as un-removable
+    return defaultUrlFilter.urlfilter.some((d: any) => d.url === url);
   }
 
   // --- EXPAND/COLLAPSE LOGIC ---
@@ -818,19 +827,31 @@
                     <td class="px-4 py-2">{entry.type}</td>
                     <td class="px-4 py-2">
                       <span
-                        class="px-2 py-0.5 rounded text-xs border bg-green-50 text-green-600 border-green-200"
+                        class="px-2 py-0.5 rounded text-xs border {entry.action ===
+                        'block'
+                          ? 'bg-red-50 text-red-600 border-red-200'
+                          : 'bg-green-50 text-green-600 border-green-200'}"
                       >
                         {entry.action}
                       </span>
                     </td>
                     <td class="px-4 py-2">
-                      <button
-                        type="button"
-                        onclick={() => removeUrlEntry(i)}
-                        class="text-red-500 hover:text-red-700 text-xs"
-                      >
-                        ✕
-                      </button>
+                      {#if isDefaultUrl(entry.url)}
+                        <span
+                          title="Default URL filter cannot be removed"
+                          class="text-gray-400 inline-flex items-center"
+                        >
+                          <Lock class="w-4 h-4" />
+                        </span>
+                      {:else}
+                        <button
+                          type="button"
+                          onclick={() => removeUrlEntry(i)}
+                          class="text-red-500 hover:text-red-700 text-xs"
+                        >
+                          ✕
+                        </button>
+                      {/if}
                     </td>
                   </tr>
                 {/each}
@@ -910,7 +931,10 @@
                       <td class="px-4 py-2">{entry.type}</td>
                       <td class="px-4 py-2">
                         <span
-                          class={`px-2 py-0.5 rounded text-xs border ${entry.action === "block" ? "bg-red-50 text-red-600 border-red-200" : "bg-green-50 text-green-600 border-green-200"}`}
+                          class="px-2 py-0.5 rounded text-xs border {entry.action ===
+                          'block'
+                            ? 'bg-red-50 text-red-600 border-red-200'
+                            : 'bg-green-50 text-green-600 border-green-200'}"
                         >
                           {entry.action}
                         </span>

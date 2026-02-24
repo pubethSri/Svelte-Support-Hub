@@ -3,7 +3,7 @@
         {
             "id": null,
             "url": "ejudge.it.kmitl.ac.th",
-            "type": "wildcard",
+            "type": "simple",
             "action": "monitor"
         }
     ]

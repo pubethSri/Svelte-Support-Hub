@@ -3,7 +3,7 @@
         {
             "id": null,
             "url": "jlearn.it.kmitl.ac.th",
-            "type": "wildcard",
+            "type": "simple",
             "action": "monitor"
         },
         {
@@ -21,7 +21,7 @@
         {
             "id": null,
             "url": "netbeans.apache.org",
-            "type": "wildcard",
+            "type": "simple",
             "action": "monitor"
         }
     ]

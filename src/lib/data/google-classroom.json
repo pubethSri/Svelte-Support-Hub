@@ -3,13 +3,13 @@
         {
             "id": null,
             "url": "classroom.google.com",
-            "type": "wildcard",
+            "type": "simple",
             "action": "monitor"
         },
         {
             "id": null,
             "url": "clients6.google.com",
-            "type": "wildcard",
+            "type": "simple",
             "action": "monitor"
         },
         {
