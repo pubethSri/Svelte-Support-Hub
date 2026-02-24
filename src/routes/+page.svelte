@@ -153,21 +153,22 @@
 </Modal>
 
 <!-- Loading Overlay -->
-{#if isNavigating}
-  <div
-    transition:fade={{ duration: 200 }}
-    class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm"
-  >
-    <img
-      src={loaderFull}
-      alt="Loading..."
-      class="pointer-events-none object-contain w-[80vw] md:w-96 h-auto max-h-[80vh]"
-    />
+<div
+  class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-200 {isNavigating
+    ? 'opacity-100 pointer-events-auto'
+    : 'opacity-0 pointer-events-none'}"
+>
+  <img
+    src={loaderFull}
+    alt=""
+    class="pointer-events-none object-contain w-[80vw] md:w-96 h-auto max-h-[80vh]"
+  />
+  {#if isNavigating}
     <div class="mt-4 text-center">
       <h3 class="text-xl font-bold text-white tracking-wide">
         Loading Dashboard...
       </h3>
       <p class="text-gray-200 mt-2">Fetching active policies</p>
     </div>
-  </div>
-{/if}
+  {/if}
+</div>

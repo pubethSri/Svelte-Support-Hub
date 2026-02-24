@@ -1,6 +1,7 @@
 <script lang="ts">
   import "./layout.css";
   import icon from "$lib/assets/img/it-logo.png";
+  import loaderFull from "$lib/loader/loader_full.webp";
   import { ModeWatcher } from "mode-watcher";
   import Header from "$lib/Header.svelte";
   import LoginCard from "$lib/LoginCard.svelte";

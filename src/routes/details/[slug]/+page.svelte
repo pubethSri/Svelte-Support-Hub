@@ -247,48 +247,49 @@
 <div
   class="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 flex flex-col items-center gap-8 relative"
 >
-  {#if isDeleting || isSaving || isRefreshing}
-    <div
-      transition:fade={{ duration: 200 }}
-      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm"
-    >
-      <img
-        src={loaderFull}
-        alt="Loading..."
-        class="pointer-events-none object-contain w-[80vw] md:w-96 h-auto max-h-[80vh]"
-      />
-      <div class="mt-4 text-center">
-        {#if isDeleting}
-          <h3 class="text-xl font-bold text-white tracking-wide">
-            Deleting Policy...
-          </h3>
-          <p class="text-gray-200 mt-2">
-            Removing <span class="font-mono font-bold text-red-400"
-              >{policy.name}</span
-            >
-          </p>
-        {:else if isSaving}
-          <h3 class="text-xl font-bold text-white tracking-wide">
-            Saving Policy...
-          </h3>
-          <p class="text-gray-200 mt-2">
-            Updating configuration for <span
-              class="font-mono font-bold text-blue-400">{policy.name}</span
-            >
-          </p>
-        {:else if isRefreshing}
-          <h3 class="text-xl font-bold text-white tracking-wide">
-            Refreshing Data...
-          </h3>
-          <p class="text-gray-200 mt-2">
-            Loading latest information for <span
-              class="font-mono font-bold text-green-400">{policy.name}</span
-            >
-          </p>
-        {/if}
-      </div>
+  <div
+    class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-200 {isDeleting ||
+    isSaving ||
+    isRefreshing
+      ? 'opacity-100 pointer-events-auto'
+      : 'opacity-0 pointer-events-none'}"
+  >
+    <img
+      src={loaderFull}
+      alt=""
+      class="pointer-events-none object-contain w-[80vw] md:w-96 h-auto max-h-[80vh]"
+    />
+    <div class="mt-4 text-center">
+      {#if isDeleting}
+        <h3 class="text-xl font-bold text-white tracking-wide">
+          Deleting Policy...
+        </h3>
+        <p class="text-gray-200 mt-2">
+          Removing <span class="font-mono font-bold text-red-400"
+            >{policy.name}</span
+          >
+        </p>
+      {:else if isSaving}
+        <h3 class="text-xl font-bold text-white tracking-wide">
+          Saving Policy...
+        </h3>
+        <p class="text-gray-200 mt-2">
+          Updating configuration for <span
+            class="font-mono font-bold text-blue-400">{policy.name}</span
+          >
+        </p>
+      {:else if isRefreshing}
+        <h3 class="text-xl font-bold text-white tracking-wide">
+          Refreshing Data...
+        </h3>
+        <p class="text-gray-200 mt-2">
+          Loading latest information for <span
+            class="font-mono font-bold text-green-400">{policy.name}</span
+          >
+        </p>
+      {/if}
     </div>
-  {/if}
+  </div>
 
   <div class="w-full max-w-4xl space-y-6">
     <div class="flex items-center gap-4">
