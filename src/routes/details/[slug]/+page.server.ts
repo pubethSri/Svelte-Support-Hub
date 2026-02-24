@@ -215,5 +215,50 @@ export const actions = {
             console.error('Update Policy Error:', err);
             return fail(500, { error: 'Failed to update policy' });
         }
+    },
+
+    updateUrlFilter: async ({ cookies, request, fetch }) => {
+        const token = cookies.get("authToken");
+        if (!token) return fail(401, { error: "Unauthorized" });
+
+        try {
+            const formData = await request.formData();
+            const urlFilterId = formData.get('urlFilterId') as string;
+            const entriesJson = formData.get('entries') as string;
+
+            if (!urlFilterId || !entriesJson) {
+                return fail(400, { error: "Missing urlFilterId or entries" });
+            }
+
+            const entries = JSON.parse(entriesJson);
+
+            const res = await fetch(
+                `${BACKEND_URL}/firewall/webfilter/urlfilter/change/${encodeURIComponent(urlFilterId)}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ entries })
+                }
+            );
+
+            if (!res.ok) {
+                return fail(res.status, { error: "Failed to update URL filter" });
+            }
+
+            // Save FortiGate config
+            await fetch(`${BACKEND_URL}/firewall/save`, {
+                method: "POST",
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            return { success: true, message: "URL filter updated successfully" };
+
+        } catch (err) {
+            console.error('Update URL Filter Error:', err);
+            return fail(500, { error: 'Failed to update URL filter' });
+        }
     }
 };

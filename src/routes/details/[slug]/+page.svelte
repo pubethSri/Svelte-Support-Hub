@@ -37,6 +37,48 @@
   let isSaving = $state(false);
   let isRefreshing = $state(false);
 
+  // --- DELETE CONFIRMATION MODAL ---
+  let showDeleteModal = $state(false);
+  let deleteFormRef = $state<HTMLFormElement | null>(null);
+  let deleteConfirmText = $state("");
+
+  // --- URL FILTER EDIT ---
+  let isEditingUrlFilter = $state(false);
+  let isSavingUrlFilter = $state(false);
+  let newUrl = $state("");
+  let newUrlType = $state<"simple" | "wildcard">("simple");
+  // Local copy of entries with pending additions
+  let pendingEntries = $state<any[]>([]);
+
+  function startUrlFilterEdit() {
+    pendingEntries = webfilter?.entries ? [...webfilter.entries] : [];
+    isEditingUrlFilter = true;
+  }
+
+  function cancelUrlFilterEdit() {
+    isEditingUrlFilter = false;
+    newUrl = "";
+    newUrlType = "simple";
+    pendingEntries = [];
+  }
+
+  function addUrlEntry() {
+    if (!newUrl.trim()) return;
+    const newEntry = {
+      id: 0,
+      url: newUrl.trim(),
+      type: newUrlType,
+      action: "monitor",
+    };
+    pendingEntries = [newEntry, ...pendingEntries];
+    newUrl = "";
+    newUrlType = "simple";
+  }
+
+  function removeUrlEntry(idx: number) {
+    pendingEntries = pendingEntries.filter((_, i) => i !== idx);
+  }
+
   // --- EXPAND/COLLAPSE LOGIC ---
   let isExpanded = $state(false);
 
@@ -450,37 +492,42 @@
                 Cancel Edit
               </DropdownMenu.Item>
             {/if}
-            <form
-              method="POST"
-              action="?/delete"
-              use:enhance={({ cancel }) => {
-                if (!confirm(`Permanently delete policy ${policy.name}?`)) {
-                  cancel();
-                  return;
+            <DropdownMenu.Item
+              class="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950 cursor-pointer"
+              disabled={isDeleting}
+              onkeydown={(e: KeyboardEvent) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  showDeleteModal = true;
                 }
-                isDeleting = true;
-                return async ({ update }) => {
-                  await update();
-                  isDeleting = false;
-                };
+              }}
+              onclick={(e) => {
+                e.preventDefault();
+                showDeleteModal = true;
               }}
             >
-              <DropdownMenu.Item
-                class="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950 cursor-pointer"
-                disabled={isDeleting}
-                onclick={(e) => {
-                  e.preventDefault();
-                  e.currentTarget.closest("form")?.requestSubmit();
-                }}
-              >
-                <Trash class="w-4 h-4 mr-2" />
-                Delete Policy
-              </DropdownMenu.Item>
-            </form>
+              <Trash class="w-4 h-4 mr-2" />
+              Delete Policy
+            </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Root>
       </div>
     </div>
+
+    <!-- Hidden delete form — lives outside the dropdown so it stays in DOM -->
+    <form
+      method="POST"
+      action="?/delete"
+      bind:this={deleteFormRef}
+      use:enhance={() => {
+        isDeleting = true;
+        return async ({ update }) => {
+          await update();
+          isDeleting = false;
+        };
+      }}
+      class="hidden"
+    ></form>
 
     <div class="grid gap-6 md:grid-cols-2">
       <div
@@ -656,36 +703,90 @@
       <div
         class="md:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow p-6 border dark:border-gray-700"
       >
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
           <h2
             class="text-lg font-semibold flex items-center gap-2 dark:text-white"
           >
             <Globe class="h-5 w-5 text-orange-500" />
             Web Filter Rules
           </h2>
-          {#if webfilter && webfilter.entries && webfilter.entries.length > 5}
-            <Button
-              variant="outline"
-              size="sm"
-              onclick={() => (isExpanded = !isExpanded)}
-              class="flex items-center gap-2"
-            >
-              {#if isExpanded}
-                <Minimize class="h-4 w-4" />
-                Collapse
-              {:else}
-                <Maximize class="h-4 w-4" />
-                Expand
-              {/if}
-            </Button>
-          {/if}
+          <div class="flex gap-2">
+            {#if webfilter && webfilter.entries && webfilter.entries.length > 5 && !isEditingUrlFilter}
+              <Button
+                variant="outline"
+                size="sm"
+                onclick={() => (isExpanded = !isExpanded)}
+                class="flex items-center gap-2"
+              >
+                {#if isExpanded}
+                  <Minimize class="h-4 w-4" /> Collapse
+                {:else}
+                  <Maximize class="h-4 w-4" /> Expand
+                {/if}
+              </Button>
+            {/if}
+            {#if !isEditingUrlFilter}
+              <Button
+                variant="outline"
+                size="sm"
+                onclick={startUrlFilterEdit}
+                class="flex items-center gap-2"
+              >
+                <Edit class="h-4 w-4" /> Edit Rules
+              </Button>
+            {:else}
+              <Button
+                variant="outline"
+                size="sm"
+                onclick={cancelUrlFilterEdit}
+                class="flex items-center gap-2"
+              >
+                <AlertCircle class="h-4 w-4" /> Cancel
+              </Button>
+            {/if}
+          </div>
         </div>
-        {#if webfilter && webfilter.entries}
-          <div
-            class="overflow-x-auto {isExpanded
-              ? ''
-              : 'max-h-80 overflow-y-auto'} transition-all duration-300"
-          >
+
+        {#if isEditingUrlFilter}
+          <!-- Add entry form -->
+          <div class="flex gap-2 mb-4 items-end flex-wrap">
+            <div class="flex flex-col gap-1 flex-1 min-w-[200px]">
+              <Label class="text-xs text-gray-500">URL / Pattern</Label>
+              <Input
+                type="text"
+                placeholder="e.g. example.com or *.example.com"
+                bind:value={newUrl}
+                class="h-9 text-sm"
+                onkeydown={(e: KeyboardEvent) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addUrlEntry();
+                  }
+                }}
+              />
+            </div>
+            <div class="flex flex-col gap-1">
+              <Label class="text-xs text-gray-500">Type</Label>
+              <select
+                bind:value={newUrlType}
+                class="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm"
+              >
+                <option value="simple">simple</option>
+                <option value="wildcard">wildcard</option>
+              </select>
+            </div>
+            <Button
+              size="sm"
+              onclick={addUrlEntry}
+              disabled={!newUrl.trim()}
+              class="h-9"
+            >
+              <Globe class="h-4 w-4 mr-1" /> Add
+            </Button>
+          </div>
+
+          <!-- Pending entries table -->
+          <div class="overflow-x-auto max-h-80 overflow-y-auto mb-4">
             <table
               class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
             >
@@ -696,13 +797,18 @@
                   <th class="px-4 py-2">URL / Pattern</th>
                   <th class="px-4 py-2">Type</th>
                   <th class="px-4 py-2">Action</th>
-                  <th class="px-4 py-2">Status</th>
+                  <th class="px-4 py-2">Remove</th>
                 </tr>
               </thead>
               <tbody>
-                {#each webfilter.entries as entry}
+                {#each pendingEntries as entry, i}
                   <tr
-                    class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                    class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 {i ===
+                      0 &&
+                    entry.action === 'monitor' &&
+                    !webfilter?.entries?.find((e: any) => e.url === entry.url)
+                      ? 'bg-green-50 dark:bg-green-900/10'
+                      : ''}"
                   >
                     <td
                       class="px-4 py-2 font-medium text-gray-900 dark:text-white"
@@ -711,21 +817,220 @@
                     <td class="px-4 py-2">{entry.type}</td>
                     <td class="px-4 py-2">
                       <span
-                        class={`px-2 py-0.5 rounded text-xs border ${entry.action === "block" ? "bg-red-50 text-red-600 border-red-200" : "bg-green-50 text-green-600 border-green-200"}`}
+                        class="px-2 py-0.5 rounded text-xs border bg-green-50 text-green-600 border-green-200"
                       >
                         {entry.action}
                       </span>
                     </td>
-                    <td class="px-4 py-2">{entry.status}</td>
+                    <td class="px-4 py-2">
+                      <button
+                        type="button"
+                        onclick={() => removeUrlEntry(i)}
+                        class="text-red-500 hover:text-red-700 text-xs"
+                      >
+                        ✕
+                      </button>
+                    </td>
                   </tr>
                 {/each}
               </tbody>
             </table>
           </div>
+
+          <!-- Save form -->
+          <form
+            method="POST"
+            action="?/updateUrlFilter"
+            use:enhance={({ formData, cancel }) => {
+              if (pendingEntries.length === 0) {
+                cancel();
+                return;
+              }
+              formData.set("urlFilterId", String(webfilter?.id ?? ""));
+              formData.set("entries", JSON.stringify(pendingEntries));
+              isSavingUrlFilter = true;
+              return async ({ result, update }) => {
+                await update();
+                isSavingUrlFilter = false;
+                if (result.type === "success") {
+                  isEditingUrlFilter = false;
+                  pendingEntries = [];
+                  await invalidate("policy:details");
+                } else {
+                  alert(
+                    (result as any).data?.error ?? "Failed to save URL filter",
+                  );
+                }
+              };
+            }}
+          >
+            <Button
+              type="submit"
+              class="w-full bg-orange-500 hover:bg-orange-600 text-white"
+              disabled={isSavingUrlFilter || pendingEntries.length === 0}
+            >
+              {#if isSavingUrlFilter}
+                <Loader2 class="h-4 w-4 mr-2 animate-spin" /> Saving...
+              {:else}
+                <FloppyDisk class="h-4 w-4 mr-2" /> Save URL Filter
+              {/if}
+            </Button>
+          </form>
         {:else}
-          <p class="text-gray-500 italic">No webfilter rules configured.</p>
+          <!-- Read-only view -->
+          {#if webfilter && webfilter.entries}
+            <div
+              class="overflow-x-auto {isExpanded
+                ? ''
+                : 'max-h-80 overflow-y-auto'} transition-all duration-300"
+            >
+              <table
+                class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
+              >
+                <thead
+                  class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 sticky top-0"
+                >
+                  <tr>
+                    <th class="px-4 py-2">URL / Pattern</th>
+                    <th class="px-4 py-2">Type</th>
+                    <th class="px-4 py-2">Action</th>
+                    <th class="px-4 py-2">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {#each webfilter.entries as entry}
+                    <tr
+                      class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                    >
+                      <td
+                        class="px-4 py-2 font-medium text-gray-900 dark:text-white"
+                        >{entry.url}</td
+                      >
+                      <td class="px-4 py-2">{entry.type}</td>
+                      <td class="px-4 py-2">
+                        <span
+                          class={`px-2 py-0.5 rounded text-xs border ${entry.action === "block" ? "bg-red-50 text-red-600 border-red-200" : "bg-green-50 text-green-600 border-green-200"}`}
+                        >
+                          {entry.action}
+                        </span>
+                      </td>
+                      <td class="px-4 py-2">{entry.status}</td>
+                    </tr>
+                  {/each}
+                </tbody>
+              </table>
+            </div>
+          {:else}
+            <p class="text-gray-500 italic">No webfilter rules configured.</p>
+          {/if}
         {/if}
       </div>
     </div>
   </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+{#if showDeleteModal}
+  <div
+    transition:fade={{ duration: 150 }}
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="delete-modal-title"
+  >
+    <div
+      class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md p-6 flex flex-col gap-5"
+    >
+      <!-- Icon + Title -->
+      <div class="flex items-start gap-4">
+        <div
+          class="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center"
+        >
+          <Trash class="w-6 h-6 text-red-600 dark:text-red-400" />
+        </div>
+        <div>
+          <h2
+            id="delete-modal-title"
+            class="text-lg font-semibold text-gray-900 dark:text-white"
+          >
+            Delete Policy
+          </h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            This action <span
+              class="font-semibold text-red-600 dark:text-red-400"
+              >cannot be undone</span
+            >. The following policy and all associated schedules and web filters
+            will be permanently deleted.
+          </p>
+        </div>
+      </div>
+
+      <!-- Policy name highlight -->
+      <div
+        class="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3"
+      >
+        <p
+          class="text-xs font-medium text-red-600 dark:text-red-400 mb-1 uppercase tracking-wide"
+        >
+          Policy Name
+        </p>
+        <p
+          class="font-mono text-sm font-semibold text-gray-900 dark:text-white break-all"
+        >
+          {policy.name}
+        </p>
+      </div>
+
+      <!-- Confirmation Input -->
+      <div class="flex flex-col gap-1.5">
+        <Label class="text-sm text-gray-600 dark:text-gray-400">
+          Type <span
+            class="font-mono font-bold tracking-widest text-red-600 dark:text-red-400"
+            >DELETE</span
+          > to confirm
+        </Label>
+        <Input
+          type="text"
+          placeholder="DELETE"
+          bind:value={deleteConfirmText}
+          class="font-mono {deleteConfirmText === 'DELETE'
+            ? 'border-red-500 focus-visible:ring-red-500'
+            : ''}"
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-3 justify-between">
+        <Button
+          variant="outline"
+          onclick={() => {
+            showDeleteModal = false;
+            deleteConfirmText = "";
+          }}
+          disabled={isDeleting}
+          class="min-w-[90px]"
+        >
+          Cancel
+        </Button>
+        <Button
+          class="min-w-[120px] bg-red-600 hover:bg-red-700 text-white disabled:opacity-50"
+          disabled={isDeleting || deleteConfirmText !== "DELETE"}
+          onclick={() => {
+            showDeleteModal = false;
+            deleteConfirmText = "";
+            deleteFormRef?.requestSubmit();
+          }}
+        >
+          {#if isDeleting}
+            <Loader2 class="w-4 h-4 mr-2 animate-spin" />
+            Deleting...
+          {:else}
+            <Trash class="w-4 h-4 mr-2" />
+            Yes, Delete
+          {/if}
+        </Button>
+      </div>
+    </div>
+  </div>
+{/if}

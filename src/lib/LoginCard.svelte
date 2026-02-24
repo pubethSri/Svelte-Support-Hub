@@ -56,7 +56,7 @@
           // Login successful - cookie is already set by server
           if (onSuccess) onSuccess(result.data.user);
         } else if (result.type === "failure") {
-          errorMessage = result.data?.error || "Login failed";
+          errorMessage = String(result.data?.error || "Login failed");
         } else {
           errorMessage = "An unexpected error occurred";
         }
