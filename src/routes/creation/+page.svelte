@@ -44,15 +44,15 @@
   let addresses = $state<{ value: string; name: string }[]>([]);
   let urlTemplates = $state<{ value: string; name: string }[]>([]);
 
-  // Filter out automatically injected templates from the MultiSelect dropdown options
-  const hiddenTemplateNames = [
-    "google-login",
-    "google-drive",
-    "default-urlfilter",
-  ];
+  // Build the list by iterating through the database array directly,
+  // since the Backend Database is strictly ordered by ID
   let availableTemplates: { value: string; name: string }[] = templates
-    .filter((t: any) => !hiddenTemplateNames.includes(t.name))
-    .map((template: any) => ({ value: template.name, name: template.name }));
+    .filter((t: any) => !t.isHidden)
+    .map((temp: any) => ({
+      value: temp.name,
+      name: temp.displayName || temp.name,
+    }));
+
   // --- 3. FETCH OPTIONS ON LOAD ---
   onMount(async () => {
     try {

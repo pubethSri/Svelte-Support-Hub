@@ -8,6 +8,18 @@
   import { Button } from "$lib/components/ui/button/index.js";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu"; // Optional: For Logout menu
   import ITkmitlLogo from "$lib/assets/img/itkmitl.svg.svelte";
+  import loaderFull from "$lib/loader/loader_full.webp";
+  import { goto } from "$app/navigation";
+
+  let isActiveNavigating = $state(false);
+
+  async function handleGoToActive(e: MouseEvent) {
+    if (window.location.pathname === "/active") return;
+    e.preventDefault();
+    isActiveNavigating = true;
+    await goto("/active");
+    isActiveNavigating = false;
+  }
 
   // 1. Receive User Data & Emit Events
   let { currentUser, onLoginClick, onLogoutClick } = $props<{
@@ -49,6 +61,7 @@
             </a>
             <a
               href="/active"
+              onclick={handleGoToActive}
               class="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-200 dark:hover:text-blue-400"
             >
               Active Policies
@@ -117,6 +130,27 @@
   <div class="animate-marquee inline-block px-4 py-1">
     🚨🚧 This Server is currently in maintenance 🚧🚨
   </div>
+</div>
+
+<!-- Loading Overlay -->
+<div
+  class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-200 {isActiveNavigating
+    ? 'opacity-100 pointer-events-auto'
+    : 'opacity-0 pointer-events-none'}"
+>
+  <img
+    src={loaderFull}
+    alt=""
+    class="pointer-events-none object-contain w-[80vw] md:w-96 h-auto max-h-[80vh]"
+  />
+  {#if isActiveNavigating}
+    <div class="mt-4 text-center">
+      <h3 class="text-xl font-bold text-white tracking-wide">
+        Loading Dashboard...
+      </h3>
+      <p class="text-gray-200 mt-2">Fetching active policies</p>
+    </div>
+  {/if}
 </div>
 
 <style>
