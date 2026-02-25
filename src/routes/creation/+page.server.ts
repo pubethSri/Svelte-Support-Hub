@@ -3,6 +3,22 @@ import { fail, redirect } from "@sveltejs/kit";
 
 const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
+export const load = async ({ fetch, cookies }) => {
+    const token = cookies.get("authToken");
+    try {
+        const res = await fetch(`${BACKEND_URL}/templates`, {
+            headers: token ? {
+                'Authorization': `Bearer ${token}`
+            } : {}
+        });
+        const templates = await res.json();
+        return { templates };
+    } catch (e) {
+        console.error("Failed to fetch templates:", e);
+        return { templates: [] };
+    }
+};
+
 export const actions = {
     createPolicy: async ({ cookies, request, fetch }) => {
         const token = cookies.get("authToken");

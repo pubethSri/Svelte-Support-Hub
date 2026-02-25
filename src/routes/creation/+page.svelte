@@ -10,25 +10,7 @@
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import { getLocalTimeZone, type CalendarDate } from "@internationalized/date";
   import { userState } from "$lib/userState.svelte";
-  import ServicesData from "$lib/services_ex.json";
   import Loader2 from "@lucide/svelte/icons/loader-2";
-  import onlearn from "$lib/data/onlearn.json";
-  import defaultUrlFilter from "$lib/data/default-urlfilter.json";
-  import jlearn from "$lib/data/jlearn.json";
-  import googleLogin from "$lib/data/google-login.json";
-  import dblearn from "$lib/data/dblearn.json";
-  import nolearn from "$lib/data/nolearn.json";
-  import ujudge from "$lib/data/ujudge.json";
-  import ejudge from "$lib/data/ejudge.json";
-  import ijudge from "$lib/data/ijudge.json";
-  import secspace from "$lib/data/secspace.json";
-  import kits from "$lib/data/kits.json";
-  import webdev from "$lib/data/webdev.json";
-  import googleClassroom from "$lib/data/google-classroom.json";
-  import googleDrive from "$lib/data/google-drive.json";
-  import blockAI from "$lib/data/block-ai.json";
-  import blockChat from "$lib/data/block-chat.json";
-  import microsoftServices from "$lib/data/microsoft-services.json";
 
   type UrlFilterEntry = {
     id: number | null;
@@ -55,12 +37,22 @@
   let selectedProfiles = $state<string[]>([]);
 
   // --- 2. STATE: DROPDOWN OPTIONS (Mocked or Fetched) ---
+  let { data } = $props();
+  // We use data.templates fetched from SQLite via the backend +page.server.ts load function
+  const templates = data.templates || [];
+
   let addresses = $state<{ value: string; name: string }[]>([]);
   let urlTemplates = $state<{ value: string; name: string }[]>([]);
 
-  let internalServices: { value: string; name: string }[] =
-    ServicesData.services.map((service) => ({ value: service, name: service }));
-
+  // Filter out automatically injected templates from the MultiSelect dropdown options
+  const hiddenTemplateNames = [
+    "google-login",
+    "google-drive",
+    "default-urlfilter",
+  ];
+  let availableTemplates: { value: string; name: string }[] = templates
+    .filter((t: any) => !hiddenTemplateNames.includes(t.name))
+    .map((template: any) => ({ value: template.name, name: template.name }));
   // --- 3. FETCH OPTIONS ON LOAD ---
   onMount(async () => {
     try {
@@ -72,9 +64,7 @@
         }));
       }
 
-      // Fetch URL Filter Templates (if available)
-      // If you have a predefined list, you can hardcode it here instead
-      urlTemplates = internalServices;
+      urlTemplates = availableTemplates;
     } catch (err) {
       console.error("Failed to load form options", err);
     }
@@ -124,7 +114,7 @@
         id: 0,
         name: `[EXAM][API] ${policyName}`,
         comment: "This WebFilter is created via API",
-        entries: buildUrlFilterPayload(selectedProfiles).urlfilter,
+        entries: generateUrlFilter(selectedProfiles).urlfilter,
       },
       onetime_schedule: {
         name: `[EXAM][API] ${policyName}`,
@@ -135,79 +125,43 @@
     };
   }
 
-  function buildUrlFilterPayload(profiles: string[]): UrlFilterPayload {
-    let entries: UrlFilterEntry[] = [];
+  function generateUrlFilter(profiles: string[]) {
+    const entries: UrlFilterEntry[] = [];
+    const injectedTemplateNames = new Set<string>();
 
-    for (const profile of profiles) {
-      switch (profile) {
-        case "On:learn":
-          entries.push(...(onlearn.urlfilter as UrlFilterEntry[]));
-          break;
-        case "J:learn":
-          entries.push(...(jlearn.urlfilter as UrlFilterEntry[]));
-          break;
-        case "DB:learn":
-          entries.push(...(dblearn.urlfilter as UrlFilterEntry[]));
-          break;
-        case "No:learn":
-          entries.push(...(nolearn.urlfilter as UrlFilterEntry[]));
-          break;
-        case "<U>judge":
-          entries.push(...(ujudge.urlfilter as UrlFilterEntry[]));
-          break;
-        case "<E>judge":
-          entries.push(...(ejudge.urlfilter as UrlFilterEntry[]));
-          break;
-        case "<I>judge":
-          entries.push(...(ijudge.urlfilter as UrlFilterEntry[]));
-          break;
-        case "Secspace":
-          entries.push(...(secspace.urlfilter as UrlFilterEntry[]));
-          break;
-        case "KITS":
-          entries.push(...(kits.urlfilter as UrlFilterEntry[]));
-          break;
-        case "WebDev":
-          entries.push(...(webdev.urlfilter as UrlFilterEntry[]));
-          break;
-        case "Google Classroom":
-          entries.push(...(googleClassroom.urlfilter as UrlFilterEntry[]));
-          break;
-        case "Block AI":
-          entries.push(...(blockAI.urlfilter as UrlFilterEntry[]));
-          break;
-        case "Block Chat":
-          entries.push(...(blockChat.urlfilter as UrlFilterEntry[]));
-          break;
-        case "Microsoft Services":
-          entries.push(...(microsoftServices.urlfilter as UrlFilterEntry[]));
-          break;
+    // Map selected template names into entries
+    for (const profileName of profiles) {
+      const template = templates.find((t: any) => t.name === profileName);
+      if (template) {
+        if (template.entries) entries.push(...template.entries);
+
+        // Read auto-inject dependencies from DB
+        if (template.autoInject && Array.isArray(template.autoInject)) {
+          template.autoInject.forEach((dep: string) =>
+            injectedTemplateNames.add(dep),
+          );
+        }
       }
     }
 
-    if (
-      [
-        "J:learn",
-        "DB:learn",
-        "No:learn",
-        "U:judge",
-        "Secspace",
-        "KITS",
-        "Google Classroom",
-        "Microsoft Services",
-      ].some((p) => profiles.includes(p))
-    ) {
-      entries.push(...(googleLogin.urlfilter as UrlFilterEntry[]));
+    // Process auto-injected templates dynamically from DB
+    for (const depName of injectedTemplateNames) {
+      if (!profiles.includes(depName)) {
+        // Don't duplicate if explicitly selected manually
+        const depTemplate = templates.find((t: any) => t.name === depName);
+        if (depTemplate?.entries) {
+          entries.push(...depTemplate.entries);
+        }
+      }
     }
 
-    if (["Google Classroom"].some((p) => profiles.includes(p))) {
-      entries.push(...(googleDrive.urlfilter as UrlFilterEntry[]));
-    }
-
-    if (
-      ["Block AI", "Block Chat"].some((p) => profiles.includes(p)) === false
-    ) {
-      entries.push(...(defaultUrlFilter.urlfilter as UrlFilterEntry[]));
+    // Auto-inject default URL filter UNLESS they are blocking AI/Chat exclusively
+    if (!profiles.includes("block-ai") && !profiles.includes("block-chat")) {
+      const defaultFilterTemplate = templates.find(
+        (t: any) => t.name === "default-urlfilter",
+      );
+      if (defaultFilterTemplate?.entries)
+        entries.push(...defaultFilterTemplate.entries);
     }
 
     // assign IDs based on final size
@@ -228,7 +182,7 @@
   </div>
 
   {#if userState.value}
-    {#if userState.value.name.toLowerCase() === "mr.jirathip kapanya" || userState.value.role.toLowerCase() === "lecturer" || userState.value.name.toLowerCase() === "montree kingkaew" || userState.value.name.toLowerCase() === "mr.pubeth sriwattana" || userState.value.name.toLowerCase() === "นายจารุกิตติ์ ศรีพาเพลิน" || userState.value.name.toLowerCase() === "นายชญานนท์ สุภากิจ"}
+    {#if userState.value.isAllowed}
       <div
         class="w-full max-w-4xl bg-white dark:bg-gray-800 p-6 rounded-lg shadow space-y-8"
       >

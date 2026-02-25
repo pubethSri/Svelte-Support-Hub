@@ -5,7 +5,7 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
     const token = cookies.get("authToken");
     
     // Public routes that don't require authentication
-    const publicRoutes = ['/'];
+    const publicRoutes = ['/', '/forbidden'];
     const isPublicRoute = publicRoutes.some(route => url.pathname === route);
     
     // If no token and trying to access protected route, redirect to landing page
@@ -32,14 +32,26 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
                 return { user: null };
             }
             
+            // Check if user is actually authorized to use the app
+            if (!payload.isAllowed && !isPublicRoute) {
+                // Do not delete token, just restrict access to this page
+                throw redirect(302, '/forbidden');
+            }
+
             return {
                 user: {
                     name: payload.name || '',
                     email: payload.email || '',
-                    role: payload.role || ''
+                    role: payload.role || '',
+                    isAllowed: payload.isAllowed || false
                 }
             };
         } catch (err) {
+            // Check if the error is a SvelteKit redirect
+            if (err && typeof err === 'object' && 'status' in err && 'location' in err) {
+                throw err;
+            }
+            
             // Invalid token - clear it and redirect
             cookies.delete('authToken', { path: '/' });
             if (!isPublicRoute) {

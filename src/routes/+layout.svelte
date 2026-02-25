@@ -11,13 +11,23 @@
 
   let { children, data } = $props();
 
-  // Directly sync server user data to prevent flash
-  // This runs immediately during component initialization
+  // Initialize server data directly to global store to prevent SSR flash
   if (data?.user) {
     userState.set(data.user);
   } else {
     userState.value = null;
   }
+
+  // Synchronize server data to global store on subsequent client navigations
+  $effect(() => {
+    if (data?.user) {
+      if (userState.value?.name !== data.user.name) {
+        userState.set(data.user);
+      }
+    } else {
+      userState.value = null;
+    }
+  });
 
   let showLoginModal = $state(false);
 

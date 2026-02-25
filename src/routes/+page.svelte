@@ -17,8 +17,6 @@
   function handleLoginSuccess(userData: any) {
     userState.set(userData);
     showLoginModal = false;
-    // Redirect to policy creation page after successful login
-    goto("/creation");
   }
 
   async function handleGoToDashboard() {
