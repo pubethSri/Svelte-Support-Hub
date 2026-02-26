@@ -1,5 +1,5 @@
 import { env } from "$env/dynamic/public";
-import { fail } from "@sveltejs/kit";
+import { fail, redirect } from "@sveltejs/kit";
 
 const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
@@ -56,6 +56,12 @@ export const load = async ({ cookies, fetch }) => {
     try {
         // A. Fetch Policies
         const res = await fetch(`${BACKEND_URL}/firewall/policies`, { headers });
+        
+        // If the backend actively rejected the token due to revoked permissions, boot them out
+        if (res.status === 401 || res.status === 403) {
+            throw redirect(302, '/forbidden');
+        }
+        
         if (!res.ok) return { policies: [] }; // Handle error gracefully or throw
 
         const data = await res.json();
@@ -104,6 +110,11 @@ export const load = async ({ cookies, fetch }) => {
         };
 
     } catch (err) {
+        // Re-throw redirects!
+        if (err && typeof err === 'object' && 'status' in err && 'location' in err) {
+            throw err;
+        }
+        
         console.error("SSR Fetch Error", err);
         return { policies: [] };
     }

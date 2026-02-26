@@ -11,9 +11,20 @@ export const load = async ({ fetch, cookies }) => {
                 'Authorization': `Bearer ${token}`
             } : {}
         });
+        
+        // If the backend actively rejected the token due to revoked permissions
+        if (res.status === 401 || res.status === 403) {
+            throw redirect(302, '/forbidden');
+        }
+        
         const templates = await res.json();
         return { templates };
     } catch (e) {
+        // Re-throw redirects!
+        if (e && typeof e === 'object' && 'status' in e && 'location' in e) {
+            throw e;
+        }
+        
         console.error("Failed to fetch templates:", e);
         return { templates: [] };
     }
