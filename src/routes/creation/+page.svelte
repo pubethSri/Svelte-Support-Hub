@@ -175,19 +175,46 @@
 </script>
 
 <div
-  class="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 flex flex-col items-center gap-6"
+  class="relative min-h-screen bg-[#fafafa] dark:bg-[#05080f] overflow-hidden selection:bg-orange-500/30 font-sans flex flex-col items-center gap-6 p-8 pt-32"
 >
-  <div class="w-full max-w-4xl flex justify-between items-center">
-    <h1 class="text-2xl font-bold dark:text-white">Policy Creation</h1>
+  <!-- Abstract Ambient Background Orbs -->
+  <div
+    class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-orange-400/20 dark:bg-orange-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_10s_infinite]"
+  ></div>
+  <div
+    class="absolute top-[20%] right-[-10%] w-[35vw] h-[35vw] rounded-full bg-pink-400/20 dark:bg-pink-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_12s_infinite_2s]"
+  ></div>
+  <div
+    class="absolute bottom-[-20%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-purple-400/20 dark:bg-purple-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_14s_infinite_4s]"
+  ></div>
+
+  <!-- Subtle Grid Pattern -->
+  <div
+    class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMTUwLCAxNTAsIDE1MCwgMC4yKSIvPjwvc3ZnPg==')] [mask-image:linear-gradient(to_bottom,white,transparent_80%)]"
+  ></div>
+
+  <div
+    class="w-full max-w-4xl flex justify-between items-center relative z-10 mb-2"
+  >
+    <h1
+      class="text-4xl md:text-5xl font-black tracking-tight text-gray-900 dark:text-white drop-shadow-sm"
+    >
+      Policy <span
+        class="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 dark:from-yellow-400 dark:via-pink-500 dark:to-purple-500 bg-clip-text text-transparent"
+        >Creation</span
+      >
+    </h1>
   </div>
 
   {#if userState.value}
     {#if userState.value.isAllowed}
       <div
-        class="w-full max-w-4xl bg-white dark:bg-gray-800 p-6 rounded-lg shadow space-y-8"
+        class="relative z-10 w-full max-w-4xl bg-white/70 dark:bg-[#0f1420]/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl space-y-8"
       >
         <div class="space-y-4">
-          <h3 class="text-lg font-semibold border-b pb-2 dark:text-white">
+          <h3
+            class="text-xl font-bold border-b border-gray-200/50 dark:border-white/10 pb-2 dark:text-white text-gray-800"
+          >
             1. Policy Details
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -220,7 +247,9 @@
         </div>
 
         <div class="space-y-4">
-          <h3 class="text-lg font-semibold border-b pb-2 dark:text-white">
+          <h3
+            class="text-xl font-bold border-b border-gray-200/50 dark:border-white/10 pb-2 dark:text-white text-gray-800"
+          >
             2. Pass Services
           </h3>
           <div>
@@ -231,7 +260,9 @@
         </div>
 
         <div class="space-y-4">
-          <h3 class="text-lg font-semibold border-b pb-2 dark:text-white">
+          <h3
+            class="text-xl font-bold border-b border-gray-200/50 dark:border-white/10 pb-2 dark:text-white text-gray-800"
+          >
             3. Schedule
           </h3>
           <div class="flex flex-wrap gap-4 items-end">
@@ -335,29 +366,54 @@
           >
             <Button
               type="submit"
-              class="w-full text-lg h-12 bg-blue-600 hover:bg-blue-700"
+              class="w-full text-lg h-14 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 transition-all duration-300 hover:-translate-y-0.5 mt-4"
               disabled={isDeploying || srcRooms.length === 0}
             >
               {#if isDeploying}
                 <Loader2 class="mr-2 h-5 w-5 animate-spin" />
-                Deploying...
+                Deploying Configuration...
               {:else}
-                Deploy Configuration
+                <span class="font-bold">Deploy Configuration</span>
               {/if}
             </Button>
           </form>
         </div>
       </div>
     {:else}
-      <div class="text-center p-10 bg-white rounded shadow dark:bg-gray-800">
-        <h2 class="text-xl font-bold mb-2">Access Denied</h2>
-        <p>You do not have permission to access this page.</p>
+      <div
+        class="relative z-10 text-center p-10 bg-white/60 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl max-w-4xl w-full"
+      >
+        <h2 class="text-2xl font-bold mb-2 dark:text-white">Access Denied</h2>
+        <p class="text-gray-600 dark:text-gray-400">
+          You do not have permission to access this page.
+        </p>
       </div>
     {/if}
   {:else}
-    <div class="text-center p-10 bg-white rounded shadow dark:bg-gray-800">
-      <h2 class="text-xl font-bold mb-2">Access Denied</h2>
-      <p>Please log in to configure firewall policies.</p>
+    <div
+      class="relative z-10 text-center p-10 bg-white/60 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl max-w-4xl w-full"
+    >
+      <h2 class="text-2xl font-bold mb-2 dark:text-white">Access Denied</h2>
+      <p class="text-gray-600 dark:text-gray-400">
+        Please log in to configure firewall policies.
+      </p>
     </div>
   {/if}
 </div>
+
+<style>
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+</style>

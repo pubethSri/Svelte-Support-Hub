@@ -76,8 +76,23 @@
 </svelte:head>
 
 <div
-  class="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 flex flex-col items-center gap-6"
+  class="relative min-h-screen bg-[#fafafa] dark:bg-[#05080f] overflow-hidden selection:bg-orange-500/30 font-sans flex flex-col items-center gap-6 p-8 pt-32"
 >
+  <!-- Abstract Ambient Background Orbs -->
+  <div
+    class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-orange-400/20 dark:bg-orange-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_10s_infinite]"
+  ></div>
+  <div
+    class="absolute top-[20%] right-[-10%] w-[35vw] h-[35vw] rounded-full bg-pink-400/20 dark:bg-pink-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_12s_infinite_2s]"
+  ></div>
+  <div
+    class="absolute bottom-[-20%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-purple-400/20 dark:bg-purple-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_14s_infinite_4s]"
+  ></div>
+
+  <!-- Subtle Grid Pattern -->
+  <div
+    class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMTUwLCAxNTAsIDE1MCwgMC4yKSIvPjwvc3ZnPg==')] [mask-image:linear-gradient(to_bottom,white,transparent_80%)]"
+  ></div>
   <img
     src={loaderFull}
     alt=""
@@ -111,15 +126,31 @@
     {/if}
   </div>
 
-  <div class="w-full max-w-6xl flex justify-between items-center">
-    <h1 class="text-2xl font-bold dark:text-white">Active Policies</h1>
+  <div class="w-full max-w-6xl flex justify-between items-center relative z-10">
+    <h1
+      class="text-3xl md:text-4xl font-black tracking-tight text-gray-900 dark:text-white drop-shadow-sm"
+    >
+      Active <span
+        class="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 dark:from-yellow-400 dark:via-pink-500 dark:to-purple-500 bg-clip-text text-transparent"
+        >Policies</span
+      >
+    </h1>
     <div class="flex items-center gap-2">
-      <Button variant="outline" onclick={handleRefresh} disabled={isLoading}>
+      <Button
+        variant="outline"
+        onclick={handleRefresh}
+        disabled={isLoading}
+        class="rounded-full border-gray-300 dark:border-white/20 bg-white/50 dark:bg-black/50 backdrop-blur-md hover:bg-orange-50 dark:hover:bg-white/10 dark:text-white transition-all duration-300"
+      >
         {#if isLoading}
-          <Loader2 class="h-4 w-4 animate-spin" />
+          <Loader2
+            class="h-4 w-4 animate-spin text-orange-500 dark:text-pink-400"
+          />
         {:else}
-          <RefreshCw class="h-4 w-4 mr-2" />
-          Refresh
+          <RefreshCw class="h-4 w-4 mr-2 text-orange-500 dark:text-pink-400" />
+          <span class="font-semibold text-gray-800 dark:text-gray-100"
+            >Refresh</span
+          >
         {/if}
       </Button>
     </div>
@@ -127,19 +158,21 @@
 
   {#if userState.value && (userState.value.name.toLowerCase() === "mr.jirathip kapanya" || userState.value.role.toLowerCase() === "lecturer" || userState.value.name.toLowerCase() === "montree kingkaew" || userState.value.name.toLowerCase() === "mr.pubeth sriwattana" || userState.value.name.toLowerCase() === "นายจารุกิตติ์ ศรีพาเพลิน" || userState.value.name.toLowerCase() === "นายชญานนท์ สุภากิจ")}
     <div
-      class="w-full max-w-6xl bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden"
+      class="relative z-10 w-full max-w-6xl bg-white/70 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl overflow-hidden"
     >
       {#if policies.length === 0}
-        <div class="p-10 text-center text-gray-500 dark:text-gray-400">
+        <div
+          class="p-10 text-center text-gray-600 dark:text-gray-400 font-medium"
+        >
           No active policies found.
         </div>
       {:else}
         <div class="relative overflow-x-auto">
           <table
-            class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
+            class="w-full text-sm text-left rtl:text-right text-gray-600 dark:text-gray-300"
           >
             <thead
-              class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400"
+              class="text-xs uppercase bg-gray-100/50 dark:bg-white/5 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-white/10"
             >
               <tr>
                 <th scope="col" class="px-6 py-3">Policy Name</th>
@@ -155,7 +188,7 @@
               {#each policies as policy}
                 {@const status = getTimelyStatus(policy)}
                 <tr
-                  class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                  class="bg-transparent border-b border-gray-100 dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/5 transition-colors duration-200"
                 >
                   <th
                     scope="row"
@@ -242,10 +275,15 @@
                   <td class="px-6 py-4 text-right">
                     <a
                       href={`/details/${encodeURIComponent(policy.name)}`}
-                      class={buttonVariants({ variant: "outline", size: "sm" })}
+                      class="{buttonVariants({
+                        variant: 'outline',
+                        size: 'sm',
+                      })} rounded-full border-gray-300 dark:border-white/20 bg-white/50 dark:bg-black/20 hover:bg-orange-50 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 transition-all duration-300 shadow-sm hover:shadow-md"
                       aria-label={`View details for ${policy.name}`}
                     >
-                      <Eye class="h-4 w-4" /> More Details
+                      <Eye
+                        class="h-4 w-4 mr-1 text-orange-500 dark:text-pink-400"
+                      /> <span class="font-medium">Details</span>
                     </a>
                   </td>
                 </tr>
@@ -256,9 +294,30 @@
       {/if}
     </div>
   {:else}
-    <div class="text-center p-10 bg-white rounded shadow dark:bg-gray-800">
-      <h2 class="text-xl font-bold mb-2">Access Denied</h2>
-      <p>You do not have permission to view active policies.</p>
+    <div
+      class="relative z-10 text-center p-10 bg-white/60 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl max-w-4xl w-full"
+    >
+      <h2 class="text-2xl font-bold mb-2 dark:text-white">Access Denied</h2>
+      <p class="text-gray-600 dark:text-gray-400">
+        You do not have permission to view active policies.
+      </p>
     </div>
   {/if}
 </div>
+
+<style>
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+</style>

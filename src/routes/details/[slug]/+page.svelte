@@ -254,8 +254,23 @@
 />
 
 <div
-  class="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 flex flex-col items-center gap-8 relative"
+  class="relative min-h-screen bg-[#fafafa] dark:bg-[#05080f] overflow-hidden selection:bg-orange-500/30 font-sans flex flex-col items-center gap-8 p-8 pt-32"
 >
+  <!-- Abstract Ambient Background Orbs -->
+  <div
+    class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-orange-400/20 dark:bg-orange-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_10s_infinite]"
+  ></div>
+  <div
+    class="absolute top-[20%] right-[-10%] w-[35vw] h-[35vw] rounded-full bg-pink-400/20 dark:bg-pink-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_12s_infinite_2s]"
+  ></div>
+  <div
+    class="absolute bottom-[-20%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-purple-400/20 dark:bg-purple-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_14s_infinite_4s]"
+  ></div>
+
+  <!-- Subtle Grid Pattern -->
+  <div
+    class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMTUwLCAxNTAsIDE1MCwgMC4yKSIvPjwvc3ZnPg==')] [mask-image:linear-gradient(to_bottom,white,transparent_80%)]"
+  ></div>
   <div
     class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-200 {isDeleting ||
     isSaving ||
@@ -265,52 +280,29 @@
   >
     <img
       src={loaderFull}
-      alt=""
-      class="pointer-events-none object-contain w-[80vw] md:w-96 h-auto max-h-[80vh]"
+      alt="Loading"
+      class="pointer-events-none object-contain w-[80vw] md:w-96 h-auto max-h-[80vh] relative z-10"
     />
-    <div class="mt-4 text-center">
-      {#if isDeleting}
-        <h3 class="text-xl font-bold text-white tracking-wide">
-          Deleting Policy...
-        </h3>
-        <p class="text-gray-200 mt-2">
-          Removing <span class="font-mono font-bold text-red-400"
-            >{policy.name}</span
-          >
-        </p>
-      {:else if isSaving}
-        <h3 class="text-xl font-bold text-white tracking-wide">
-          Saving Policy...
-        </h3>
-        <p class="text-gray-200 mt-2">
-          Updating configuration for <span
-            class="font-mono font-bold text-blue-400">{policy.name}</span
-          >
-        </p>
-      {:else if isRefreshing}
-        <h3 class="text-xl font-bold text-white tracking-wide">
-          Refreshing Data...
-        </h3>
-        <p class="text-gray-200 mt-2">
-          Loading latest information for <span
-            class="font-mono font-bold text-green-400">{policy.name}</span
-          >
-        </p>
-      {/if}
-    </div>
   </div>
 
-  <div class="w-full max-w-4xl space-y-6">
+  <div class="w-full max-w-4xl space-y-6 relative z-10">
     <div class="flex items-center gap-4">
-      <Button variant="ghost" size="icon" href="/active">
+      <Button
+        variant="ghost"
+        size="icon"
+        href="/active"
+        class="hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
+      >
         <ArrowLeft class="h-6 w-6" />
       </Button>
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1
+          class="text-3xl font-bold text-gray-900 dark:text-white drop-shadow-sm"
+        >
           {policy.name}
         </h1>
         <span
-          class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${policy.status === "enable" ? "bg-green-100 text-green-800 border-green-200" : "bg-red-100 text-red-800 border-red-200"}`}
+          class={`inline-flex items-center px-3 py-1 mt-1 rounded-full text-xs font-bold shadow-sm ${policy.status === "enable" ? "bg-green-100/80 text-green-800 border border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-800" : "bg-red-100/80 text-red-800 border border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800"}`}
         >
           {policy.status.toUpperCase()}
         </span>
@@ -321,19 +313,23 @@
           size="sm"
           onclick={handleRefresh}
           disabled={isRefreshing || isSaving}
-          class="flex items-center gap-2"
+          class="flex items-center gap-2 rounded-full border-gray-300 dark:border-white/20 bg-white/50 dark:bg-black/50 backdrop-blur-md hover:bg-orange-50 dark:hover:bg-white/10 dark:text-white transition-all duration-300 shadow-sm"
         >
           {#if isRefreshing}
-            <Loader2 class="h-4 w-4 animate-spin" />
+            <Loader2
+              class="h-4 w-4 animate-spin text-orange-500 dark:text-pink-400"
+            />
           {:else}
-            <RefreshCw class="h-4 w-4" />
+            <RefreshCw class="h-4 w-4 text-orange-500 dark:text-pink-400" />
           {/if}
-          Refresh
+          <span class="font-semibold text-gray-800 dark:text-gray-100"
+            >Refresh</span
+          >
         </Button>
 
         {#if hasUnsavedChanges}
           <div
-            class="flex items-center gap-2 text-orange-600 dark:text-orange-400 text-sm"
+            class="flex items-center gap-2 text-orange-600 dark:text-orange-400 text-sm font-bold bg-orange-100 dark:bg-orange-900/30 px-3 py-1 rounded-full shadow-sm"
           >
             <AlertCircle class="h-4 w-4" />
             <span>Unsaved changes</span>
@@ -439,7 +435,7 @@
               disabled={isSaving ||
                 !isScheduleValid ||
                 editedSrcRooms.length === 0}
-              class="cursor-pointer dark:bg-blue-900 text-white dark:hover:bg-blue-800 hover:bg-blue-600 bg-blue-700"
+              class="cursor-pointer bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 shadow-lg shadow-orange-500/25 text-white rounded-full transition-all duration-300"
             >
               {#if isSaving}
                 <svg
@@ -473,9 +469,9 @@
           <Button
             size="lg"
             disabled={isEditing}
-            class="cursor-pointer dark:bg-blue-900 text-white dark:hover:bg-blue-800 hover:bg-blue-600 bg-blue-700 opacity-50"
+            class="cursor-pointer bg-gradient-to-r from-orange-500 to-pink-500 text-white opacity-50 rounded-full"
           >
-            <FloppyDisk class="w-5 h-5" />
+            <FloppyDisk class="w-5 h-5 mr-2" />
             Save Changes
           </Button>
         {/if}
@@ -541,7 +537,7 @@
 
     <div class="grid gap-6 md:grid-cols-2">
       <div
-        class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border dark:border-gray-700"
+        class="relative z-10 bg-white/70 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl p-8"
       >
         <h2
           class="text-lg font-semibold mb-4 flex items-center gap-2 dark:text-white"
@@ -598,7 +594,7 @@
       </div>
 
       <div
-        class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border dark:border-gray-700"
+        class="relative z-10 bg-white/70 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl p-8"
       >
         <div class="flex items-center justify-between mb-4">
           <h2
@@ -711,7 +707,7 @@
       </div>
 
       <div
-        class="md:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow p-6 border dark:border-gray-700"
+        class="relative z-10 md:col-span-2 bg-white/70 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl p-8"
       >
         <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
           <h2
@@ -796,12 +792,14 @@
           </div>
 
           <!-- Pending entries table -->
-          <div class="overflow-x-auto max-h-80 overflow-y-auto mb-4">
+          <div
+            class="overflow-x-auto max-h-80 overflow-y-auto mb-4 rounded-xl border border-gray-200 dark:border-white/10"
+          >
             <table
               class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
             >
               <thead
-                class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 sticky top-0"
+                class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-[#1a2133] dark:text-gray-300 sticky top-0 z-10 shadow-sm"
               >
                 <tr>
                   <th class="px-4 py-2">URL / Pattern</th>
@@ -813,12 +811,12 @@
               <tbody>
                 {#each pendingEntries as entry, i}
                   <tr
-                    class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 {i ===
+                    class="bg-transparent border-b border-gray-100 dark:border-white/5 {i ===
                       0 &&
                     entry.action === 'monitor' &&
                     !webfilter?.entries?.find((e: any) => e.url === entry.url)
-                      ? 'bg-green-50 dark:bg-green-900/10'
-                      : ''}"
+                      ? 'bg-green-50/50 dark:bg-green-900/10'
+                      : 'hover:bg-white/50 dark:hover:bg-white/5'} transition-colors duration-200"
                   >
                     <td
                       class="px-4 py-2 font-medium text-gray-900 dark:text-white"
@@ -902,7 +900,7 @@
           <!-- Read-only view -->
           {#if webfilter && webfilter.entries}
             <div
-              class="overflow-x-auto {isExpanded
+              class="overflow-x-auto rounded-xl border border-gray-200 dark:border-white/10 {isExpanded
                 ? ''
                 : 'max-h-80 overflow-y-auto'} transition-all duration-300"
             >
@@ -910,7 +908,7 @@
                 class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
               >
                 <thead
-                  class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 sticky top-0"
+                  class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-[#1a2133] dark:text-gray-300 sticky top-0 z-10 shadow-sm"
                 >
                   <tr>
                     <th class="px-4 py-2">URL / Pattern</th>
@@ -922,7 +920,7 @@
                 <tbody>
                   {#each webfilter.entries as entry}
                     <tr
-                      class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                      class="bg-transparent border-b border-gray-100 dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/5 transition-colors duration-200"
                     >
                       <td
                         class="px-4 py-2 font-medium text-gray-900 dark:text-white"
@@ -958,13 +956,13 @@
 {#if showDeleteModal}
   <div
     transition:fade={{ duration: 150 }}
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+    class="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
     role="dialog"
     aria-modal="true"
     aria-labelledby="delete-modal-title"
   >
     <div
-      class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md p-6 flex flex-col gap-5"
+      class="relative bg-white/90 dark:bg-[#0f1420]/95 backdrop-blur-2xl rounded-[2rem] border border-white/40 dark:border-white/10 shadow-2xl w-full max-w-md p-6 flex flex-col gap-5"
     >
       <!-- Icon + Title -->
       <div class="flex items-start gap-4">
