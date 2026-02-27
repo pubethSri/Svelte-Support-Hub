@@ -8,6 +8,7 @@
   import { Modal } from "flowbite-svelte";
   import { userState } from "$lib/userState.svelte";
   import { invalidateAll } from "$app/navigation";
+  import { browser } from "$app/environment";
 
   let { children, data } = $props();
 
@@ -27,6 +28,22 @@
     } else {
       userState.value = null;
     }
+  });
+
+  // Live-refresh dbRole from DB on each page load (no re-login needed)
+  $effect(() => {
+    if (!browser || !userState.value) return;
+
+    fetch("/api/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (json?.success && json.user && userState.value) {
+          if (userState.value.dbRole !== json.user.dbRole) {
+            userState.set({ ...userState.value, dbRole: json.user.dbRole });
+          }
+        }
+      })
+      .catch(() => {});
   });
 
   let showLoginModal = $state(false);

@@ -12,6 +12,8 @@
   import ITkmitlLogo from "$lib/assets/img/itkmitl.svg.svelte";
   import loaderFull from "$lib/loader/loader_full.webp";
   import { goto } from "$app/navigation";
+  import { browser } from "$app/environment";
+  import { userState } from "$lib/userState.svelte";
 
   let isActiveNavigating = $state(false);
   let mobileMenuOpen = $state(false);
@@ -27,10 +29,24 @@
 
   // 1. Receive User Data & Emit Events
   let { currentUser, onLoginClick, onLogoutClick } = $props<{
-    currentUser: { name: string; role: string } | null;
+    currentUser: { name: string; role: string; dbRole?: string | null } | null;
     onLoginClick: () => void;
     onLogoutClick: () => void;
   }>();
+
+  function fetchLiveRole() {
+    if (!browser || !currentUser) return;
+    fetch("/api/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (json?.success && json.user) {
+          if (userState.value && userState.value.dbRole !== json.user.dbRole) {
+            userState.set({ ...userState.value, dbRole: json.user.dbRole });
+          }
+        }
+      })
+      .catch(() => {});
+  }
 
   function canViewAdmin(user: any) {
     if (!user) return false;
@@ -110,7 +126,11 @@
         </Button>
 
         {#if currentUser}
-          <DropdownMenu.Root>
+          <DropdownMenu.Root
+            onOpenChange={(open) => {
+              if (open) fetchLiveRole();
+            }}
+          >
             <DropdownMenu.Trigger
               class="flex items-center gap-2 md:gap-3 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 px-3 md:px-4 py-2 rounded-full hover:bg-orange-100 dark:hover:bg-orange-500/20 transition-all duration-300 group"
             >
@@ -120,23 +140,47 @@
                 <UserIcon class="h-3.5 w-3.5" />
               </div>
               <span
-                class="hidden sm:inline font-bold text-sm bg-gradient-to-r from-orange-600 to-pink-600 dark:from-orange-400 dark:to-pink-400 bg-clip-text text-transparent group-hover:opacity-80 transition-opacity max-w-[120px] truncate"
+                class="hidden sm:inline font-bold text-sm bg-gradient-to-r from-orange-600 to-pink-600 dark:from-orange-400 dark:to-pink-400 bg-clip-text text-transparent group-hover:opacity-80 transition-opacity max-w-[100px] truncate"
               >
-                {currentUser.name}
+                {currentUser.name.split(" ")[0]}
               </span>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content
               align="end"
               class="w-56 mt-2 rounded-2xl bg-white/95 dark:bg-[#0a0f18]/95 backdrop-blur-xl border border-gray-200 dark:border-white/10 shadow-2xl p-2"
             >
-              <div class="px-2 py-3 flex flex-col gap-1">
-                <span
-                  class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider"
-                  >Role</span
-                >
-                <span class="text-sm font-bold text-gray-900 dark:text-gray-100"
-                  >{currentUser.role.toUpperCase()}</span
-                >
+              <div class="px-2 py-3 flex flex-col gap-2">
+                <div>
+                  <span
+                    class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider"
+                    >Full Name</span
+                  >
+                  <p class="text-sm font-bold text-gray-900 dark:text-gray-100">
+                    {currentUser.name}
+                  </p>
+                </div>
+                <div>
+                  <span
+                    class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider"
+                    >Role</span
+                  >
+                  <p class="text-sm font-bold text-gray-900 dark:text-gray-100">
+                    {currentUser.role.toUpperCase()}
+                  </p>
+                </div>
+                {#if currentUser.dbRole}
+                  <div>
+                    <span
+                      class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider"
+                      >Special Role</span
+                    >
+                    <p
+                      class="text-sm font-bold text-purple-600 dark:text-purple-400"
+                    >
+                      {currentUser.dbRole.toUpperCase()}
+                    </p>
+                  </div>
+                {/if}
               </div>
               <DropdownMenu.Separator
                 class="bg-gray-100 dark:bg-white/10 my-1"
@@ -165,7 +209,7 @@
             variant="ghost"
             size="icon"
             onclick={() => (mobileMenuOpen = !mobileMenuOpen)}
-            class="md:hidden rounded-full hover:bg-gray-200/50 dark:hover:bg-white/10 h-9 w-9"
+            class="md:hidden rounded-full hover:bg-gray-200/50 dark:hover:bg-white/10 h-9 w-9 active:scale-90 transition-transform duration-200"
           >
             {#if mobileMenuOpen}
               <XIcon class="h-5 w-5" />
@@ -185,7 +229,7 @@
         <a
           href="/creation"
           onclick={() => (mobileMenuOpen = false)}
-          class="text-sm font-semibold px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-white/10 transition-all duration-300"
+          class="text-sm font-semibold px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-white/10 hover:translate-x-2 active:scale-95 transition-all duration-300 shadow-sm hover:shadow-md"
         >
           Create Policy
         </a>
@@ -195,7 +239,7 @@
             mobileMenuOpen = false;
             handleGoToActive(e);
           }}
-          class="text-sm font-semibold px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-white/10 transition-all duration-300 {isActiveNavigating
+          class="text-sm font-semibold px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-white/10 hover:translate-x-2 active:scale-95 transition-all duration-300 shadow-sm hover:shadow-md {isActiveNavigating
             ? 'animate-pulse text-pink-500'
             : ''}"
         >

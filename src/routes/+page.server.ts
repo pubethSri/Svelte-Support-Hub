@@ -34,7 +34,7 @@ export const actions: Actions = {
                     path: '/',
                     httpOnly: true,
                     secure: false, // Set to true in production with HTTPS
-                    sameSite: 'strict',
+                    sameSite: 'lax',
                     maxAge: 60 * 60 * 24 // 24 hours
                 });
 

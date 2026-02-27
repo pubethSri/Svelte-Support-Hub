@@ -3,6 +3,7 @@ import type { LayoutServerLoad } from "./$types";
 
 export const load: LayoutServerLoad = async ({ cookies, url }) => {
     const token = cookies.get("authToken");
+    // console.log(`[Layout] path=${url.pathname}, hasToken=${!!token}`);
     
     // Public routes that don't require authentication
     const publicRoutes = ['/', '/forbidden'];
@@ -43,6 +44,7 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
                     name: payload.name || '',
                     email: payload.email || '',
                     role: payload.role || '',
+                    dbRole: payload.dbRole || null,
                     isAllowed: payload.isAllowed || false
                 }
             };

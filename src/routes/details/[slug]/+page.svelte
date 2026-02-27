@@ -254,7 +254,7 @@
 />
 
 <div
-  class="relative min-h-screen bg-[#fafafa] dark:bg-[#05080f] overflow-hidden selection:bg-orange-500/30 font-sans flex flex-col items-center gap-8 p-8 pt-32"
+  class="relative min-h-screen bg-[#fafafa] dark:bg-[#05080f] overflow-hidden selection:bg-orange-500/30 font-sans flex flex-col items-center gap-6 md:gap-8 px-4 md:px-8 pt-24 md:pt-32 pb-8"
 >
   <!-- Abstract Ambient Background Orbs -->
   <div
@@ -286,28 +286,30 @@
   </div>
 
   <div class="w-full max-w-4xl space-y-6 relative z-10">
-    <div class="flex items-center gap-4">
-      <Button
-        variant="ghost"
-        size="icon"
-        href="/active"
-        class="hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
-      >
-        <ArrowLeft class="h-6 w-6" />
-      </Button>
-      <div>
-        <h1
-          class="text-3xl font-bold text-gray-900 dark:text-white drop-shadow-sm"
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+      <div class="flex items-center gap-3">
+        <Button
+          variant="ghost"
+          size="icon"
+          href="/active"
+          class="hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors flex-shrink-0"
         >
-          {policy.name}
-        </h1>
-        <span
-          class={`inline-flex items-center px-3 py-1 mt-1 rounded-full text-xs font-bold shadow-sm ${policy.status === "enable" ? "bg-green-100/80 text-green-800 border border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-800" : "bg-red-100/80 text-red-800 border border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800"}`}
-        >
-          {policy.status.toUpperCase()}
-        </span>
+          <ArrowLeft class="h-6 w-6" />
+        </Button>
+        <div class="min-w-0">
+          <h1
+            class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white drop-shadow-sm truncate"
+          >
+            {policy.name}
+          </h1>
+          <span
+            class={`inline-flex items-center px-3 py-1 mt-1 rounded-full text-xs font-bold shadow-sm ${policy.status === "enable" ? "bg-green-100/80 text-green-800 border border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-800" : "bg-red-100/80 text-red-800 border border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800"}`}
+          >
+            {policy.status.toUpperCase()}
+          </span>
+        </div>
       </div>
-      <div class="ml-auto flex items-center gap-2">
+      <div class="flex items-center gap-2 flex-wrap sm:ml-auto">
         <Button
           variant="outline"
           size="sm"
@@ -322,17 +324,18 @@
           {:else}
             <RefreshCw class="h-4 w-4 text-orange-500 dark:text-pink-400" />
           {/if}
-          <span class="font-semibold text-gray-800 dark:text-gray-100"
+          <span
+            class="hidden sm:inline font-semibold text-gray-800 dark:text-gray-100"
             >Refresh</span
           >
         </Button>
 
         {#if hasUnsavedChanges}
           <div
-            class="flex items-center gap-2 text-orange-600 dark:text-orange-400 text-sm font-bold bg-orange-100 dark:bg-orange-900/30 px-3 py-1 rounded-full shadow-sm"
+            class="flex items-center gap-2 text-orange-600 dark:text-orange-400 text-xs sm:text-sm font-bold bg-orange-100 dark:bg-orange-900/30 px-2 sm:px-3 py-1 rounded-full shadow-sm"
           >
-            <AlertCircle class="h-4 w-4" />
-            <span>Unsaved changes</span>
+            <AlertCircle class="h-4 w-4 flex-shrink-0" />
+            <span class="whitespace-nowrap">Unsaved</span>
           </div>
         {/if}
 
@@ -537,7 +540,7 @@
 
     <div class="grid gap-6 md:grid-cols-2">
       <div
-        class="relative z-10 bg-white/70 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl p-8"
+        class="relative z-10 bg-white/70 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-2xl md:rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl p-4 sm:p-6 md:p-8"
       >
         <h2
           class="text-lg font-semibold mb-4 flex items-center gap-2 dark:text-white"
@@ -546,14 +549,14 @@
           General Info
         </h2>
         <dl class="space-y-3 text-sm">
-          <div class="flex justify-between">
+          <div class="flex flex-col gap-0.5">
             <dt class="text-gray-500">ID</dt>
             <dd class="font-medium dark:text-white">{policy.policyid}</dd>
           </div>
-          <div class="flex justify-between">
+          <div class="flex flex-col gap-0.5">
             <dt class="text-gray-500">Source Address</dt>
             {#if isEditing}
-              <dd class="font-medium dark:text-white w-full ml-4">
+              <dd class="font-medium dark:text-white w-full">
                 <MultiSelect
                   items={availableRooms}
                   bind:value={editedSrcRooms}
@@ -576,17 +579,19 @@
               <dd class="font-medium dark:text-white">--</dd>
             {/if}
           </div>
-          <div class="flex justify-between">
+          <div class="flex flex-col gap-0.5">
             <dt class="text-gray-500">Destination Address</dt>
             {#if policy.dstaddr.length > 0}
               {#each policy.dstaddr as dst}
-                <dd class="font-medium dark:text-white">{dst.name}</dd>
+                <dd class="font-medium dark:text-white break-all">
+                  {dst.name}
+                </dd>
               {/each}
             {:else}
               <dd class="font-medium dark:text-white">--</dd>
             {/if}
           </div>
-          <div class="flex justify-between">
+          <div class="flex flex-col gap-0.5">
             <dt class="text-gray-500">Action</dt>
             <dd class="font-medium dark:text-white">{policy.action}</dd>
           </div>
@@ -594,7 +599,7 @@
       </div>
 
       <div
-        class="relative z-10 bg-white/70 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl p-8"
+        class="relative z-10 bg-white/70 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-2xl md:rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl p-4 sm:p-6 md:p-8 overflow-hidden"
       >
         <div class="flex items-center justify-between mb-4">
           <h2
@@ -707,16 +712,18 @@
       </div>
 
       <div
-        class="relative z-10 md:col-span-2 bg-white/70 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl p-8"
+        class="relative z-10 md:col-span-2 bg-white/70 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-2xl md:rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl p-4 sm:p-6 md:p-8"
       >
-        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <div
+          class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2"
+        >
           <h2
             class="text-lg font-semibold flex items-center gap-2 dark:text-white"
           >
             <Globe class="h-5 w-5 text-orange-500" />
             Web Filter Rules
           </h2>
-          <div class="flex gap-2">
+          <div class="flex gap-2 flex-wrap">
             {#if webfilter && webfilter.entries && webfilter.entries.length > 5 && !isEditingUrlFilter}
               <Button
                 variant="outline"
@@ -802,10 +809,10 @@
                 class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-[#1a2133] dark:text-gray-300 sticky top-0 z-10 shadow-sm"
               >
                 <tr>
-                  <th class="px-4 py-2">URL / Pattern</th>
-                  <th class="px-4 py-2">Type</th>
-                  <th class="px-4 py-2">Action</th>
-                  <th class="px-4 py-2">Remove</th>
+                  <th class="px-2 sm:px-4 py-2 text-xs">URL / Pattern</th>
+                  <th class="px-2 sm:px-4 py-2 text-xs">Type</th>
+                  <th class="px-2 sm:px-4 py-2 text-xs">Action</th>
+                  <th class="px-2 sm:px-4 py-2 text-xs">Remove</th>
                 </tr>
               </thead>
               <tbody>
@@ -819,11 +826,13 @@
                       : 'hover:bg-white/50 dark:hover:bg-white/5'} transition-colors duration-200"
                   >
                     <td
-                      class="px-4 py-2 font-medium text-gray-900 dark:text-white"
+                      class="px-2 sm:px-4 py-2 font-medium text-gray-900 dark:text-white break-all text-xs sm:text-sm"
                       >{entry.url}</td
                     >
-                    <td class="px-4 py-2">{entry.type}</td>
-                    <td class="px-4 py-2">
+                    <td class="px-2 sm:px-4 py-2 text-xs sm:text-sm"
+                      >{entry.type}</td
+                    >
+                    <td class="px-2 sm:px-4 py-2">
                       <span
                         class="px-2 py-0.5 rounded text-xs border {entry.action ===
                         'block'
@@ -833,7 +842,7 @@
                         {entry.action}
                       </span>
                     </td>
-                    <td class="px-4 py-2">
+                    <td class="px-2 sm:px-4 py-2">
                       {#if isDefaultUrl(entry.url)}
                         <span
                           title="Default URL filter cannot be removed"
@@ -911,10 +920,10 @@
                   class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-[#1a2133] dark:text-gray-300 sticky top-0 z-10 shadow-sm"
                 >
                   <tr>
-                    <th class="px-4 py-2">URL / Pattern</th>
-                    <th class="px-4 py-2">Type</th>
-                    <th class="px-4 py-2">Action</th>
-                    <th class="px-4 py-2">Status</th>
+                    <th class="px-2 sm:px-4 py-2 text-xs">URL / Pattern</th>
+                    <th class="px-2 sm:px-4 py-2 text-xs">Type</th>
+                    <th class="px-2 sm:px-4 py-2 text-xs">Action</th>
+                    <th class="px-2 sm:px-4 py-2 text-xs">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -923,11 +932,13 @@
                       class="bg-transparent border-b border-gray-100 dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/5 transition-colors duration-200"
                     >
                       <td
-                        class="px-4 py-2 font-medium text-gray-900 dark:text-white"
+                        class="px-2 sm:px-4 py-2 font-medium text-gray-900 dark:text-white break-all text-xs sm:text-sm"
                         >{entry.url}</td
                       >
-                      <td class="px-4 py-2">{entry.type}</td>
-                      <td class="px-4 py-2">
+                      <td class="px-2 sm:px-4 py-2 text-xs sm:text-sm"
+                        >{entry.type}</td
+                      >
+                      <td class="px-2 sm:px-4 py-2">
                         <span
                           class="px-2 py-0.5 rounded text-xs border {entry.action ===
                           'block'
@@ -937,7 +948,9 @@
                           {entry.action}
                         </span>
                       </td>
-                      <td class="px-4 py-2">{entry.status}</td>
+                      <td class="px-2 sm:px-4 py-2 text-xs sm:text-sm"
+                        >{entry.status}</td
+                      >
                     </tr>
                   {/each}
                 </tbody>

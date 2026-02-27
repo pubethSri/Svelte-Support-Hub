@@ -3,6 +3,7 @@ import { browser } from '$app/environment';
 type User = {
     name: string;
     role: string;
+    dbRole?: string | null;
     isAllowed?: boolean;
 } | null;
 
