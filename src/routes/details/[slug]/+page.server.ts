@@ -103,7 +103,7 @@ export const actions = {
             }
 
             // Redirect to list page after successful delete
-            throw redirect(303, '/active');
+            throw redirect(303, '/dashboard');
 
         } catch (err) {
             // Rethrow redirects (required by SvelteKit)

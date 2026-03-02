@@ -30,7 +30,7 @@
     }
   });
 
-  // Live-refresh dbRole from DB on each page load (no re-login needed)
+  // Live-refresh dbRole and isAllowed from DB on each page load (no re-login needed)
   $effect(() => {
     if (!browser || !userState.value) return;
 
@@ -38,8 +38,15 @@
       .then((res) => (res.ok ? res.json() : null))
       .then((json) => {
         if (json?.success && json.user && userState.value) {
-          if (userState.value.dbRole !== json.user.dbRole) {
-            userState.set({ ...userState.value, dbRole: json.user.dbRole });
+          const needsUpdate =
+            userState.value.dbRole !== json.user.dbRole ||
+            userState.value.isAllowed !== json.user.isAllowed;
+          if (needsUpdate) {
+            userState.set({
+              ...userState.value,
+              dbRole: json.user.dbRole,
+              isAllowed: json.user.isAllowed,
+            });
           }
         }
       })
@@ -87,7 +94,7 @@
 </Modal>
 
 <svelte:head>
-  <title>หน้าหลัก | ITSupportHub</title>
+  <title>Netblocker</title>
   <link rel="icon" href={icon} />
 </svelte:head>
 

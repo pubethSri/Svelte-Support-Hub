@@ -23,7 +23,7 @@
 
   async function handleGoToDashboard() {
     isNavigating = true;
-    await goto("/active");
+    await goto("/dashboard");
     isNavigating = false;
   }
 
@@ -199,6 +199,31 @@
       <!-- CTA Buttons container -->
       <div class="flex flex-col sm:flex-row gap-4 mb-24">
         {#if userState.value}
+          <Button
+            size="lg"
+            href="/creation"
+            class="group relative h-14 px-8 rounded-full bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 overflow-hidden"
+          >
+            <div
+              class="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-white/20 to-purple-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+            ></div>
+            <span class="relative font-bold text-lg flex items-center gap-2">
+              Create Policy
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 group-hover:rotate-90 transition-transform duration-300"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                ><path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4v16m8-8H4"
+                /></svg
+              >
+            </span>
+          </Button>
           <Button
             size="lg"
             onclick={handleGoToDashboard}

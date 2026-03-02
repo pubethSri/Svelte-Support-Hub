@@ -291,7 +291,7 @@
         <Button
           variant="ghost"
           size="icon"
-          href="/active"
+          href="/dashboard"
           class="hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors flex-shrink-0"
         >
           <ArrowLeft class="h-6 w-6" />

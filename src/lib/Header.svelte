@@ -13,17 +13,18 @@
   import loaderFull from "$lib/loader/loader_full.webp";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
+  import { page } from "$app/stores";
   import { userState } from "$lib/userState.svelte";
 
   let isActiveNavigating = $state(false);
   let mobileMenuOpen = $state(false);
 
   async function handleGoToActive(e: MouseEvent) {
-    if (window.location.pathname === "/active") return;
+    if (window.location.pathname === "/dashboard") return;
     e.preventDefault();
     isActiveNavigating = true;
     mobileMenuOpen = false;
-    await goto("/active");
+    await goto("/dashboard");
     isActiveNavigating = false;
   }
 
@@ -50,14 +51,12 @@
 
   function canViewAdmin(user: any) {
     if (!user) return false;
-    return (
-      user.name?.toLowerCase() === "mr.jirathip kapanya" ||
-      user.role?.toLowerCase() === "lecturer" ||
-      user.name?.toLowerCase() === "montree kingkaew" ||
-      user.name?.toLowerCase() === "mr.pubeth sriwattana" ||
-      user.name?.toLowerCase() === "นายจารุกิตติ์ ศรีพาเพลิน" ||
-      user.name?.toLowerCase() === "นายชญานนท์ สุภากิจ"
-    );
+    return !!user.isAllowed;
+  }
+
+  function isAdminRole(user: any) {
+    if (!user) return false;
+    return user.dbRole && user.dbRole.toLowerCase().includes("admin");
   }
 </script>
 
@@ -92,19 +91,35 @@
           >
             <a
               href="/creation"
-              class="text-sm font-semibold px-4 py-2 rounded-full text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-white/10 hover:shadow-sm transition-all duration-300"
+              class="text-sm font-semibold px-4 py-2 rounded-full transition-all duration-300 {$page
+                .url.pathname === '/creation'
+                ? 'text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 shadow-sm'
+                : 'text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-white/10 hover:shadow-sm'}"
             >
               Create Policy
             </a>
             <a
-              href="/active"
+              href="/dashboard"
               onclick={handleGoToActive}
-              class="text-sm font-semibold px-4 py-2 rounded-full text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-white/10 hover:shadow-sm transition-all duration-300 {isActiveNavigating
+              class="text-sm font-semibold px-4 py-2 rounded-full transition-all duration-300 {isActiveNavigating
                 ? 'animate-pulse text-pink-500'
-                : ''}"
+                : $page.url.pathname === '/dashboard'
+                  ? 'text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 shadow-sm'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-white/10 hover:shadow-sm'}"
             >
-              {isActiveNavigating ? "Loading..." : "Active Policies"}
+              {isActiveNavigating ? "Loading..." : "Dashboard"}
             </a>
+            {#if isAdminRole(currentUser)}
+              <a
+                href="/admin"
+                class="text-sm font-semibold px-4 py-2 rounded-full transition-all duration-300 {$page
+                  .url.pathname === '/admin'
+                  ? 'text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 shadow-sm'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-white/10 hover:shadow-sm'}"
+              >
+                Admin
+              </a>
+            {/if}
           </div>
         {/if}
       </div>
@@ -229,22 +244,39 @@
         <a
           href="/creation"
           onclick={() => (mobileMenuOpen = false)}
-          class="text-sm font-semibold px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-white/10 hover:translate-x-2 active:scale-95 transition-all duration-300 shadow-sm hover:shadow-md"
+          class="text-sm font-semibold px-4 py-3 rounded-xl hover:translate-x-2 active:scale-95 transition-all duration-300 shadow-sm hover:shadow-md {$page
+            .url.pathname === '/creation'
+            ? 'text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20'
+            : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-white/10'}"
         >
           Create Policy
         </a>
         <a
-          href="/active"
+          href="/dashboard"
           onclick={(e) => {
             mobileMenuOpen = false;
             handleGoToActive(e);
           }}
-          class="text-sm font-semibold px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-white/10 hover:translate-x-2 active:scale-95 transition-all duration-300 shadow-sm hover:shadow-md {isActiveNavigating
+          class="text-sm font-semibold px-4 py-3 rounded-xl hover:translate-x-2 active:scale-95 transition-all duration-300 shadow-sm hover:shadow-md {isActiveNavigating
             ? 'animate-pulse text-pink-500'
-            : ''}"
+            : $page.url.pathname === '/dashboard'
+              ? 'text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20'
+              : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-white/10'}"
         >
           {isActiveNavigating ? "Loading..." : "Active Policies"}
         </a>
+        {#if isAdminRole(currentUser)}
+          <a
+            href="/admin"
+            onclick={() => (mobileMenuOpen = false)}
+            class="text-sm font-semibold px-4 py-3 rounded-xl hover:translate-x-2 active:scale-95 transition-all duration-300 shadow-sm hover:shadow-md {$page
+              .url.pathname === '/admin'
+              ? 'text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20'
+              : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-white/10'}"
+          >
+            Admin Panel
+          </a>
+        {/if}
       </div>
     {/if}
   </div>

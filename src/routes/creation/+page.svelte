@@ -354,7 +354,7 @@
                 isDeploying = false;
 
                 if (result.type === "redirect") {
-                  // Success - will redirect to /active
+                  // Success - will redirect to /dashboard
                   alert("Policy created successfully!");
                 } else if (result.type === "failure") {
                   alert(result.data?.error || "Failed to create policy");

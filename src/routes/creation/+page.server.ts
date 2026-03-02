@@ -86,7 +86,7 @@ export const actions = {
             }
 
             // Success - redirect to active policies page
-            throw redirect(303, '/active');
+            throw redirect(303, '/dashboard');
 
         } catch (err) {
             // Re-throw redirects

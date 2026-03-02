@@ -53,6 +53,29 @@ export const load = async ({ cookies, fetch }) => {
 
     const headers = { 'Authorization': `Bearer ${token}` };
 
+    // 2. Check user role (admin sees all, non-admin sees only their own)
+    let isAdmin = false;
+    let ownedPolicies: string[] = [];
+
+    try {
+        const meRes = await fetch(`${BACKEND_URL}/auth/me`, { headers });
+        if (meRes.ok) {
+            const meData = await meRes.json();
+            const dbRole = (meData.user?.dbRole || '').toLowerCase();
+            isAdmin = dbRole.includes('admin');
+        }
+
+        if (!isAdmin) {
+            const ownedRes = await fetch(`${BACKEND_URL}/audit/my-policies`, { headers });
+            if (ownedRes.ok) {
+                const ownedData = await ownedRes.json();
+                ownedPolicies = ownedData.policies || [];
+            }
+        }
+    } catch (e) {
+        console.error("Role/ownership check error:", e);
+    }
+
     try {
         // A. Fetch Policies
         const res = await fetch(`${BACKEND_URL}/firewall/policies`, { headers });
@@ -67,8 +90,16 @@ export const load = async ({ cookies, fetch }) => {
         const data = await res.json();
         let rawList: Policy[] = data.results || (Array.isArray(data) ? data : []);
         
-        // Filter
+        // Filter for API-created policies
         rawList = rawList.filter(p => p.comments === "Created via API don't edit or delete");
+
+        // Filter by ownership for non-admin users
+        if (!isAdmin && ownedPolicies.length > 0) {
+            rawList = rawList.filter(p => ownedPolicies.includes(p.name));
+        } else if (!isAdmin && ownedPolicies.length === 0) {
+            // Non-admin with no owned policies = show nothing
+            return { policies: [] };
+        }
 
         // B. Enrich Policies (Parallel Fetching)
         const enrichedPolicies = await Promise.all(rawList.map(async (policy) => {
