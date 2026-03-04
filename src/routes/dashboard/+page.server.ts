@@ -56,6 +56,7 @@ export const load = async ({ cookies, fetch }) => {
     // 2. Check user role (admin sees all, non-admin sees only their own)
     let isAdmin = false;
     let ownedPolicies: string[] = [];
+    let ownerMap: Record<string, string> = {};
 
     try {
         const meRes = await fetch(`${BACKEND_URL}/auth/me`, { headers });
@@ -71,6 +72,13 @@ export const load = async ({ cookies, fetch }) => {
                 const ownedData = await ownedRes.json();
                 ownedPolicies = ownedData.policies || [];
             }
+        }
+
+        // Fetch owner map for all policies
+        const ownersRes = await fetch(`${BACKEND_URL}/audit/owners`, { headers });
+        if (ownersRes.ok) {
+            const ownersData = await ownersRes.json();
+            ownerMap = ownersData.owners || {};
         }
     } catch (e) {
         console.error("Role/ownership check error:", e);
@@ -132,7 +140,7 @@ export const load = async ({ cookies, fetch }) => {
                 } catch (e) { console.error(`Webfilter error: ${policy.name}`); }
             }
 
-            return { ...policy, ...updates };
+            return { ...policy, ...updates, owner: ownerMap[policy.name] || null };
         }));
 
         // Return data to the page

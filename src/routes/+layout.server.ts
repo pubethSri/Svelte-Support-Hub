@@ -17,9 +17,14 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
     // If token exists, decode and validate expiration
     if (token) {
         try {
-            // Decode JWT to get user info
-            const payloadBase64 = token.split('.')[1];
-            const payloadJson = atob(payloadBase64);
+            // Decode JWT to get user info (base64url → base64 → UTF-8)
+            let payloadBase64 = token.split('.')[1];
+            // JWT uses base64url: replace URL-safe chars and add padding
+            payloadBase64 = payloadBase64.replace(/-/g, '+').replace(/_/g, '/');
+            while (payloadBase64.length % 4) payloadBase64 += '=';
+            const binaryString = atob(payloadBase64);
+            const bytes = Uint8Array.from(binaryString, c => c.charCodeAt(0));
+            const payloadJson = new TextDecoder().decode(bytes);
             const payload = JSON.parse(payloadJson);
             
             // Check if token is expired

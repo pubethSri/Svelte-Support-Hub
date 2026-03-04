@@ -37,8 +37,12 @@ export const load: PageServerLoad = async ({ cookies, fetch }) => {
     // Decode JWT to get the current user's login username
     let currentLoginUsername = '';
     try {
-        const payloadBase64 = token.split('.')[1];
-        const payloadJson = atob(payloadBase64);
+        let payloadBase64 = token.split('.')[1];
+        payloadBase64 = payloadBase64.replace(/-/g, '+').replace(/_/g, '/');
+        while (payloadBase64.length % 4) payloadBase64 += '=';
+        const binaryString = atob(payloadBase64);
+        const bytes = Uint8Array.from(binaryString, c => c.charCodeAt(0));
+        const payloadJson = new TextDecoder().decode(bytes);
         const payload = JSON.parse(payloadJson);
         currentLoginUsername = payload.id || '';
     } catch {}

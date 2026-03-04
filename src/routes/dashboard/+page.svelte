@@ -181,6 +181,7 @@
                 <th scope="col" class="px-6 py-3">Start Time</th>
                 <th scope="col" class="px-6 py-3">End Time</th>
                 <th scope="col" class="px-6 py-3">Status</th>
+                <th scope="col" class="px-6 py-3">Owner</th>
                 <th scope="col" class="px-6 py-3 text-right">Actions</th>
               </tr>
             </thead>
@@ -270,6 +271,17 @@
                           >Disabled</span
                         >
                       </div>
+                    {/if}
+                  </td>
+                  <td class="px-6 py-4">
+                    {#if policy.owner}
+                      <span
+                        class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >{policy.owner}</span
+                      >
+                    {:else}
+                      <span class="text-sm text-gray-400 italic">Not found</span
+                      >
                     {/if}
                   </td>
                   <td class="px-6 py-4 text-right">

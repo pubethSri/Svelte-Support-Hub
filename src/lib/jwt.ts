@@ -6,8 +6,12 @@ export type JwtPayload = {
 
 export function decodeJwt(token: string): JwtPayload | null {
   try {
-    const payload = token.split('.')[1]
-    return JSON.parse(atob(payload))
+    let payload = token.split('.')[1]
+    payload = payload.replace(/-/g, '+').replace(/_/g, '/')
+    while (payload.length % 4) payload += '='
+    const binaryString = atob(payload)
+    const bytes = Uint8Array.from(binaryString, c => c.charCodeAt(0))
+    return JSON.parse(new TextDecoder().decode(bytes))
   } catch {
     return null
   }
