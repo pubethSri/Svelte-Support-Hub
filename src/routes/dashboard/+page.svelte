@@ -3,11 +3,12 @@
   import { Button, buttonVariants } from "$lib/components/ui/button/index.js";
   import Loader2 from "@lucide/svelte/icons/loader-2";
   import RefreshCw from "@lucide/svelte/icons/refresh-cw";
-  import { invalidateAll } from "$app/navigation"; // Used to re-run the load function
+  import { goto, invalidateAll } from "$app/navigation"; // Used to re-run the load function
   import { enhance } from "$app/forms";
   import { fade } from "svelte/transition";
   import loaderFull from "$lib/loader/loader_full.webp";
   import Eye from "@lucide/svelte/icons/eye";
+  import Plus from "@lucide/svelte/icons/plus";
 
   // 1. Receive Data from Server
   let { data } = $props();
@@ -136,6 +137,17 @@
       >
     </h1>
     <div class="flex items-center gap-2">
+      <Button
+        variant="outline"
+        onclick={() => goto("/creation")}
+        class="rounded-full border-gray-300 dark:border-white/20 bg-white/50 dark:bg-black/50 backdrop-blur-md hover:bg-orange-50 dark:hover:bg-white/10 dark:text-white transition-all duration-300"
+      >
+        <Plus class="h-4 w-4 mr-2 text-orange-500 dark:text-pink-400" />
+        <span class="font-semibold text-gray-800 dark:text-gray-100"
+          >Create</span
+        >
+      </Button>
+
       <Button
         variant="outline"
         onclick={handleRefresh}

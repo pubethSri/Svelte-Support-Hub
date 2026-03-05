@@ -22,8 +22,31 @@
   import RefreshCw from "@lucide/svelte/icons/refresh-cw";
   import Loader2 from "@lucide/svelte/icons/loader-2";
   import Lock from "@lucide/svelte/icons/lock";
+  import CheckCircle from "@lucide/svelte/icons/check-circle";
+  import XCircle from "@lucide/svelte/icons/x-circle";
 
   import defaultUrlFilter from "$lib/data/default-urlfilter.json";
+
+  // Notification state
+  let showSuccessToast = $state(false);
+  let successMessage = $state("");
+  let showErrorModal = $state(false);
+  let errorMessage = $state("");
+  let successTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  function showSuccess(msg: string) {
+    successMessage = msg;
+    showSuccessToast = true;
+    if (successTimeout) clearTimeout(successTimeout);
+    successTimeout = setTimeout(() => {
+      showSuccessToast = false;
+    }, 2500);
+  }
+
+  function showError(msg: string) {
+    errorMessage = msg;
+    showErrorModal = true;
+  }
 
   // Import your loaders
   import loaderFull from "$lib/loader/loader_full.webp";
@@ -397,15 +420,17 @@
                 isSaving = false;
 
                 if (result.type === "success") {
-                  alert("Policy updated successfully!");
+                  showSuccess("Policy updated successfully!");
                   isEditing = false;
                   editedStartTime = "";
                   editedEndTime = "";
                   editedSrcRooms = [];
                   originalSrcRooms = [];
-                  window.location.reload();
+                  setTimeout(() => invalidate("policy:details"), 500);
                 } else if (result.type === "failure") {
-                  alert(result.data?.error || "Failed to update policy");
+                  showError(
+                    (result.data as any)?.error || "Failed to update policy",
+                  );
                 }
               };
             }}
@@ -430,6 +455,22 @@
               type="hidden"
               name="srcRooms"
               value={JSON.stringify(editedSrcRooms)}
+            />
+            <input
+              type="hidden"
+              name="scheduleChanged"
+              value={editedStartTime !== originalStartTime ||
+              editedEndTime !== originalEndTime
+                ? "true"
+                : "false"}
+            />
+            <input
+              type="hidden"
+              name="srcAddrChanged"
+              value={JSON.stringify([...editedSrcRooms].sort()) !==
+              JSON.stringify([...originalSrcRooms].sort())
+                ? "true"
+                : "false"}
             />
 
             <Button
@@ -883,11 +924,12 @@
                 await update();
                 isSavingUrlFilter = false;
                 if (result.type === "success") {
+                  showSuccess("URL filter updated successfully!");
                   isEditingUrlFilter = false;
                   pendingEntries = [];
                   await invalidate("policy:details");
                 } else {
-                  alert(
+                  showError(
                     (result as any).data?.error ?? "Failed to save URL filter",
                   );
                 }
@@ -1071,3 +1113,83 @@
     </div>
   </div>
 {/if}
+
+<!-- Success Toast (auto-dismiss) -->
+{#if showSuccessToast}
+  <div
+    transition:fade={{ duration: 200 }}
+    class="fixed top-6 right-6 z-[200] flex items-center gap-3 px-5 py-4 rounded-2xl bg-green-50/95 dark:bg-green-950/95 border border-green-200 dark:border-green-800 shadow-2xl backdrop-blur-xl max-w-sm"
+  >
+    <div
+      class="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/60 flex items-center justify-center"
+    >
+      <CheckCircle class="w-5 h-5 text-green-600 dark:text-green-400" />
+    </div>
+    <div>
+      <p class="text-sm font-semibold text-green-800 dark:text-green-200">
+        Success
+      </p>
+      <p class="text-xs text-green-600 dark:text-green-400 mt-0.5">
+        {successMessage}
+      </p>
+    </div>
+    <!-- Shrinking progress bar -->
+    <div
+      class="absolute bottom-0 left-0 right-0 h-1 rounded-b-2xl overflow-hidden"
+    >
+      <div
+        class="h-full bg-green-500/60 dark:bg-green-400/60"
+        style="animation: shrink 2.5s linear forwards"
+      ></div>
+    </div>
+  </div>
+{/if}
+
+<!-- Error Modal (requires click) -->
+{#if showErrorModal}
+  <div
+    transition:fade={{ duration: 150 }}
+    class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div
+      class="bg-white/95 dark:bg-[#0f1420]/95 backdrop-blur-2xl rounded-[2rem] border border-white/40 dark:border-white/10 shadow-2xl w-full max-w-sm p-6 flex flex-col items-center gap-4"
+    >
+      <div
+        class="w-14 h-14 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center"
+      >
+        <XCircle class="w-7 h-7 text-red-600 dark:text-red-400" />
+      </div>
+      <div class="text-center">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+          Operation Failed
+        </h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
+          {errorMessage}
+        </p>
+      </div>
+      <Button
+        onclick={() => {
+          showErrorModal = false;
+        }}
+        class="w-full mt-2 bg-red-600 hover:bg-red-700 text-white rounded-full"
+      >
+        OK
+      </Button>
+    </div>
+  </div>
+{/if}
+
+<style>
+  :global {
+    @keyframes shrink {
+      from {
+        width: 100%;
+      }
+      to {
+        width: 0%;
+      }
+    }
+  }
+</style>

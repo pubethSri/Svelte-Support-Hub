@@ -125,7 +125,9 @@ export const actions = {
             const scheduleName = formData.get('scheduleName') as string;
             const startUtc = formData.get('startUtc') as string;
             const endUtc = formData.get('endUtc') as string;
-            const srcRooms = formData.get('srcRooms') as string; // JSON string array
+            const srcRooms = formData.get('srcRooms') as string;
+            const scheduleChanged = formData.get('scheduleChanged') === 'true';
+            const srcAddrChanged = formData.get('srcAddrChanged') === 'true';
 
             // Validate inputs
             if (!scheduleName || !startUtc || !endUtc) {
@@ -140,36 +142,36 @@ export const actions = {
                 return fail(400, { error: "Start time must be before end time" });
             }
 
-            // Prepare the schedule payload
-            const schedulePayload = {
-                name: scheduleName,
-                "start-utc": startTimestamp,
-                "end-utc": endTimestamp,
-                "expiration-days": 0
-            };
+            // Update schedule only if it changed
+            if (scheduleChanged) {
+                const schedulePayload = {
+                    name: scheduleName,
+                    "start-utc": startTimestamp,
+                    "end-utc": endTimestamp,
+                    "expiration-days": 0
+                };
 
-            // Update schedule
-            const updateRes = await fetch(
-                `${BACKEND_URL}/firewall/schedule/onetime/change/${encodeURIComponent(scheduleName)}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(schedulePayload)
+                const updateRes = await fetch(
+                    `${BACKEND_URL}/firewall/schedule/onetime/change/${encodeURIComponent(scheduleName)}`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(schedulePayload)
+                    }
+                );
+
+                if (!updateRes.ok) {
+                    return fail(updateRes.status, { error: "Failed to update schedule" });
                 }
-            );
-
-            if (!updateRes.ok) {
-                return fail(updateRes.status, { error: "Failed to update schedule" });
             }
 
-            // Update source addresses if provided
-            if (srcRooms && policyName) {
+            // Update source addresses only if they changed
+            if (srcAddrChanged && srcRooms && policyName) {
                 const roomsArray = JSON.parse(srcRooms);
                 
-                // Validate that at least one room is selected
                 if (!Array.isArray(roomsArray) || roomsArray.length === 0) {
                     return fail(400, { error: "At least one source address must be selected" });
                 }
