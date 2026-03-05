@@ -156,7 +156,7 @@
     </div>
   </div>
 
-  {#if userState.value && (userState.value.name.toLowerCase() === "mr.jirathip kapanya" || userState.value.role.toLowerCase() === "lecturer" || userState.value.name.toLowerCase() === "montree kingkaew" || userState.value.name.toLowerCase() === "mr.pubeth sriwattana" || userState.value.name.toLowerCase() === "นายจารุกิตติ์ ศรีพาเพลิน" || userState.value.name.toLowerCase() === "นายชญานนท์ สุภากิจ")}
+  {#if userState.value && userState.value.isAllowed}
     <div
       class="relative z-10 w-full max-w-6xl bg-white/70 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl overflow-hidden"
     >

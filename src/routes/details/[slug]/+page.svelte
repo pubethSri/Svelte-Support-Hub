@@ -876,6 +876,7 @@
                 return;
               }
               formData.set("urlFilterId", String(webfilter?.id ?? ""));
+              formData.set("policyName", policy.name);
               formData.set("entries", JSON.stringify(pendingEntries));
               isSavingUrlFilter = true;
               return async ({ result, update }) => {

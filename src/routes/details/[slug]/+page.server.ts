@@ -224,6 +224,7 @@ export const actions = {
         try {
             const formData = await request.formData();
             const urlFilterId = formData.get('urlFilterId') as string;
+            const policyName = formData.get('policyName') as string;
             const entriesJson = formData.get('entries') as string;
 
             if (!urlFilterId || !entriesJson) {
@@ -233,7 +234,7 @@ export const actions = {
             const entries = JSON.parse(entriesJson);
 
             const res = await fetch(
-                `${BACKEND_URL}/firewall/webfilter/urlfilter/change/${encodeURIComponent(urlFilterId)}`,
+                `${BACKEND_URL}/firewall/webfilter/urlfilter/change/${encodeURIComponent(urlFilterId)}?policyName=${encodeURIComponent(policyName || '')}`,
                 {
                     method: "PUT",
                     headers: {
