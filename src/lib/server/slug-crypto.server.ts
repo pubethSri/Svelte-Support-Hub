@@ -25,12 +25,15 @@ function fromBase64Url(str: string): Buffer {
 }
 
 /**
- * Encrypt a policy name into a URL-safe base64url string.
+ * Encrypt a policyid into a URL-safe base64url string.
+ * Uses a deterministic IV (derived from the plaintext via HMAC) so the
+ * same input always produces the same URL — bookmarks and sharing work.
  * Format: iv (12 bytes) + authTag (16 bytes) + ciphertext → base64url
  */
 export function encryptSlug(plaintext: string): string {
     const key = getKey();
-    const iv = crypto.randomBytes(IV_LENGTH);
+    // Deterministic IV: HMAC-SHA256 of the plaintext, truncated to 12 bytes
+    const iv = crypto.createHmac('sha256', key).update(plaintext).digest().subarray(0, IV_LENGTH);
     const cipher = crypto.createCipheriv(ALGORITHM, key, iv, { authTagLength: AUTH_TAG_LENGTH });
 
     const encrypted = Buffer.concat([
