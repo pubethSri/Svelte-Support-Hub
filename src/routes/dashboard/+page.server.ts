@@ -1,5 +1,6 @@
 import { env } from "$env/dynamic/public";
 import { fail, redirect } from "@sveltejs/kit";
+import { encryptSlug } from "$lib/server/slug-crypto.server";
 
 const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
@@ -86,7 +87,7 @@ export const load = async ({ cookies, fetch }) => {
 
     try {
         // A. Fetch Policies
-        const res = await fetch(`${BACKEND_URL}/firewall/policies`, { headers });
+        const res = await fetch(`${BACKEND_URL}/firewall/policies/comments/Created via API don't edit or delete`, { headers });
         
         // If the backend actively rejected the token due to revoked permissions, boot them out
         if (res.status === 401 || res.status === 403) {
@@ -97,9 +98,6 @@ export const load = async ({ cookies, fetch }) => {
 
         const data = await res.json();
         let rawList: Policy[] = data.results || (Array.isArray(data) ? data : []);
-        
-        // Filter for API-created policies
-        rawList = rawList.filter(p => p.comments === "Created via API don't edit or delete");
 
         // Filter by ownership for non-admin users
         if (!isAdmin && ownedPolicies.length > 0) {
@@ -145,7 +143,10 @@ export const load = async ({ cookies, fetch }) => {
 
         // Return data to the page
         return {
-            policies: enrichedPolicies
+            policies: enrichedPolicies.map(p => ({
+                ...p,
+                encryptedSlug: encryptSlug(String(p.policyid))
+            }))
         };
 
     } catch (err) {

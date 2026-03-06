@@ -1,5 +1,6 @@
 import { env } from "$env/dynamic/public";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
+import { decryptSlug } from "$lib/server/slug-crypto.server";
 
 const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
@@ -7,7 +8,12 @@ export const load = async ({ params, cookies, fetch, depends }) => {
     // Add dependency to allow explicit invalidation
     depends('policy:details');
     
-    const slug = decodeURIComponent(params.slug);
+    let policyId: number;
+    try {
+        policyId = parseInt(decryptSlug(params.slug), 10);
+    } catch {
+        throw error(400, "Invalid or tampered URL");
+    }
     const token = cookies.get("authToken");
 
     if (!token) {
@@ -35,8 +41,8 @@ export const load = async ({ params, cookies, fetch, depends }) => {
         const data = await res.json();
         const allPolicies = data.results || [];
         
-        // 2. Find the specific policy
-        const policy = allPolicies.find((p: any) => p.name === slug);
+        // 2. Find the specific policy by policyid
+        const policy = allPolicies.find((p: any) => p.policyid === policyId);
         
         if (!policy) {
             throw error(404, "Policy not found");
@@ -72,7 +78,7 @@ export const load = async ({ params, cookies, fetch, depends }) => {
         }
 
         return {
-            slug,
+            policyId,
             policy,
             schedule,
             webfilter,
@@ -87,13 +93,32 @@ export const load = async ({ params, cookies, fetch, depends }) => {
 
 export const actions = {
     delete: async ({ cookies, params, fetch }) => {
-        const slug = decodeURIComponent(params.slug);
+        let policyId: number;
+        try {
+            policyId = parseInt(decryptSlug(params.slug), 10);
+        } catch {
+            return fail(400, { error: "Invalid or tampered URL" });
+        }
         const token = cookies.get("authToken");
         
         if (!token) return fail(401, { error: "Unauthorized" });
 
         try {
-            const res = await fetch(`${BACKEND_URL}/firewall/policies/fullhouse/delete/${encodeURIComponent(slug)}`, {
+            // First, look up the policy name by policyid
+            const policiesRes = await fetch(`${BACKEND_URL}/firewall/policies`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!policiesRes.ok) {
+                return fail(policiesRes.status, { error: "Failed to fetch policies" });
+            }
+            const policiesData = await policiesRes.json();
+            const allPolicies = policiesData.results || [];
+            const policy = allPolicies.find((p: any) => p.policyid === policyId);
+            if (!policy) {
+                return fail(404, { error: "Policy not found" });
+            }
+
+            const res = await fetch(`${BACKEND_URL}/firewall/policies/fullhouse/delete/${encodeURIComponent(policy.name)}`, {
                 method: "DELETE",
                 headers: { Authorization: `Bearer ${token}` },
             });

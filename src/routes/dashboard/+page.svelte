@@ -298,7 +298,7 @@
                   </td>
                   <td class="px-6 py-4 text-right">
                     <a
-                      href={`/details/${encodeURIComponent(policy.name)}`}
+                      href={`/details/${policy.encryptedSlug}`}
                       class="{buttonVariants({
                         variant: 'outline',
                         size: 'sm',
