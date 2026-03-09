@@ -47,27 +47,35 @@ export const load: PageServerLoad = async ({ cookies, fetch }) => {
         currentLoginUsername = payload.id || '';
     } catch {}
 
-    // Fetch admin dashboard data from backend
+    // Fetch admin dashboard data + cleanup data from backend
     try {
-        const res = await fetch(`${BACKEND_URL}/admin/dashboard-data`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const [dashRes, previewRes] = await Promise.all([
+            fetch(`${BACKEND_URL}/admin/dashboard-data`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }),
+            fetch(`${BACKEND_URL}/admin/cleanup/preview`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }),
+        ]);
 
-        if (res.status === 401 || res.status === 403) {
+        if (dashRes.status === 401 || dashRes.status === 403) {
             throw redirect(302, '/forbidden');
         }
 
-        const data = await res.json();
+        const data = await dashRes.json();
+        const previewData = previewRes.ok ? await previewRes.json() : { expired: [] };
+
         return {
             allowedUsers: data.allowedUsers || [],
             stats: data.stats || { totalUsers: 0, adminUsers: 0 },
-            currentUsername: currentLoginUsername
+            currentUsername: currentLoginUsername,
+            expiredPolicies: previewData.expired || [],
         };
     } catch (e) {
         if (e && typeof e === 'object' && 'status' in e && 'location' in e) {
             throw e;
         }
         console.error("Failed to fetch admin data:", e);
-        return { allowedUsers: [], stats: { totalUsers: 0, adminUsers: 0 } };
+        return { allowedUsers: [], stats: { totalUsers: 0, adminUsers: 0 }, expiredPolicies: [] };
     }
 };
