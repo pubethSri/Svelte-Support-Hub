@@ -82,6 +82,23 @@
       isRefreshingPreview = false;
     }
   }
+
+  let isRunningCleanup = $state(false);
+  let isConfirmingCleanup = $state(false);
+
+  async function runCleanupNow() {
+    isRunningCleanup = true;
+    try {
+      const res = await fetch("/api/admin/cleanup/run", { method: "POST" });
+      if (res.ok) {
+        await refreshPreview();
+      }
+    } catch {
+    } finally {
+      isRunningCleanup = false;
+      isConfirmingCleanup = false;
+    }
+  }
 </script>
 
 <div class="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8">
@@ -264,15 +281,27 @@
                 These policies will be automatically deleted at the top of the next hour
               </p>
             </div>
-            <button
-              onclick={refreshPreview}
-              disabled={isRefreshingPreview}
-              class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:border-orange-300 dark:hover:border-orange-500/30 transition-all disabled:opacity-50"
-            >
-              <RefreshCw
-                class="w-4 h-4 {isRefreshingPreview ? 'animate-spin' : ''}"
-              />
-            </button>
+            <div class="flex gap-2">
+                <button
+                  onclick={() => (isConfirmingCleanup = true)}
+                  disabled={isRunningCleanup || isRefreshingPreview}
+                  class="flex items-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/20 rounded-lg text-sm font-bold hover:bg-red-100 dark:hover:bg-red-500/20 transition-all disabled:opacity-50"
+                  title="Immediately delete all expired policies"
+                >
+                  <Trash2 class="w-4 h-4" />
+                  Delete Now
+                </button>
+              <button
+                onclick={refreshPreview}
+                disabled={isRefreshingPreview || isRunningCleanup}
+                class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:border-orange-300 dark:hover:border-orange-500/30 transition-all disabled:opacity-50"
+                title="Refresh preview"
+              >
+                <RefreshCw
+                  class="w-4 h-4 {isRefreshingPreview ? 'animate-spin' : ''}"
+                />
+              </button>
+            </div>
           </div>
 
           {#if expiredPolicies.length === 0}
@@ -334,3 +363,45 @@
     {/if}
   </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+{#if isConfirmingCleanup}
+  <div class="fixed inset-0 z-[100] flex items-center justify-center px-4 bg-gray-900/50 backdrop-blur-sm transition-opacity">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 w-full max-w-md overflow-hidden transform transition-all scale-100 opacity-100">
+      <div class="px-6 py-6 sm:p-8">
+        <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 dark:bg-red-500/20 rounded-full">
+          <Trash2 class="w-6 h-6 text-red-600 dark:text-red-400" />
+        </div>
+        <div class="text-center">
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Delete Expired Policies?</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            You are about to permanently delete <strong>{expiredPolicies.length}</strong> expired polic{expiredPolicies.length === 1 ? 'y' : 'ies'}.
+            <br />This action cannot be undone. Are you sure you want to proceed?
+          </p>
+        </div>
+        
+        <div class="mt-8 flex gap-3">
+          <button
+            onclick={() => (isConfirmingCleanup = false)}
+            disabled={isRunningCleanup}
+            class="flex-1 px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            onclick={runCleanupNow}
+            disabled={isRunningCleanup}
+            class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition-colors disabled:opacity-50"
+          >
+            {#if isRunningCleanup}
+              <RefreshCw class="w-5 h-5 animate-spin" />
+              Deleting...
+            {:else}
+              Confirm Delete
+            {/if}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+{/if}
