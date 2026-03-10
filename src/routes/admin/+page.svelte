@@ -520,7 +520,7 @@
               oninput={handleUsernameInput}
               onfocus={() => { if (newUsername.length >= 2) showADDropdown = true; }}
               onblur={() => setTimeout(() => (showADDropdown = false), 200)}
-              placeholder="e.g. it66070030 or Jirathip"
+              placeholder="e.g. itxxxxxx or Name"
               class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
             />
             
