@@ -9,6 +9,7 @@
   import RefreshCw from "@lucide/svelte/icons/refresh-cw";
   import Clock from "@lucide/svelte/icons/clock";
   import AlertTriangle from "@lucide/svelte/icons/alert-triangle";
+  import UserPlus from "@lucide/svelte/icons/user-plus";
 
   let { data } = $props();
 
@@ -36,6 +37,92 @@
   let deletingId = $state<number | null>(null);
   let isDeleting = $state(false);
   let isRefreshing = $state(false);
+
+  // --- Add User State ---
+  let isAddingUser = $state(false);
+  let newUsername = $state("");
+  let newRole = $state("admin");
+  let customRole = $state("");
+  let isSubmittingUser = $state(false);
+  let addUserError = $state("");
+  
+  // AD Search State
+  let adSearchResults = $state<{username: string, name: string}[]>([]);
+  let isSearchingAD = $state(false);
+  let showADDropdown = $state(false);
+  
+  let searchTimeout: ReturnType<typeof setTimeout>;
+  
+  function handleUsernameInput(e: Event) {
+    const val = (e.target as HTMLInputElement).value;
+    newUsername = val;
+    
+    if (val.length < 2) {
+      adSearchResults = [];
+      showADDropdown = false;
+      return;
+    }
+    
+    clearTimeout(searchTimeout);
+    isSearchingAD = true;
+    showADDropdown = true;
+    
+    searchTimeout = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/admin/users/search?q=${encodeURIComponent(val)}`);
+        if (res.ok) {
+          const data = await res.json();
+          adSearchResults = data.results || [];
+        }
+      } catch {
+        adSearchResults = [];
+      } finally {
+        isSearchingAD = false;
+      }
+    }, 500); // 500ms debounce
+  }
+
+  function selectADUser(user: {username: string, name: string}) {
+    newUsername = user.username;
+    adSearchResults = [];
+    showADDropdown = false;
+  }
+
+  async function addUser() {
+    if (!newUsername.trim()) {
+      addUserError = "Username is required";
+      return;
+    }
+    
+    isSubmittingUser = true;
+    addUserError = "";
+    
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: newUsername.trim(),
+          role: newRole === 'other' ? customRole.trim() : newRole
+        })
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok && !data.error) {
+        isAddingUser = false;
+        newUsername = "";
+        newRole = "admin";
+        await refreshUsers();
+      } else {
+        addUserError = data.error || data.message || "Failed to add user";
+      }
+    } catch {
+      addUserError = "Network error while connecting to server";
+    } finally {
+      isSubmittingUser = false;
+    }
+  }
 
   async function refreshUsers() {
     isRefreshing = true;
@@ -148,10 +235,18 @@
         <button
           onclick={refreshUsers}
           disabled={isRefreshing}
-          class="px-4 py-3 bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-xl text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-300 dark:hover:border-purple-500/30 transition-all disabled:opacity-50"
+          class="px-4 py-3 bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-xl text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-300 dark:hover:border-purple-500/30 transition-all disabled:opacity-50 flex items-center justify-center shrink-0"
           title="Refresh user list"
         >
           <RefreshCw class="w-4 h-4 {isRefreshing ? 'animate-spin' : ''}" />
+        </button>
+        <button
+          onclick={() => (isAddingUser = true)}
+          class="flex items-center gap-2 px-4 py-3 bg-purple-600 dark:bg-purple-500 text-white rounded-xl shadow-sm hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors shrink-0"
+          title="Add allowed user"
+        >
+          <UserPlus class="w-4 h-4" />
+          <span class="hidden sm:inline font-semibold text-sm">Add User</span>
         </button>
       </div>
 
@@ -193,7 +288,7 @@
                     <td class="px-6 py-4">
                       <span
                         class="text-sm font-semibold text-gray-900 dark:text-white"
-                        >{user.username}</span
+                        >{user.name ? `${user.name}(${user.username})` : user.username}</span
                       >
                     </td>
                     <td class="px-6 py-4">
@@ -211,16 +306,10 @@
                       </span>
                     </td>
                     <td class="px-6 py-4 text-right">
-                      {#if user.role
-                        .toLowerCase()
-                        .includes("admin") || user.username === currentUsername}
-                        <span
-                          class="text-xs text-gray-400 dark:text-gray-600 italic"
-                        >
-                          {user.username === currentUsername
-                            ? "You"
-                            : "Protected"}
-                        </span>
+                      {#if user.username === currentUsername}
+                        <span class="text-xs text-gray-400 dark:text-gray-600 italic">You</span>
+                      {:else if user.role.toLowerCase().includes("admin") && currentUsername !== "it66070030"}
+                        <span class="text-xs text-gray-400 dark:text-gray-600 italic">Protected</span>
                       {:else if deletingId === user.id}
                         <div class="flex items-center justify-end gap-2">
                           <span
@@ -398,6 +487,141 @@
               Deleting...
             {:else}
               Confirm Delete
+            {/if}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+{/if}
+
+<!-- Add User Modal -->
+{#if isAddingUser}
+  <div class="fixed inset-0 z-[100] flex items-center justify-center px-4 bg-gray-900/50 backdrop-blur-sm transition-opacity">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 w-full max-w-md overflow-hidden transform transition-all scale-100 opacity-100">
+      <div class="px-6 py-6 sm:p-8">
+        <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-purple-100 dark:bg-purple-500/20 rounded-full">
+          <UserPlus class="w-6 h-6 text-purple-600 dark:text-purple-400" />
+        </div>
+        <div class="text-center mb-6">
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Add New User</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            Allow a new user from Active Directory to log in and manage policies.
+          </p>
+        </div>
+        
+        <div class="space-y-4 text-left">
+          <div class="relative">
+            <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username (ID) or Name</label>
+            <input
+              id="username"
+              type="text"
+              value={newUsername}
+              oninput={handleUsernameInput}
+              onfocus={() => { if (newUsername.length >= 2) showADDropdown = true; }}
+              onblur={() => setTimeout(() => (showADDropdown = false), 200)}
+              placeholder="e.g. it66070030 or Jirathip"
+              class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+            />
+            
+            <!-- AD Search Dropdown -->
+            {#if showADDropdown && (isSearchingAD || adSearchResults.length > 0)}
+              <div class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                {#if isSearchingAD}
+                  <div class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2">
+                    <RefreshCw class="w-4 h-4 animate-spin" /> Searching AD...
+                  </div>
+                {:else if adSearchResults.length > 0}
+                  <ul class="py-1">
+                    {#each adSearchResults as adUser}
+                      <li>
+                        <!-- svelte-ignore a11y_click_events_have_key_events -->
+                        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+                        <!-- svelte-ignore a11y_no_static_element_interactions -->
+                        <div 
+                          onclick={() => selectADUser(adUser)}
+                          class="px-4 py-2 hover:bg-purple-50 dark:hover:bg-purple-500/10 cursor-pointer flex flex-col"
+                        >
+                          <span class="text-sm font-semibold text-gray-900 dark:text-white">{adUser.name}</span>
+                          <span class="text-xs text-gray-500 dark:text-gray-400">{adUser.username}</span>
+                        </div>
+                      </li>
+                    {/each}
+                  </ul>
+                {/if}
+              </div>
+            {/if}
+          </div>
+          <div>
+            <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
+            <select
+              id="role"
+              bind:value={newRole}
+              class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+            >
+              <option value="admin">Admin</option>
+              <option value="TA">TA</option>
+              <option value="lecturer">Lecturer</option>
+              <option value="other">Other (Custom)</option>
+            </select>
+            
+            {#if newRole === 'other'}
+              <div class="mt-3 animate-in fade-in slide-in-from-top-1">
+                <label for="customRole" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Custom Role Name</label>
+                <input
+                  id="customRole"
+                  type="text"
+                  bind:value={customRole}
+                  placeholder="e.g. SuperAdmin"
+                  class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                />
+              </div>
+            {/if}
+            
+            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1.5 ml-1">
+              {#if newRole === 'admin'}
+                Admins have full global system access.
+              {:else if newRole === 'TA'}
+                TAs can manage policies for specific courses.
+              {:else if newRole === 'other'}
+                Type a custom role name for this user.
+              {:else}
+                Lecturers are restricted to default permissions.
+              {/if}
+            </p>
+          </div>
+          {#if addUserError}
+            <div class="p-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl">
+              <p class="text-xs text-red-600 dark:text-red-400 font-semibold">{addUserError}</p>
+            </div>
+          {/if}
+        </div>
+        
+        <div class="mt-8 flex gap-3">
+          <button
+            onclick={() => {
+              isAddingUser = false;
+              addUserError = "";
+              newUsername = "";
+              newRole = "admin";
+              customRole = "";
+              adSearchResults = [];
+            }}
+            disabled={isSubmittingUser}
+            class="flex-1 px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            onclick={addUser}
+            disabled={isSubmittingUser || !newUsername.trim() || (newRole === 'other' && !customRole.trim())}
+            class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold transition-colors disabled:opacity-50"
+          >
+            {#if isSubmittingUser}
+              <RefreshCw class="w-5 h-5 animate-spin" />
+              Adding...
+            {:else}
+              Add User
             {/if}
           </button>
         </div>
