@@ -222,11 +222,11 @@
               <Label class="mb-2">Policy Name</Label>
               <Input
                 type="text"
-                placeholder="ex. Midterm <name>"
+                placeholder="ex. CNI2025, Functional Programming"
                 bind:value={policyName}
               />
               <p class="text-xs text-gray-500 mt-1">
-                Please include "Midterm" followed by the exam name.
+                Name cannot be in Thai and No special characters
               </p>
             </div>
 
