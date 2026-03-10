@@ -77,14 +77,14 @@
 </svelte:head>
 
 <div
-  class="relative min-h-screen bg-[#fafafa] dark:bg-[#05080f] overflow-hidden selection:bg-orange-500/30 font-sans flex flex-col items-center gap-6 p-8 pt-32"
+  class="relative min-h-screen bg-[#fafafa] dark:bg-[#05080f] overflow-hidden selection:bg-purple-500/30 font-sans flex flex-col items-center gap-6 p-8 pt-32"
 >
   <!-- Abstract Ambient Background Orbs -->
   <div
-    class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-orange-400/20 dark:bg-orange-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_10s_infinite]"
+    class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-indigo-400/20 dark:bg-indigo-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_10s_infinite]"
   ></div>
   <div
-    class="absolute top-[20%] right-[-10%] w-[35vw] h-[35vw] rounded-full bg-pink-400/20 dark:bg-pink-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_12s_infinite_2s]"
+    class="absolute top-[20%] right-[-10%] w-[35vw] h-[35vw] rounded-full bg-fuchsia-400/20 dark:bg-fuchsia-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_12s_infinite_2s]"
   ></div>
   <div
     class="absolute bottom-[-20%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-purple-400/20 dark:bg-purple-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_14s_infinite_4s]"
@@ -132,7 +132,7 @@
       class="text-3xl md:text-4xl font-black tracking-tight text-gray-900 dark:text-white drop-shadow-sm"
     >
       Active <span
-        class="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 dark:from-yellow-400 dark:via-pink-500 dark:to-purple-500 bg-clip-text text-transparent"
+        class="bg-gradient-to-r from-purple-500 via-fuchsia-500 to-indigo-600 dark:from-purple-400 dark:via-fuchsia-500 dark:to-indigo-500 bg-clip-text text-transparent"
         >Policies</span
       >
     </h1>
@@ -140,9 +140,9 @@
       <Button
         variant="outline"
         onclick={() => goto("/creation")}
-        class="rounded-full border-gray-300 dark:border-white/20 bg-white/50 dark:bg-black/50 backdrop-blur-md hover:bg-orange-50 dark:hover:bg-white/10 dark:text-white transition-all duration-300"
+        class="rounded-full border-gray-300 dark:border-white/20 bg-white/50 dark:bg-black/50 backdrop-blur-md hover:bg-purple-50 dark:hover:bg-white/10 dark:text-white transition-all duration-300"
       >
-        <Plus class="h-4 w-4 mr-2 text-orange-500 dark:text-pink-400" />
+        <Plus class="h-4 w-4 mr-2 text-purple-600 dark:text-purple-400" />
         <span class="font-semibold text-gray-800 dark:text-gray-100"
           >Create</span
         >
@@ -152,14 +152,14 @@
         variant="outline"
         onclick={handleRefresh}
         disabled={isLoading}
-        class="rounded-full border-gray-300 dark:border-white/20 bg-white/50 dark:bg-black/50 backdrop-blur-md hover:bg-orange-50 dark:hover:bg-white/10 dark:text-white transition-all duration-300"
+        class="rounded-full border-gray-300 dark:border-white/20 bg-white/50 dark:bg-black/50 backdrop-blur-md hover:bg-purple-50 dark:hover:bg-white/10 dark:text-white transition-all duration-300"
       >
         {#if isLoading}
           <Loader2
-            class="h-4 w-4 animate-spin text-orange-500 dark:text-pink-400"
+            class="h-4 w-4 animate-spin text-purple-600 dark:text-purple-400"
           />
         {:else}
-          <RefreshCw class="h-4 w-4 mr-2 text-orange-500 dark:text-pink-400" />
+          <RefreshCw class="h-4 w-4 mr-2 text-purple-600 dark:text-purple-400" />
           <span class="font-semibold text-gray-800 dark:text-gray-100"
             >Refresh</span
           >

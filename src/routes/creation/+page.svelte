@@ -33,10 +33,10 @@
   let dateValue = $state<CalendarDate | undefined>();
   let startTime = $state("");
   let endTime = $state("");
-
   let selectedProfiles = $state<string[]>([]);
+  let serviceMode = $state<"pass" | "block">("pass");
 
-  // --- 2. STATE: DROPDOWN OPTIONS (Mocked or Fetched) ---
+  // --- 2. STATE: DROPDOWN OPTIONS (Fetched) ---
   let { data } = $props();
   // We use data.templates fetched from SQLite via the backend +page.server.ts load function
   const templates = data.templates || [];
@@ -44,14 +44,21 @@
   let addresses = $state<{ value: string; name: string }[]>([]);
   let urlTemplates = $state<{ value: string; name: string }[]>([]);
 
-  // Build the list by iterating through the database array directly,
-  // since the Backend Database is strictly ordered by ID
-  let availableTemplates: { value: string; name: string }[] = templates
-    .filter((t: any) => !t.isHidden)
-    .map((temp: any) => ({
-      value: temp.name,
-      name: temp.displayName || temp.name,
-    }));
+  // Dynamically derive the available templates based on the selected mode
+  const availableTemplates = $derived(
+    templates
+      .filter((t: any) => !t.isHidden && t.mode === serviceMode)
+      .map((temp: any) => ({
+        value: temp.name,
+        name: temp.displayName || temp.name,
+      }))
+  );
+
+  // When availableTemplates (i.e. serviceMode) changes, clear the selection and update dropdown
+  $effect(() => {
+    selectedProfiles = [];
+    urlTemplates = availableTemplates;
+  });
 
   // --- 3. FETCH OPTIONS ON LOAD ---
   onMount(async () => {
@@ -155,8 +162,8 @@
       }
     }
 
-    // Auto-inject default URL filter UNLESS they are blocking AI/Chat exclusively
-    if (!profiles.includes("block-ai") && !profiles.includes("block-chat")) {
+    // Auto-inject default URL filter ONLY if they are in "pass" mode
+    if (serviceMode === "pass") {
       const defaultFilterTemplate = templates.find(
         (t: any) => t.name === "default-urlfilter",
       );
@@ -175,14 +182,14 @@
 </script>
 
 <div
-  class="relative min-h-screen bg-[#fafafa] dark:bg-[#05080f] overflow-hidden selection:bg-orange-500/30 font-sans flex flex-col items-center gap-6 p-8 pt-32"
+  class="relative min-h-screen bg-[#fafafa] dark:bg-[#05080f] overflow-hidden selection:bg-purple-500/30 font-sans flex flex-col items-center gap-6 p-8 pt-32"
 >
   <!-- Abstract Ambient Background Orbs -->
   <div
-    class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-orange-400/20 dark:bg-orange-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_10s_infinite]"
+    class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-indigo-400/20 dark:bg-indigo-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_10s_infinite]"
   ></div>
   <div
-    class="absolute top-[20%] right-[-10%] w-[35vw] h-[35vw] rounded-full bg-pink-400/20 dark:bg-pink-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_12s_infinite_2s]"
+    class="absolute top-[20%] right-[-10%] w-[35vw] h-[35vw] rounded-full bg-fuchsia-400/20 dark:bg-fuchsia-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_12s_infinite_2s]"
   ></div>
   <div
     class="absolute bottom-[-20%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-purple-400/20 dark:bg-purple-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_14s_infinite_4s]"
@@ -200,7 +207,7 @@
       class="text-4xl md:text-5xl font-black tracking-tight text-gray-900 dark:text-white drop-shadow-sm"
     >
       Policy <span
-        class="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 dark:from-yellow-400 dark:via-pink-500 dark:to-purple-500 bg-clip-text text-transparent"
+        class="bg-gradient-to-r from-purple-500 via-fuchsia-500 to-indigo-600 dark:from-purple-400 dark:via-fuchsia-500 dark:to-indigo-500 bg-clip-text text-transparent"
         >Creation</span
       >
     </h1>
@@ -219,10 +226,16 @@
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="col-span-2">
-              <Label class="mb-2">Policy Name</Label>
+              <div class="flex items-center justify-between mb-2">
+                <Label>Policy Name</Label>
+                <span class="text-xs font-medium {17 - policyName.length <= 3 ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500'}">
+                  {17 - policyName.length} characters left
+                </span>
+              </div>
               <Input
                 type="text"
-                placeholder="ex. CNI2025, Functional Programming"
+                maxlength={17}
+                placeholder="ex. CNI2025, Functional Prog"
                 bind:value={policyName}
               />
               <p class="text-xs text-gray-500 mt-1">
@@ -250,12 +263,37 @@
           <h3
             class="text-xl font-bold border-b border-gray-200/50 dark:border-white/10 pb-2 dark:text-white text-gray-800"
           >
-            2. Pass Services
+            2. Services
           </h3>
           <div>
-            <Label class="mb-2">Select Services to let it passthrough</Label>
-            <MultiSelect items={urlTemplates} bind:value={selectedProfiles} />
-            <p class="text-xs text-gray-500 mt-1">Select services to apply.</p>
+            <div class="flex items-center gap-4 mb-4">
+              <div class="inline-flex rounded-lg border border-gray-200 dark:border-white/10 p-1 bg-gray-50 dark:bg-black/20">
+                <button
+                  type="button"
+                  class="px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 {serviceMode === 'pass' ? 'bg-white dark:bg-white/10 shadow-sm text-purple-600 dark:text-purple-400' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}"
+                  onclick={() => { serviceMode = "pass"; }}
+                >
+                  Pass Mode
+                </button>
+                <button
+                  type="button"
+                  class="px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 {serviceMode === 'block' ? 'bg-white dark:bg-white/10 shadow-sm text-red-600 dark:text-red-400' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}"
+                  onclick={() => { serviceMode = "block"; }}
+                >
+                  Block Mode
+                </button>
+              </div>
+            </div>
+
+            <Label class="mb-2">
+              {#if serviceMode === "pass"}
+                Pass Mode: Default will block everything. Select services to let them passthrough.
+              {:else}
+                Block Mode: Default will pass everything. Select specific services to block.
+              {/if}
+            </Label>
+            <MultiSelect items={urlTemplates} bind:value={selectedProfiles} placeholder={serviceMode === "pass" ? "Block everything" : "Pass everything"}/>
+            <p class="text-xs text-gray-500 mt-1">Select services to apply under {serviceMode === "pass" ? "Pass" : "Block"} mode.</p>
           </div>
         </div>
 
@@ -366,7 +404,7 @@
           >
             <Button
               type="submit"
-              class="w-full text-lg h-14 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 transition-all duration-300 hover:-translate-y-0.5 mt-4"
+              class="w-full text-lg h-14 rounded-full bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300 hover:-translate-y-0.5 mt-4"
               disabled={isDeploying || srcRooms.length === 0}
             >
               {#if isDeploying}

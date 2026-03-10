@@ -277,14 +277,14 @@
 />
 
 <div
-  class="relative min-h-screen bg-[#fafafa] dark:bg-[#05080f] overflow-hidden selection:bg-orange-500/30 font-sans flex flex-col items-center gap-6 md:gap-8 px-4 md:px-8 pt-24 md:pt-32 pb-8"
+  class="relative min-h-screen bg-[#fafafa] dark:bg-[#05080f] overflow-hidden selection:bg-purple-500/30 font-sans flex flex-col items-center gap-6 md:gap-8 px-4 md:px-8 pt-24 md:pt-32 pb-8"
 >
   <!-- Abstract Ambient Background Orbs -->
   <div
-    class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-orange-400/20 dark:bg-orange-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_10s_infinite]"
+    class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-indigo-400/20 dark:bg-indigo-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_10s_infinite]"
   ></div>
   <div
-    class="absolute top-[20%] right-[-10%] w-[35vw] h-[35vw] rounded-full bg-pink-400/20 dark:bg-pink-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_12s_infinite_2s]"
+    class="absolute top-[20%] right-[-10%] w-[35vw] h-[35vw] rounded-full bg-fuchsia-400/20 dark:bg-fuchsia-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_12s_infinite_2s]"
   ></div>
   <div
     class="absolute bottom-[-20%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-purple-400/20 dark:bg-purple-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-[blob_14s_infinite_4s]"
@@ -338,14 +338,14 @@
           size="sm"
           onclick={handleRefresh}
           disabled={isRefreshing || isSaving}
-          class="flex items-center gap-2 rounded-full border-gray-300 dark:border-white/20 bg-white/50 dark:bg-black/50 backdrop-blur-md hover:bg-orange-50 dark:hover:bg-white/10 dark:text-white transition-all duration-300 shadow-sm"
+          class="flex items-center gap-2 rounded-full border-gray-300 dark:border-white/20 bg-white/50 dark:bg-black/50 backdrop-blur-md hover:bg-purple-50 dark:hover:bg-white/10 dark:text-white transition-all duration-300 shadow-sm"
         >
           {#if isRefreshing}
             <Loader2
-              class="h-4 w-4 animate-spin text-orange-500 dark:text-pink-400"
+              class="h-4 w-4 animate-spin text-purple-600 dark:text-purple-400"
             />
           {:else}
-            <RefreshCw class="h-4 w-4 text-orange-500 dark:text-pink-400" />
+            <RefreshCw class="h-4 w-4 text-purple-600 dark:text-purple-400" />
           {/if}
           <span
             class="hidden sm:inline font-semibold text-gray-800 dark:text-gray-100"
@@ -355,7 +355,7 @@
 
         {#if hasUnsavedChanges}
           <div
-            class="flex items-center gap-2 text-orange-600 dark:text-orange-400 text-xs sm:text-sm font-bold bg-orange-100 dark:bg-orange-900/30 px-2 sm:px-3 py-1 rounded-full shadow-sm"
+            class="flex items-center gap-2 text-purple-600 dark:text-purple-400 text-xs sm:text-sm font-bold bg-purple-100 dark:bg-purple-900/30 px-2 sm:px-3 py-1 rounded-full shadow-sm"
           >
             <AlertCircle class="h-4 w-4 flex-shrink-0" />
             <span class="whitespace-nowrap">Unsaved</span>
@@ -479,7 +479,7 @@
               disabled={isSaving ||
                 !isScheduleValid ||
                 editedSrcRooms.length === 0}
-              class="cursor-pointer bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 shadow-lg shadow-orange-500/25 text-white rounded-full transition-all duration-300"
+              class="cursor-pointer bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 shadow-lg shadow-purple-500/25 text-white rounded-full transition-all duration-300"
             >
               {#if isSaving}
                 <svg
@@ -513,7 +513,7 @@
           <Button
             size="lg"
             disabled={isEditing}
-            class="cursor-pointer bg-gradient-to-r from-orange-500 to-pink-500 text-white opacity-50 rounded-full"
+            class="cursor-pointer bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white opacity-50 rounded-full"
           >
             <FloppyDisk class="w-5 h-5 mr-2" />
             Save Changes
@@ -761,7 +761,7 @@
           <h2
             class="text-lg font-semibold flex items-center gap-2 dark:text-white"
           >
-            <Globe class="h-5 w-5 text-orange-500" />
+            <Globe class="h-5 w-5 text-purple-500" />
             Web Filter Rules
           </h2>
           <div class="flex gap-2 flex-wrap">
@@ -938,7 +938,7 @@
           >
             <Button
               type="submit"
-              class="w-full bg-orange-500 hover:bg-orange-600 text-white"
+              class="w-full bg-purple-600 hover:bg-purple-700 text-white"
               disabled={isSavingUrlFilter || pendingEntries.length === 0}
             >
               {#if isSavingUrlFilter}
