@@ -24,6 +24,8 @@
   };
 
   let isDeploying = $state(false);
+  let queuePosition = $state<number | null>(null);
+  let queueStatus = $state<string>("");
 
   // --- 1. STATE: FORM DATA ---
   let policyName = $state("");
@@ -386,18 +388,51 @@
               formData.set("policyData", JSON.stringify(payload));
 
               isDeploying = true;
+              queueStatus = "waiting";
+              queuePosition = null;
 
               return async ({ result, update }) => {
-                await update();
-                isDeploying = false;
+                await update({ reset: false });
 
-                if (result.type === "redirect") {
-                  // Success - will redirect to /dashboard
-                  alert("Policy created successfully!");
+                if (result.type === "success" && result.data?.success) {
+                  const jobId = result.data.jobId;
+                  
+                  // Start polling
+                  const pollInterval = window.setInterval(async () => {
+                    try {
+                      const res = await fetch(`/api/queue/${jobId}`);
+                      if (!res.ok) return;
+                      
+                      const statusData = await res.json();
+                      
+                      if (statusData.status === "completed") {
+                        clearInterval(pollInterval);
+                        isDeploying = false;
+                        queuePosition = null;
+                        alert("Policy created successfully!");
+                        window.location.href = "/dashboard";
+                      } else if (statusData.status === "failed") {
+                        clearInterval(pollInterval);
+                        isDeploying = false;
+                        queuePosition = null;
+                        alert(statusData.error || "Failed to create policy");
+                      } else {
+                        // "waiting" or "processing"
+                        queueStatus = statusData.status;
+                        queuePosition = statusData.position;
+                      }
+                    } catch (e) {
+                      console.error("Failed to poll queue:", e);
+                    }
+                  }, 2000);
                 } else if (result.type === "failure") {
+                  isDeploying = false;
                   alert(result.data?.error || "Failed to create policy");
                 } else if (result.type === "error") {
+                  isDeploying = false;
                   alert("An unexpected error occurred. Please try again.");
+                } else {
+                  isDeploying = false;
                 }
               };
             }}
@@ -409,7 +444,13 @@
             >
               {#if isDeploying}
                 <Loader2 class="mr-2 h-5 w-5 animate-spin" />
-                Deploying Configuration...
+                {#if queueStatus === 'processing'}
+                  Processing Configuration...
+                {:else if queuePosition !== null}
+                  Waiting in Queue ({queuePosition - 1 > 0 ? `${queuePosition - 1} people ahead of you` : 'You are next!'})...
+                {:else}
+                  Queuing Configuration...
+                {/if}
               {:else}
                 <span class="font-bold">Deploy Configuration</span>
               {/if}

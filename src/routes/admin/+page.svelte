@@ -14,7 +14,36 @@
   let { data } = $props();
 
   // --- Tab State ---
-  let activeTab = $state<"users" | "cleanup">("users");
+  let activeTab = $state<"users" | "cleanup" | "queue">("users");
+
+  // --- Queue State ---
+  let queueJobs = $state<any[]>([]);
+  let isRefreshingQueue = $state(false);
+  let queueInterval: ReturnType<typeof setInterval>;
+
+  async function refreshQueue() {
+    isRefreshingQueue = true;
+    try {
+      const res = await fetch("/api/admin/queue");
+      if (res.ok) {
+        const data = await res.json();
+        queueJobs = data.jobs || [];
+      }
+    } catch {} 
+    finally {
+      isRefreshingQueue = false;
+    }
+  }
+
+  $effect(() => {
+    if (activeTab === "queue") {
+      refreshQueue(); // Fetch immediately on tab switch
+      queueInterval = setInterval(refreshQueue, 2000); // Poll every 2 seconds
+    } else {
+      clearInterval(queueInterval);
+    }
+    return () => clearInterval(queueInterval); // Cleanup on destroy
+  });
 
   // --- Users Tab State ---
   let allowedUsers = $state(data.allowedUsers || []);
@@ -210,6 +239,15 @@
       >
         <Clock class="w-4 h-4" />
         Policy Cleanup
+      </button>
+      <button
+        onclick={() => (activeTab = "queue")}
+        class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {activeTab === 'queue'
+          ? 'bg-white dark:bg-gray-700 text-purple-700 dark:text-purple-300 shadow-sm'
+          : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}"
+      >
+        <RefreshCw class="w-4 h-4 {activeTab === 'queue' ? 'animate-spin-slow' : ''}" />
+        Live Queue
       </button>
     </div>
 
@@ -445,6 +483,127 @@
             </div>
             <div class="p-4 text-center text-xs text-gray-400 dark:text-gray-500">
               {expiredPolicies.length} expired polic{expiredPolicies.length === 1 ? "y" : "ies"} will be automatically deleted at the top of the next hour
+            </div>
+          {/if}
+        </div>
+      </div>
+    {/if}
+
+    <!-- ============== QUEUE TAB ============== -->
+    {#if activeTab === "queue"}
+      <div class="space-y-6">
+
+        <div
+          class="bg-white dark:bg-gray-900/50 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden"
+        >
+          <div class="p-6 pb-4 flex items-center justify-between">
+            <div>
+              <h3
+                class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2"
+              >
+                <RefreshCw
+                  class="w-5 h-5 text-purple-500 dark:text-purple-400"
+                />
+                Live Creation Queue
+              </h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Real-time monitor of server load and active FortiGate configuration jobs. Auto-refreshes every 2s.
+              </p>
+            </div>
+            <div class="flex gap-2">
+              <button
+                onclick={refreshQueue}
+                disabled={isRefreshingQueue}
+                class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-300 dark:hover:border-purple-500/30 transition-all disabled:opacity-50"
+                title="Force refresh queue"
+              >
+                <RefreshCw
+                  class="w-4 h-4 {isRefreshingQueue ? 'animate-spin' : ''}"
+                />
+              </button>
+            </div>
+          </div>
+
+          {#if queueJobs.length === 0}
+            <div class="p-8 pt-2 text-center">
+              <Check
+                class="w-10 h-10 text-green-400 dark:text-green-500 mx-auto mb-3"
+              />
+              <p
+                class="text-gray-500 dark:text-gray-400 font-medium"
+              >
+                The queue is totally empty. Server is resting!
+              </p>
+            </div>
+          {:else}
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr
+                    class="bg-gray-50 dark:bg-gray-800/50 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  >
+                    <th class="px-6 py-3">Job ID</th>
+                    <th class="px-6 py-3">Policy Name</th>
+                    <th class="px-6 py-3">Status</th>
+                    <th class="px-6 py-3">Position</th>
+                    <th class="px-6 py-3">Rooms Overlap Check</th>
+                  </tr>
+                </thead>
+                <tbody
+                  class="divide-y divide-gray-100 dark:divide-gray-800"
+                >
+                  {#each queueJobs as job}
+                    <tr
+                      class="hover:bg-purple-50/50 dark:hover:bg-purple-500/5 transition-colors"
+                    >
+                      <td
+                        class="px-6 py-4 text-xs text-gray-500 dark:text-gray-400 font-mono truncate max-w-[120px]"
+                        title={job.id}>{job.id}</td
+                      >
+                      <td
+                        class="px-6 py-4 text-sm font-bold text-gray-900 dark:text-white"
+                      >
+                        {job.metadata?.policyName || "Unknown"}
+                        {#if job.error}
+                          <p class="text-xs text-red-500 font-normal truncate max-w-[200px]" title={job.error}>{job.error}</p>
+                        {/if}
+                      </td>
+                      <td class="px-6 py-4">
+                        <span
+                          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold 
+                            {job.status === 'processing' ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-200' : ''}
+                            {job.status === 'waiting' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300 border border-orange-200' : ''}
+                            {job.status === 'completed' ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-300 border border-green-200' : ''}
+                            {job.status === 'failed' ? 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-300 border border-red-200' : ''}"
+                        >
+                          {#if job.status === 'processing'}<RefreshCw class="w-3 h-3 animate-spin"/>{/if}
+                          {#if job.status === 'waiting'}<Clock class="w-3 h-3"/>{/if}
+                          {#if job.status === 'completed'}<Check class="w-3 h-3"/>{/if}
+                          {#if job.status === 'failed'}<AlertTriangle class="w-3 h-3"/>{/if}
+                          {job.status.toUpperCase()}
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 text-sm text-gray-500 font-mono">
+                         {#if job.status === 'waiting'}
+                            #{job.position}
+                         {:else}
+                            -
+                         {/if}
+                      </td>
+                      <td class="px-6 py-4 text-xs text-gray-500 dark:text-gray-400">
+                        {#if job.metadata?.srcRooms}
+                           {job.metadata.srcRooms.length} room{job.metadata.srcRooms.length === 1 ? '' : 's'}
+                        {:else}
+                           N/A
+                        {/if}
+                      </td>
+                    </tr>
+                  {/each}
+                </tbody>
+              </table>
+            </div>
+            <div class="p-4 text-center text-xs text-gray-400 dark:text-gray-500">
+              {queueJobs.filter(j => j.status === 'waiting').length} waiting, {queueJobs.filter(j => j.status === 'processing').length} processing. (Completed/Failed jobs self-destruct after 5m)
             </div>
           {/if}
         </div>

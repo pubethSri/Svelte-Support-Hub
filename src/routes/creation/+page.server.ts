@@ -85,8 +85,12 @@ export const actions = {
                 });
             }
 
-            // Success - redirect to active policies page
-            throw redirect(303, '/dashboard');
+            // Success - return the jobId straight to the Svelte frontend
+            const jsonRes = await response.json();
+            return {
+                success: true,
+                jobId: jsonRes.jobId
+            };
 
         } catch (err) {
             // Re-throw redirects
