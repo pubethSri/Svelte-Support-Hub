@@ -215,6 +215,33 @@
       isConfirmingCleanup = false;
     }
   }
+
+  // --- Next Cleanup Time Logic ---
+  let nextCleanupTime = $state("");
+
+  function updateNextCleanupTime() {
+    const now = new Date();
+    const nextTarget = new Date(now);
+    
+    if (now.getMinutes() >= 55) {
+      nextTarget.setHours(now.getHours() + 1, 55, 0, 0);
+    } else {
+      nextTarget.setHours(now.getHours(), 55, 0, 0);
+    }
+    
+    nextCleanupTime = nextTarget.toLocaleTimeString('en-GB', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      timeZone: 'Asia/Bangkok'
+    });
+  }
+
+  $effect(() => {
+    updateNextCleanupTime();
+    // Update every minute to keep it fresh if left open
+    const interval = setInterval(updateNextCleanupTime, 60000);
+    return () => clearInterval(interval);
+  });
 </script>
 
 <div class="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8">
@@ -405,7 +432,7 @@
                 Expired Policies
               </h3>
               <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                These policies will be automatically deleted at the top of the next hour
+                These policies will be automatically deleted at the next cleanup time: <strong class="text-gray-700 dark:text-gray-300">{nextCleanupTime}</strong> (UTC+7)
               </p>
             </div>
             <div class="flex gap-2">
@@ -482,7 +509,7 @@
               </table>
             </div>
             <div class="p-4 text-center text-xs text-gray-400 dark:text-gray-500">
-              {expiredPolicies.length} expired polic{expiredPolicies.length === 1 ? "y" : "ies"} will be automatically deleted at the top of the next hour
+              {expiredPolicies.length} expired polic{expiredPolicies.length === 1 ? "y" : "ies"} will be automatically deleted at the next cleanup time: <strong class="text-gray-700 dark:text-gray-300">{nextCleanupTime}</strong> (UTC+7)
             </div>
           {/if}
         </div>
