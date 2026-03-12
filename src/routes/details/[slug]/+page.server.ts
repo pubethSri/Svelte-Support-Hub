@@ -48,9 +48,9 @@ export const load = async ({ params, cookies, fetch, depends }) => {
             throw error(404, "Policy not found");
         }
 
-        // 3. Parallel Fetch for Schedule and Webfilter
+        // 3. Parallel Fetch for Schedule, Webfilter, and Owner
         // Add timestamp to URLs
-        const [scheduleRes, webfilterRes] = await Promise.all([
+        const [scheduleRes, webfilterRes, ownerRes] = await Promise.all([
             // Fetch Schedule (Use policy.schedule as the reference)
             fetch(`${BACKEND_URL}/firewall/schedule/onetime/${encodeURIComponent(policy.schedule)}?t=${timestamp}`, { 
                 headers,
@@ -61,11 +61,18 @@ export const load = async ({ params, cookies, fetch, depends }) => {
             fetch(`${BACKEND_URL}/firewall/webfilter/urlfilter/name/${encodeURIComponent(policy["webfilter-profile"])}?t=${timestamp}`, { 
                 headers,
                 cache: 'no-store'
+            }),
+
+            // Fetch Policy Owner
+            fetch(`${BACKEND_URL}/audit/owner/${encodeURIComponent(policy.name)}?t=${timestamp}`, {
+                headers,
+                cache: 'no-store'
             })
         ]);
 
         let schedule = null;
         let webfilter = null;
+        let owner = 'unknown';
 
         if (scheduleRes.ok) {
             const sData = await scheduleRes.json();
@@ -77,11 +84,19 @@ export const load = async ({ params, cookies, fetch, depends }) => {
             webfilter = wData.results?.[0] || null;
         }
 
+        if (ownerRes.ok) {
+            const oData = await ownerRes.json();
+            if (oData.success) {
+                owner = oData.owner;
+            }
+        }
+
         return {
             policyId,
             policy,
             schedule,
             webfilter,
+            owner,
             timestamp // Include timestamp to make data unique
         };
 

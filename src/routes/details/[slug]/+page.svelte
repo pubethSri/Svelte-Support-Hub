@@ -57,6 +57,7 @@
   const policy = $derived(data.policy);
   const schedule = $derived(data.schedule);
   const webfilter = $derived(data.webfilter);
+  const owner = $derived(data.owner);
 
   // --- LOADER LOGIC ---
   let isDeleting = $state(false);
@@ -594,6 +595,11 @@
             <dt class="text-gray-500">ID</dt>
             <dd class="font-medium dark:text-white">{policy.policyid}</dd>
           </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-gray-500">Created By</dt>
+            <dd class="font-medium dark:text-white">{owner}</dd>
+          </div>
+
           <div class="flex flex-col gap-0.5">
             <dt class="text-gray-500">Source Address</dt>
             {#if isEditing}
