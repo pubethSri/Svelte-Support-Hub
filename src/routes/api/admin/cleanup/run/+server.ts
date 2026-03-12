@@ -3,7 +3,7 @@ import type { RequestHandler } from "./$types";
 
 const BACKEND_URL = env.PUBLIC_BACKEND_URL || "http://localhost:3000";
 
-export const POST: RequestHandler = async ({ cookies }) => {
+export const POST: RequestHandler = async ({ cookies, fetch }) => {
     const token = cookies.get("authToken");
     if (!token) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });

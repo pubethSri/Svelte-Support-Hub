@@ -14,7 +14,7 @@
   let { data } = $props();
 
   // --- Tab State ---
-  let activeTab = $state<"users" | "cleanup" | "queue">("users");
+  let activeTab = $state<"users" | "cleanup" | "queue">("queue");
 
   // --- Queue State ---
   let queueJobs = $state<any[]>([]);
@@ -248,10 +248,19 @@
   <div class="max-w-4xl mx-auto">
 
     <!-- Tab Navigation -->
-    <div class="mt-2 mb-6 flex gap-1 bg-gray-100 dark:bg-gray-800/50 p-1 rounded-xl w-fit mx-auto">
+    <div class="mt-2 mb-6 flex gap-1 bg-gray-100 dark:bg-gray-800/50 p-1 rounded-xl w-full max-w-fit mx-auto overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-hide shrink-0">
+      <button
+        onclick={() => (activeTab = "queue")}
+        class="flex shrink-0 items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {activeTab === 'queue'
+          ? 'bg-white dark:bg-gray-700 text-purple-700 dark:text-purple-300 shadow-sm'
+          : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}"
+      >
+        <RefreshCw class="w-4 h-4 {activeTab === 'queue' ? 'animate-spin-slow' : ''}" />
+        Live Queue
+      </button>
       <button
         onclick={() => (activeTab = "users")}
-        class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {activeTab === 'users'
+        class="flex shrink-0 items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {activeTab === 'users'
           ? 'bg-white dark:bg-gray-700 text-purple-700 dark:text-purple-300 shadow-sm'
           : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}"
       >
@@ -260,21 +269,12 @@
       </button>
       <button
         onclick={() => (activeTab = "cleanup")}
-        class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {activeTab === 'cleanup'
+        class="flex shrink-0 items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {activeTab === 'cleanup'
           ? 'bg-white dark:bg-gray-700 text-purple-700 dark:text-purple-300 shadow-sm'
           : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}"
       >
         <Clock class="w-4 h-4" />
         Policy Cleanup
-      </button>
-      <button
-        onclick={() => (activeTab = "queue")}
-        class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {activeTab === 'queue'
-          ? 'bg-white dark:bg-gray-700 text-purple-700 dark:text-purple-300 shadow-sm'
-          : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}"
-      >
-        <RefreshCw class="w-4 h-4 {activeTab === 'queue' ? 'animate-spin-slow' : ''}" />
-        Live Queue
       </button>
     </div>
 

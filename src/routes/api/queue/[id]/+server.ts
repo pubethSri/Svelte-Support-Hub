@@ -2,7 +2,7 @@ import { env } from "$env/dynamic/public";
 
 const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
-export async function GET({ params, cookies }) {
+export async function GET({ params, cookies, fetch }) {
     const token = cookies.get("authToken");
     try {
         const response = await fetch(`${BACKEND_URL}/firewall/queue/${params.id}`, {

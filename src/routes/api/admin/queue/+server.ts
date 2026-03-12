@@ -5,7 +5,7 @@ import { env } from '$env/dynamic/public';
 /**
  * Proxy GET requests to the Elysia backend to retrieve the live Job Queue.
  */
-export const GET: RequestHandler = async ({ cookies }) => {
+export const GET: RequestHandler = async ({ cookies, fetch }) => {
     const token = cookies.get('authToken');
 
     if (!token) {

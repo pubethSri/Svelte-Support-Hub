@@ -4,7 +4,7 @@ import type { RequestHandler } from "./$types";
 const BACKEND_URL = env.PUBLIC_BACKEND_URL || "http://localhost:3000";
 
 // POST: Add a new allowed user
-export const POST: RequestHandler = async ({ cookies, request }) => {
+export const POST: RequestHandler = async ({ cookies, request, fetch }) => {
     const token = cookies.get("authToken");
 
     if (!token) {

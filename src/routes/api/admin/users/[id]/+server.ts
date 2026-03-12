@@ -4,7 +4,7 @@ import type { RequestHandler } from "./$types";
 const BACKEND_URL = env.PUBLIC_BACKEND_URL || "http://localhost:3000";
 
 // DELETE: Remove an allowed user by ID
-export const DELETE: RequestHandler = async ({ cookies, params }) => {
+export const DELETE: RequestHandler = async ({ cookies, params, fetch }) => {
     const token = cookies.get("authToken");
 
     if (!token) {
