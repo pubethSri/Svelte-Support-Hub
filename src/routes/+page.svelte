@@ -11,6 +11,7 @@
   import Zap from "@lucide/svelte/icons/zap";
   import { fade } from "svelte/transition";
   import { onMount } from "svelte";
+  import { _ } from "svelte-i18n";
 
   let showLoginModal = $state(false);
   let isNavigating = $state(false);
@@ -208,7 +209,7 @@
               class="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-white/20 to-purple-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
             ></div>
             <span class="relative font-bold text-lg flex items-center gap-2">
-              Create Policy
+              {$_('landing.create_policy')}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="h-5 w-5 group-hover:rotate-90 transition-transform duration-300"
@@ -234,7 +235,7 @@
               class="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-white/20 to-purple-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
             ></div>
             <span class="relative font-bold text-lg flex items-center gap-2">
-              {isNavigating ? "Loading..." : "Go to Dashboard"}
+              {isNavigating ? $_('common.loading') : $_('landing.go_to_dashboard')}
               {#if !isNavigating}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -261,7 +262,7 @@
             <div
               class="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-white/20 to-purple-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
             ></div>
-            <span class="relative font-bold text-lg">Get Started - Login</span>
+            <span class="relative font-bold text-lg">{$_('landing.get_started')}</span>
           </Button>
         {/if}
       </div>
@@ -297,9 +298,9 @@
   {#if isNavigating}
     <div class="mt-4 text-center">
       <h3 class="text-xl font-bold text-white tracking-wide">
-        Loading Dashboard...
+        {$_('landing.loading_dashboard')}
       </h3>
-      <p class="text-gray-200 mt-2">Fetching active policies</p>
+      <p class="text-gray-200 mt-2">{$_('landing.fetching_policies')}</p>
     </div>
   {/if}
 </div>

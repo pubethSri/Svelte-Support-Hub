@@ -7,6 +7,7 @@
 
   // Icons for Social Login
   import Globe from "@lucide/svelte/icons/globe";
+  import { _ } from "svelte-i18n";
 
   let revealPassword = $state(false);
   let usernameValue = $state("");
@@ -33,7 +34,7 @@
     <h2
       class="text-[26px] font-bold text-gray-900 dark:text-white tracking-tight"
     >
-      Account Log In
+      {$_('login.title')}
     </h2>
   </div>
 
@@ -56,9 +57,9 @@
           // Login successful - cookie is already set by server
           if (onSuccess) onSuccess(result.data.user);
         } else if (result.type === "failure") {
-          errorMessage = String(result.data?.error || "Login failed");
+          errorMessage = String(result.data?.error || $_('login.login_failed'));
         } else {
-          errorMessage = "An unexpected error occurred";
+          errorMessage = $_('login.unexpected_error');
         }
       };
     }}
@@ -70,7 +71,7 @@
         id="username"
         name="username"
         type="text"
-        placeholder="IT Username"
+        placeholder={$_('login.username_placeholder')}
         bind:value={usernameValue}
         required
       />
@@ -82,7 +83,7 @@
         id="password"
         name="password"
         type={revealPassword ? "text" : "password"}
-        placeholder="Password"
+        placeholder={$_('login.password_placeholder')}
         bind:value={passwordValue}
         required
       />
@@ -111,7 +112,7 @@
         : 'bg-gray-200 text-gray-400 hover:bg-gray-200 cursor-not-allowed'}"
       disabled={!usernameValue || !passwordValue || isLoading}
     >
-      {isLoading ? "Logging in..." : "Log In"}
+      {isLoading ? $_('login.logging_in') : $_('login.login_button')}
     </Button>
   </form>
 
@@ -119,7 +120,7 @@
     <div class="flex-grow border-t border-gray-200"></div>
     <span
       class="flex-shrink-0 mx-4 text-gray-400 text-xs uppercase tracking-wider"
-      >More Login Methods</span
+      >{$_('login.more_methods')}</span
     >
     <div class="flex-grow border-t border-gray-200"></div>
   </div>

@@ -12,6 +12,7 @@
   import UserPlus from "@lucide/svelte/icons/user-plus";
   import FileText from "@lucide/svelte/icons/file-text";
   import ArrowUp from "@lucide/svelte/icons/arrow-up";
+  import { _ } from "svelte-i18n";
 
   let { data } = $props();
 
@@ -322,7 +323,7 @@
           : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}"
       >
         <RefreshCw class="w-4 h-4 {activeTab === 'queue' ? 'animate-spin-slow' : ''}" />
-        Live Queue
+        {$_('admin.tab_queue')}
       </button>
       <button
         onclick={() => (activeTab = "users")}
@@ -331,7 +332,7 @@
           : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}"
       >
         <Users class="w-4 h-4" />
-        Users Management
+        {$_('admin.tab_users')}
       </button>
       <button
         onclick={() => (activeTab = "cleanup")}
@@ -340,7 +341,7 @@
           : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}"
       >
         <Clock class="w-4 h-4" />
-        Policy Cleanup
+        {$_('admin.tab_cleanup')}
       </button>
       <button
         onclick={() => { activeTab = "logs"; if (!logsLoaded) fetchLogs(); }}
@@ -349,7 +350,7 @@
           : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}"
       >
         <FileText class="w-4 h-4" />
-        Audit Logs
+        {$_('admin.tab_logs')}
       </button>
     </div>
 
@@ -368,7 +369,7 @@
           <input
             type="text"
             bind:value={searchQuery}
-            placeholder="Search by username, role, or ID..."
+            placeholder={$_('admin.users.search_placeholder')}
             class="w-full pl-11 pr-4 py-3 bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-xl text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
           />
         </div>
@@ -386,7 +387,7 @@
           title="Add allowed user"
         >
           <UserPlus class="w-4 h-4" />
-          <span class="hidden sm:inline font-semibold text-sm">Add User</span>
+          <span class="hidden sm:inline font-semibold text-sm">{$_('admin.users.add_user')}</span>
         </button>
       </div>
 
@@ -410,10 +411,10 @@
                 <tr
                   class="bg-gray-50 dark:bg-gray-800/50 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                 >
-                  <th class="px-6 py-4">ID</th>
-                  <th class="px-6 py-4">Username</th>
-                  <th class="px-6 py-4">Role</th>
-                  <th class="px-6 py-4 text-right">Actions</th>
+                  <th class="px-6 py-4">{$_('details.id')}</th>
+                  <th class="px-6 py-4">{$_('admin.users.th_username')}</th>
+                  <th class="px-6 py-4">{$_('admin.users.th_role')}</th>
+                  <th class="px-6 py-4 text-right">{$_('admin.users.th_actions')}</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
@@ -504,7 +505,7 @@
                 <AlertTriangle
                   class="w-5 h-5 text-orange-500 dark:text-orange-400"
                 />
-                Expired Policies
+                {$_('admin.cleanup.title')}
               </h3>
               <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 These policies will be automatically deleted at the next cleanup time: <strong class="text-gray-700 dark:text-gray-300">{nextCleanupTime}</strong> (UTC+7)
@@ -518,7 +519,7 @@
                   title="Immediately delete all expired policies"
                 >
                   <Trash2 class="w-4 h-4" />
-                  Delete Now
+                  {$_('admin.cleanup.delete_now')}
                 </button>
               <button
                 onclick={refreshPreview}
@@ -541,7 +542,7 @@
               <p
                 class="text-gray-500 dark:text-gray-400 font-medium"
               >
-                No expired policies — all clear!
+                {$_('admin.cleanup.no_expired')}
               </p>
             </div>
           {:else}
@@ -551,9 +552,9 @@
                   <tr
                     class="bg-gray-50 dark:bg-gray-800/50 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                   >
-                    <th class="px-6 py-3">Policy Name</th>
-                    <th class="px-6 py-3">Policy ID</th>
-                    <th class="px-6 py-3">Expired</th>
+                    <th class="px-6 py-3">{$_('admin.cleanup.th_policy')}</th>
+                    <th class="px-6 py-3">{$_('details.id')}</th>
+                    <th class="px-6 py-3">{$_('common.expired')}</th>
                   </tr>
                 </thead>
                 <tbody
@@ -606,7 +607,7 @@
                 <RefreshCw
                   class="w-5 h-5 text-purple-500 dark:text-purple-400"
                 />
-                Live Creation Queue
+                {$_('admin.queue.title')}
               </h3>
               <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 Real-time monitor of server load and active FortiGate configuration jobs. Auto-refreshes every 2s.
@@ -634,7 +635,7 @@
               <p
                 class="text-gray-500 dark:text-gray-400 font-medium"
               >
-                The queue is totally empty. Server is resting!
+                {$_('admin.queue.empty')}
               </p>
             </div>
           {:else}
@@ -645,10 +646,10 @@
                     class="bg-gray-50 dark:bg-gray-800/50 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                   >
                     <th class="px-6 py-3">Job ID</th>
-                    <th class="px-6 py-3">Policy Name</th>
-                    <th class="px-6 py-3">Status</th>
-                    <th class="px-6 py-3">Position</th>
-                    <th class="px-6 py-3">Rooms Overlap Check</th>
+                    <th class="px-6 py-3">{$_('dashboard.th_policy_name')}</th>
+                    <th class="px-6 py-3">{$_('admin.queue.status')}</th>
+                    <th class="px-6 py-3">{$_('admin.queue.position')}</th>
+                    <th class="px-6 py-3">{$_('admin.queue.info')}</th>
                   </tr>
                 </thead>
                 <tbody
@@ -721,7 +722,7 @@
             <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search logs by policy, action, user, or details..."
+              placeholder={$_('admin.logs.search_placeholder')}
               bind:value={logsSearch}
               class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all"
             />
@@ -732,7 +733,7 @@
             class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold transition-colors disabled:opacity-50 flex items-center gap-2"
           >
             <RefreshCw class="w-4 h-4 {logsLoading ? 'animate-spin' : ''}" />
-            Refresh
+            {$_('common.refresh')}
           </button>
         </div>
 
@@ -743,12 +744,12 @@
         {#if logsLoading && !logsLoaded}
           <div class="text-center py-12">
             <RefreshCw class="w-8 h-8 animate-spin text-purple-500 mx-auto mb-3" />
-            <p class="text-gray-500 dark:text-gray-400">Loading audit logs...</p>
+            <p class="text-gray-500 dark:text-gray-400">{$_('admin.logs.loading')}</p>
           </div>
         {:else if filteredLogs.length === 0}
           <div class="text-center py-12 text-gray-400 dark:text-gray-500">
             <FileText class="w-12 h-12 mx-auto mb-3 opacity-40" />
-            <p>{logsSearch ? 'No logs match your search.' : 'No audit logs found.'}</p>
+            <p>{logsSearch ? $_('admin.logs.no_match') : $_('admin.logs.no_logs')}</p>
           </div>
         {:else}
           <div class="space-y-2">
@@ -766,13 +767,13 @@
                   </span>
                 </div>
                 <div class="text-sm text-gray-600 dark:text-gray-400">
-                  <span class="font-medium">By:</span> {log.username || log.actorUsername || 'unknown'}
+                  <span class="font-medium">{$_('admin.logs.by')}</span> {log.username || log.actorUsername || $_('common.unknown')}
                 </div>
                 {#if log.details}
                   {@const parsed = (() => { try { return JSON.parse(log.details); } catch { return null; } })()}
                   {#if parsed}
                     <details class="mt-2">
-                      <summary class="text-xs text-purple-600 dark:text-purple-400 cursor-pointer hover:underline font-medium">View details</summary>
+                      <summary class="text-xs text-purple-600 dark:text-purple-400 cursor-pointer hover:underline font-medium">{$_('admin.logs.view_details')}</summary>
                       <pre class="mt-1 text-xs bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 overflow-x-auto text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">{JSON.stringify(parsed, null, 2)}</pre>
                     </details>
                   {:else}
@@ -808,10 +809,9 @@
           <Trash2 class="w-6 h-6 text-red-600 dark:text-red-400" />
         </div>
         <div class="text-center">
-          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Delete Expired Policies?</h3>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{$_('admin.cleanup.delete_confirm_title')}</h3>
           <p class="text-sm text-gray-500 dark:text-gray-400">
-            You are about to permanently delete <strong>{expiredPolicies.length}</strong> expired polic{expiredPolicies.length === 1 ? 'y' : 'ies'}.
-            <br />This action cannot be undone. Are you sure you want to proceed?
+            {$_('admin.cleanup.delete_confirm_msg', { values: { count: expiredPolicies.length } })}
           </p>
         </div>
         
@@ -821,7 +821,7 @@
             disabled={isRunningCleanup}
             class="flex-1 px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
           >
-            Cancel
+            {$_('common.cancel')}
           </button>
           <button
             onclick={runCleanupNow}
@@ -830,9 +830,9 @@
           >
             {#if isRunningCleanup}
               <RefreshCw class="w-5 h-5 animate-spin" />
-              Deleting...
+              {$_('admin.cleanup.deleting')}
             {:else}
-              Confirm Delete
+              {$_('admin.cleanup.confirm_delete')}
             {/if}
           </button>
         </div>
@@ -850,15 +850,15 @@
           <UserPlus class="w-6 h-6 text-purple-600 dark:text-purple-400" />
         </div>
         <div class="text-center mb-6">
-          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Add New User</h3>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{$_('admin.users.add_title')}</h3>
           <p class="text-sm text-gray-500 dark:text-gray-400">
-            Allow a new user from Active Directory to log in and manage policies.
+            {$_('admin.users.add_description')}
           </p>
         </div>
         
         <div class="space-y-4 text-left">
           <div class="relative">
-            <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username (ID) or Name</label>
+            <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{$_('admin.users.username_label')}</label>
             <input
               id="username"
               type="text"
@@ -866,7 +866,7 @@
               oninput={handleUsernameInput}
               onfocus={() => { if (newUsername.length >= 2) showADDropdown = true; }}
               onblur={() => setTimeout(() => (showADDropdown = false), 200)}
-              placeholder="e.g. itxxxxxx or Name"
+              placeholder={$_('admin.users.username_placeholder')}
               class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
             />
             
@@ -875,7 +875,7 @@
               <div class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-48 overflow-y-auto">
                 {#if isSearchingAD}
                   <div class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2">
-                    <RefreshCw class="w-4 h-4 animate-spin" /> Searching AD...
+                    <RefreshCw class="w-4 h-4 animate-spin" /> {$_('admin.users.searching_ad')}
                   </div>
                 {:else if adSearchResults.length > 0}
                   <ul class="py-1">
@@ -899,26 +899,26 @@
             {/if}
           </div>
           <div>
-            <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
+            <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{$_('admin.users.role_label')}</label>
             <select
               id="role"
               bind:value={newRole}
               class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
             >
-              <option value="admin">Admin</option>
-              <option value="TA">TA</option>
-              <option value="lecturer">Lecturer</option>
-              <option value="other">Other (Custom)</option>
+              <option value="admin">{$_('admin.users.role_admin')}</option>
+              <option value="TA">{$_('admin.users.role_ta')}</option>
+              <option value="lecturer">{$_('admin.users.role_lecturer')}</option>
+              <option value="other">{$_('admin.users.role_other')}</option>
             </select>
             
             {#if newRole === 'other'}
               <div class="mt-3 animate-in fade-in slide-in-from-top-1">
-                <label for="customRole" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Custom Role Name</label>
+                <label for="customRole" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{$_('admin.users.custom_role_label')}</label>
                 <input
                   id="customRole"
                   type="text"
                   bind:value={customRole}
-                  placeholder="e.g. SuperAdmin"
+                  placeholder={$_('admin.users.custom_role_placeholder')}
                   class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
                 />
               </div>
@@ -926,13 +926,13 @@
             
             <p class="text-xs text-gray-400 dark:text-gray-500 mt-1.5 ml-1">
               {#if newRole === 'admin'}
-                Admins have full global system access.
+                {$_('admin.users.role_admin_desc')}
               {:else if newRole === 'TA'}
-                TAs can manage policies for specific courses.
+                {$_('admin.users.role_ta_desc')}
               {:else if newRole === 'other'}
-                Type a custom role name for this user.
+                {$_('admin.users.role_other_desc')}
               {:else}
-                Lecturers are restricted to default permissions.
+                {$_('admin.users.role_lecturer_desc')}
               {/if}
             </p>
           </div>
@@ -956,7 +956,7 @@
             disabled={isSubmittingUser}
             class="flex-1 px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
           >
-            Cancel
+            {$_('common.cancel')}
           </button>
           <button
             onclick={addUser}
@@ -965,9 +965,9 @@
           >
             {#if isSubmittingUser}
               <RefreshCw class="w-5 h-5 animate-spin" />
-              Adding...
+              {$_('admin.users.adding')}
             {:else}
-              Add User
+              {$_('admin.users.add_user')}
             {/if}
           </button>
         </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "$lib/i18n";
   import "./layout.css";
   import icon from "$lib/assets/img/it-logo.png";
   import loaderFull from "$lib/loader/loader_full.webp";

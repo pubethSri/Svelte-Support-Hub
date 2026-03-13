@@ -24,6 +24,7 @@
   import Lock from "@lucide/svelte/icons/lock";
   import CheckCircle from "@lucide/svelte/icons/check-circle";
   import XCircle from "@lucide/svelte/icons/x-circle";
+  import { _ } from "svelte-i18n";
 
   import defaultUrlFilter from "$lib/data/default-urlfilter.json";
 
@@ -350,7 +351,7 @@
           {/if}
           <span
             class="hidden sm:inline font-semibold text-gray-800 dark:text-gray-100"
-            >Refresh</span
+            >{$_('common.refresh')}</span
           >
         </Button>
 
@@ -359,7 +360,7 @@
             class="flex items-center gap-2 text-purple-600 dark:text-purple-400 text-xs sm:text-sm font-bold bg-purple-100 dark:bg-purple-900/30 px-2 sm:px-3 py-1 rounded-full shadow-sm"
           >
             <AlertCircle class="h-4 w-4 flex-shrink-0" />
-            <span class="whitespace-nowrap">Unsaved</span>
+            <span class="whitespace-nowrap">{$_('details.unsaved')}</span>
           </div>
         {/if}
 
@@ -506,7 +507,7 @@
                 Saving...
               {:else}
                 <FloppyDisk class="w-5 h-5" />
-                Save Changes
+                {$_('details.save_changes')}
               {/if}
             </Button>
           </form>
@@ -517,7 +518,7 @@
             class="cursor-pointer bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white opacity-50 rounded-full"
           >
             <FloppyDisk class="w-5 h-5 mr-2" />
-            Save Changes
+            {$_('details.save_changes')}
           </Button>
         {/if}
 
@@ -531,7 +532,7 @@
             {#if schedule && !isEditing}
               <DropdownMenu.Item class="cursor-pointer" onclick={handleEdit}>
                 <Edit class="w-4 w-4 mr-2" />
-                Edit Policy
+                {$_('details.edit_policy')}
               </DropdownMenu.Item>
             {/if}
             {#if isEditing}
@@ -540,7 +541,7 @@
                 onclick={handleCancelEdit}
               >
                 <AlertCircle class="w-4 h-4 mr-2" />
-                Cancel Edit
+                {$_('details.cancel_edit')}
               </DropdownMenu.Item>
             {/if}
             <DropdownMenu.Item
@@ -558,7 +559,7 @@
               }}
             >
               <Trash class="w-4 h-4 mr-2" />
-              Delete Policy
+              {$_('details.delete_policy')}
             </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Root>
@@ -588,20 +589,20 @@
           class="text-lg font-semibold mb-4 flex items-center gap-2 dark:text-white"
         >
           <ShieldAlert class="h-5 w-5 text-blue-500" />
-          General Info
+          {$_('details.general_info')}
         </h2>
         <dl class="space-y-3 text-sm">
           <div class="flex flex-col gap-0.5">
-            <dt class="text-gray-500">ID</dt>
+            <dt class="text-gray-500">{$_('details.id')}</dt>
             <dd class="font-medium dark:text-white">{policy.policyid}</dd>
           </div>
           <div class="flex flex-col gap-0.5">
-            <dt class="text-gray-500">Created By</dt>
+            <dt class="text-gray-500">{$_('details.created_by')}</dt>
             <dd class="font-medium dark:text-white">{owner}</dd>
           </div>
 
           <div class="flex flex-col gap-0.5">
-            <dt class="text-gray-500">Source Address</dt>
+            <dt class="text-gray-500">{$_('details.source_address')}</dt>
             {#if isEditing}
               <dd class="font-medium dark:text-white w-full">
                 <MultiSelect
@@ -610,11 +611,11 @@
                 />
                 {#if editedSrcRooms.length === 0}
                   <p class="text-xs text-red-600 dark:text-red-400 mt-1">
-                    ⚠️ At least one room must be selected
+                    {$_('details.room_required')}
                   </p>
                 {:else}
                   <p class="text-xs text-gray-500 mt-1">
-                    Select one or more rooms
+                    {$_('details.select_rooms')}
                   </p>
                 {/if}
               </dd>
@@ -627,7 +628,7 @@
             {/if}
           </div>
           <div class="flex flex-col gap-0.5">
-            <dt class="text-gray-500">Destination Address</dt>
+            <dt class="text-gray-500">{$_('details.destination_address')}</dt>
             {#if policy.dstaddr.length > 0}
               {#each policy.dstaddr as dst}
                 <dd class="font-medium dark:text-white break-all">
@@ -639,7 +640,7 @@
             {/if}
           </div>
           <div class="flex flex-col gap-0.5">
-            <dt class="text-gray-500">Action</dt>
+            <dt class="text-gray-500">{$_('details.action')}</dt>
             <dd class="font-medium dark:text-white">{policy.action}</dd>
           </div>
         </dl>
@@ -653,7 +654,7 @@
             class="text-lg font-semibold flex items-center gap-2 dark:text-white"
           >
             <Calendar class="h-5 w-5 text-purple-500" />
-            Schedule
+            {$_('details.schedule')}
           </h2>
           {#if scheduleStatus === "Active"}
             <div class="flex items-center">
@@ -668,28 +669,28 @@
               <div class="h-2.5 w-2.5 rounded-full bg-yellow-400 mr-2"></div>
               <span
                 class="text-yellow-700 dark:text-yellow-400 font-medium text-sm"
-                >Inactive</span
+                >{$_('common.inactive')}</span
               >
             </div>
           {:else if scheduleStatus === "Expired"}
             <div class="flex items-center">
               <div class="h-2.5 w-2.5 rounded-full bg-gray-400 mr-2"></div>
               <span class="text-gray-500 dark:text-gray-400 font-medium text-sm"
-                >Expired</span
+                >{$_('common.expired')}</span
               >
             </div>
           {:else if scheduleStatus === "Disabled"}
             <div class="flex items-center">
               <div class="h-2.5 w-2.5 rounded-full bg-red-500 mr-2"></div>
               <span class="text-red-700 dark:text-red-400 font-medium text-sm"
-                >Disabled</span
+                >{$_('common.disabled')}</span
               >
             </div>
           {:else}
             <div class="flex items-center">
               <div class="h-2.5 w-2.5 rounded-full bg-blue-500 mr-2"></div>
               <span class="text-blue-700 dark:text-blue-400 font-medium text-sm"
-                >Always Active</span
+                >{$_('common.always_active')}</span
               >
             </div>
           {/if}
@@ -732,7 +733,7 @@
                     class="h-4 w-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0"
                   />
                   <p class="text-sm text-red-600 dark:text-red-400">
-                    Start time must be before end time
+                    {$_('details.time_error')}
                   </p>
                 </div>
               {/if}
@@ -740,13 +741,13 @@
           {:else}
             <dl class="space-y-3 text-sm">
               <div class="border-t pt-2 mt-2 dark:border-gray-700">
-                <dt class="text-gray-500 mb-1">Start Time</dt>
+                <dt class="text-gray-500 mb-1">{$_('details.start_time')}</dt>
                 <dd class="font-medium text-green-600 text-base">
                   {formatDate(schedule.start)}
                 </dd>
               </div>
               <div class="">
-                <dt class="text-gray-500 mb-1">End Time</dt>
+                <dt class="text-gray-500 mb-1">{$_('details.end_time')}</dt>
                 <dd class="font-medium text-red-700 text-base">
                   {formatDate(schedule.end)}
                 </dd>
@@ -754,7 +755,7 @@
             </dl>
           {/if}
         {:else}
-          <p class="text-gray-500 italic">No schedule details found.</p>
+          <p class="text-gray-500 italic">{$_('details.no_schedule')}</p>
         {/if}
       </div>
 
@@ -768,7 +769,7 @@
             class="text-lg font-semibold flex items-center gap-2 dark:text-white"
           >
             <Globe class="h-5 w-5 text-purple-500" />
-            Web Filter Rules
+            {$_('details.web_filter')}
           </h2>
           <div class="flex gap-2 flex-wrap">
             {#if webfilter && webfilter.entries && webfilter.entries.length > 5 && !isEditingUrlFilter}
@@ -779,9 +780,9 @@
                 class="flex items-center gap-2"
               >
                 {#if isExpanded}
-                  <Minimize class="h-4 w-4" /> Collapse
+                  <Minimize class="h-4 w-4" /> {$_('details.collapse')}
                 {:else}
-                  <Maximize class="h-4 w-4" /> Expand
+                  <Maximize class="h-4 w-4" /> {$_('details.expand')}
                 {/if}
               </Button>
             {/if}
@@ -792,7 +793,7 @@
                 onclick={startUrlFilterEdit}
                 class="flex items-center gap-2"
               >
-                <Edit class="h-4 w-4" /> Edit Rules
+                <Edit class="h-4 w-4" /> {$_('details.edit_rules')}
               </Button>
             {:else}
               <Button
@@ -801,7 +802,7 @@
                 onclick={cancelUrlFilterEdit}
                 class="flex items-center gap-2"
               >
-                <AlertCircle class="h-4 w-4" /> Cancel
+                <AlertCircle class="h-4 w-4" /> {$_('common.cancel')}
               </Button>
             {/if}
           </div>

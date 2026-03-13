@@ -9,6 +9,7 @@
   import loaderFull from "$lib/loader/loader_full.webp";
   import Eye from "@lucide/svelte/icons/eye";
   import Plus from "@lucide/svelte/icons/plus";
+  import { _ } from "svelte-i18n";
 
   // 1. Receive Data from Server
   let { data } = $props();
@@ -116,10 +117,10 @@
     {#if deletingPolicyName}
       <div class="mt-4 text-center">
         <h3 class="text-xl font-bold text-white tracking-wide">
-          Deleting Policy...
+          {$_('dashboard.deleting_policy')}
         </h3>
         <p class="text-gray-200 mt-2">
-          Say goodbye to <span class="font-mono font-bold text-red-400"
+          {$_('dashboard.say_goodbye')} <span class="font-mono font-bold text-red-400"
             >{deletingPolicyName}</span
           >
         </p>
@@ -131,9 +132,9 @@
     <h1
       class="text-3xl md:text-4xl font-black tracking-tight text-gray-900 dark:text-white drop-shadow-sm"
     >
-      Active <span
+      {$_('dashboard.title_active')} <span
         class="bg-gradient-to-r from-purple-500 via-fuchsia-500 to-indigo-600 dark:from-purple-400 dark:via-fuchsia-500 dark:to-indigo-500 bg-clip-text text-transparent"
-        >Policies</span
+        >{$_('dashboard.title_policies')}</span
       >
     </h1>
     <div class="flex items-center gap-2">
@@ -144,7 +145,7 @@
       >
         <Plus class="h-4 w-4 mr-2 text-purple-600 dark:text-purple-400" />
         <span class="font-semibold text-gray-800 dark:text-gray-100"
-          >Create</span
+          >{$_('common.create')}</span
         >
       </Button>
 
@@ -161,7 +162,7 @@
         {:else}
           <RefreshCw class="h-4 w-4 mr-2 text-purple-600 dark:text-purple-400" />
           <span class="font-semibold text-gray-800 dark:text-gray-100"
-            >Refresh</span
+            >{$_('common.refresh')}</span
           >
         {/if}
       </Button>
@@ -176,7 +177,7 @@
         <div
           class="p-10 text-center text-gray-600 dark:text-gray-400 font-medium"
         >
-          No active policies found.
+          {$_('dashboard.no_policies')}
         </div>
       {:else}
         <div class="relative overflow-x-auto">
@@ -187,14 +188,14 @@
               class="text-xs uppercase bg-gray-100/50 dark:bg-white/5 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-white/10"
             >
               <tr>
-                <th scope="col" class="px-6 py-3">Policy Name</th>
-                <th scope="col" class="px-6 py-3">Services</th>
-                <th scope="col" class="px-6 py-3">Room</th>
-                <th scope="col" class="px-6 py-3">Start Time</th>
-                <th scope="col" class="px-6 py-3">End Time</th>
-                <th scope="col" class="px-6 py-3">Status</th>
-                <th scope="col" class="px-6 py-3">Owner</th>
-                <th scope="col" class="px-6 py-3 text-right">Actions</th>
+                <th scope="col" class="px-6 py-3">{$_('dashboard.th_policy_name')}</th>
+                <th scope="col" class="px-6 py-3">{$_('dashboard.th_services')}</th>
+                <th scope="col" class="px-6 py-3">{$_('dashboard.th_room')}</th>
+                <th scope="col" class="px-6 py-3">{$_('dashboard.th_start_time')}</th>
+                <th scope="col" class="px-6 py-3">{$_('dashboard.th_end_time')}</th>
+                <th scope="col" class="px-6 py-3">{$_('dashboard.th_status')}</th>
+                <th scope="col" class="px-6 py-3">{$_('dashboard.th_owner')}</th>
+                <th scope="col" class="px-6 py-3 text-right">{$_('dashboard.th_actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -262,7 +263,7 @@
                         ></div>
                         <span
                           class="text-yellow-700 dark:text-yellow-400 font-medium"
-                          >Inactive</span
+                          >{$_('common.inactive')}</span
                         >
                       </div>
                     {:else if status === "Expired"}
@@ -271,7 +272,7 @@
                           class="h-2.5 w-2.5 rounded-full bg-gray-400 mr-2"
                         ></div>
                         <span class="text-gray-500 dark:text-gray-400"
-                          >Expired</span
+                          >{$_('common.expired')}</span
                         >
                       </div>
                     {:else}
@@ -280,7 +281,7 @@
                           class="h-2.5 w-2.5 rounded-full bg-red-500 mr-2"
                         ></div>
                         <span class="text-red-700 dark:text-red-400"
-                          >Disabled</span
+                          >{$_('common.disabled')}</span
                         >
                       </div>
                     {/if}
@@ -292,7 +293,7 @@
                         >{policy.owner}</span
                       >
                     {:else}
-                      <span class="text-sm text-gray-400 italic">Not found</span
+                      <span class="text-sm text-gray-400 italic">{$_('common.not_found')}</span
                       >
                     {/if}
                   </td>
@@ -307,7 +308,7 @@
                     >
                       <Eye
                         class="h-4 w-4 mr-1 text-orange-500 dark:text-pink-400"
-                      /> <span class="font-medium">Details</span>
+                      /> <span class="font-medium">{$_('common.details')}</span>
                     </a>
                   </td>
                 </tr>
@@ -321,9 +322,9 @@
     <div
       class="relative z-10 text-center p-10 bg-white/60 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl max-w-4xl w-full"
     >
-      <h2 class="text-2xl font-bold mb-2 dark:text-white">Access Denied</h2>
+      <h2 class="text-2xl font-bold mb-2 dark:text-white">{$_('common.access_denied')}</h2>
       <p class="text-gray-600 dark:text-gray-400">
-        You do not have permission to view active policies.
+        {$_('dashboard.access_denied_msg')}
       </p>
     </div>
   {/if}

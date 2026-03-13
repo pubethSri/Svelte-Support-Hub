@@ -14,6 +14,7 @@
   import HelpCircle from "@lucide/svelte/icons/help-circle";
   import { driver } from "driver.js";
   import "driver.js/dist/driver.css";
+  import { _ } from "svelte-i18n";
 
   type UrlFilterEntry = {
     id: number | null;
@@ -194,32 +195,32 @@
         {
           element: '#step-policy-details',
           popover: {
-            title: 'Policy Details',
-            description: 'Start by giving your policy a descriptive name (e.g., CNI2025). Choose the rooms (source addresses) where this policy will apply.',
+            title: $_('creation.tour.policy_details_title'),
+            description: $_('creation.tour.policy_details_desc'),
             side: "top", align: 'start'
           }
         },
         {
           element: '#step-services',
           popover: {
-            title: 'Services & Rules',
-            description: 'Select either Pass or Block mode. Pass mode blocks everything by default except what you select. Block mode passes everything except what you select.',
+            title: $_('creation.tour.services_title'),
+            description: $_('creation.tour.services_desc'),
             side: "top", align: 'start'
           }
         },
         {
           element: '#step-schedule',
           popover: {
-            title: 'Schedule Your Deployment',
-            description: 'Determine when this policy should be active. Select the specific Date, Start Time, and End Time for the policy.',
+            title: $_('creation.tour.schedule_title'),
+            description: $_('creation.tour.schedule_desc'),
             side: "top", align: 'start'
           }
         },
         {
           element: '#step-deploy',
           popover: {
-            title: 'Deploy Configuration',
-            description: 'Once all details are filled out, click here to deploy your configuration. It will be sent to the queue for processing.',
+            title: $_('creation.tour.deploy_title'),
+            description: $_('creation.tour.deploy_desc'),
             side: "top", align: 'start'
           }
         }
@@ -255,9 +256,9 @@
     <h1
       class="text-4xl md:text-5xl font-black tracking-tight text-gray-900 dark:text-white drop-shadow-sm"
     >
-      Policy <span
+      {$_('creation.title_policy')} <span
         class="bg-gradient-to-r from-purple-500 via-fuchsia-500 to-indigo-600 dark:from-purple-400 dark:via-fuchsia-500 dark:to-indigo-500 bg-clip-text text-transparent"
-        >Creation</span
+        >{$_('creation.title_creation')}</span
       >
     </h1>
     {#if userState.value?.isAllowed}
@@ -268,7 +269,7 @@
         onclick={startTour}
       >
         <HelpCircle class="w-4 h-4" />
-        <span class="hidden sm:inline">How to use</span>
+        <span class="hidden sm:inline">{$_('creation.how_to_use')}</span>
       </Button>
     {/if}
   </div>
@@ -282,41 +283,41 @@
           <h3
             class="text-xl font-bold border-b border-gray-200/50 dark:border-white/10 pb-2 dark:text-white text-gray-800"
           >
-            1. Policy Details
+            {$_('creation.policy_details')}
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="col-span-2">
               <div class="flex items-center justify-between mb-2">
-                <Label>Policy Name</Label>
+                <Label>{$_('creation.policy_name')}</Label>
                 <span
                   class="text-xs font-medium {17 - policyName.length <= 3
                     ? 'text-purple-600 dark:text-purple-400'
                     : 'text-gray-400 dark:text-gray-500'}"
                 >
-                  {17 - policyName.length} characters left
+                  {$_('creation.characters_left', { values: { count: 17 - policyName.length } })}
                 </span>
               </div>
               <Input
                 type="text"
                 maxlength={17}
-                placeholder="ex. CNI2025, Functional Prog"
+                placeholder={$_('creation.policy_name_placeholder')}
                 bind:value={policyName}
               />
               <p class="text-xs text-gray-500 mt-1">
-                Name cannot be in Thai and No special characters
+                {$_('creation.name_restriction')}
               </p>
             </div>
 
             <div class="col-span-2">
-              <Label class="mb-2">Room</Label>
+              <Label class="mb-2">{$_('creation.room')}</Label>
               <MultiSelect items={addresses} bind:value={srcRooms} />
               {#if srcRooms.length === 0}
                 <p class="text-xs text-red-600 dark:text-red-400 mt-1">
-                  ⚠️ At least one room must be selected
+                  {$_('creation.room_required')}
                 </p>
               {:else}
                 <p class="text-xs text-gray-500 mt-1">
-                  Select one or more rooms to apply.
+                  {$_('creation.room_hint')}
                 </p>
               {/if}
             </div>
@@ -327,7 +328,7 @@
           <h3
             class="text-xl font-bold border-b border-gray-200/50 dark:border-white/10 pb-2 dark:text-white text-gray-800"
           >
-            2. Services
+            {$_('creation.services')}
           </h3>
           <div>
             <div class="flex items-center gap-4 mb-4">
@@ -344,7 +345,7 @@
                     serviceMode = "pass";
                   }}
                 >
-                  Pass Mode
+                  {$_('creation.pass_mode')}
                 </button>
                 <button
                   type="button"
@@ -356,31 +357,29 @@
                     serviceMode = "block";
                   }}
                 >
-                  Block Mode
+                  {$_('creation.block_mode')}
                 </button>
               </div>
             </div>
 
             <Label class="mb-2">
               {#if serviceMode === "pass"}
-                Pass Mode: Default will block everything. Select services to let
-                them passthrough.
+                {$_('creation.pass_mode_desc')}
               {:else}
-                Block Mode: Default will pass everything. Select specific
-                services to block.
+                {$_('creation.block_mode_desc')}
               {/if}
             </Label>
             <MultiSelect
               items={urlTemplates}
               bind:value={selectedProfiles}
               placeholder={serviceMode === "pass"
-                ? "Block everything"
-                : "Pass everything"}
+                ? $_('creation.block_everything')
+                : $_('creation.pass_everything')}
             />
             <p class="text-xs text-gray-500 mt-1">
-              Select services to apply under {serviceMode === "pass"
-                ? "Pass"
-                : "Block"} mode.
+              {serviceMode === "pass"
+                ? $_('creation.services_hint_pass')
+                : $_('creation.services_hint_block')}
             </p>
           </div>
         </div>
@@ -389,11 +388,11 @@
           <h3
             class="text-xl font-bold border-b border-gray-200/50 dark:border-white/10 pb-2 dark:text-white text-gray-800"
           >
-            3. Schedule
+            {$_('creation.schedule')}
           </h3>
           <div class="flex flex-wrap gap-4 items-end">
             <div class="flex flex-col gap-2">
-              <Label>Date</Label>
+              <Label>{$_('creation.date')}</Label>
               <Popover.Root>
                 <Popover.Trigger>
                   {#snippet child({ props })}
@@ -405,7 +404,7 @@
                         ? dateValue
                             .toDate(getLocalTimeZone())
                             .toLocaleDateString()
-                        : "Select date"}
+                        : $_('creation.select_date')}
                       <ChevronDownIcon class="h-4 w-4 opacity-50" />
                     </div>
                   {/snippet}
@@ -417,12 +416,12 @@
             </div>
 
             <div class="flex flex-col gap-2">
-              <Label>Start Time</Label>
+              <Label>{$_('creation.start_time')}</Label>
               <Input type="time" bind:value={startTime} class="w-32" />
             </div>
 
             <div class="flex flex-col gap-2">
-              <Label>End Time</Label>
+              <Label>{$_('creation.end_time')}</Label>
               <Input type="time" bind:value={endTime} class="w-32" />
             </div>
           </div>
@@ -435,36 +434,36 @@
             use:enhance={({ cancel, formData }) => {
               // Client-side validation
               if (policyName.trim() === "") {
-                alert("Please enter a valid policy name.");
+                alert($_('creation.validation.name_required'));
                 cancel();
                 return;
               }
               if (!/^[A-Za-z0-9 ]+$/.test(policyName)) {
                 alert(
-                  "Policy name must contain only English letters, numbers, and spaces.",
+                  $_('creation.validation.name_english_only'),
                 );
                 cancel();
                 return;
               }
               if (policyName.length > 17) {
-                alert("Policy name must not exceed 17 characters.");
+                alert($_('creation.validation.name_too_long'));
                 cancel();
                 return;
               }
               if (!srcRooms || srcRooms.length === 0) {
                 alert(
-                  "Please select at least one room.\n\nAt least one source address must be specified.",
+                  $_('creation.validation.room_required'),
                 );
                 cancel();
                 return;
               }
               if (!dateValue || !startTime || !endTime) {
-                alert("Please complete the schedule fields.");
+                alert($_('creation.validation.schedule_required'));
                 cancel();
                 return;
               }
               if (startTime >= endTime) {
-                alert("Start time must be before end time.");
+                alert($_('creation.validation.time_order'));
                 cancel();
                 return;
               }
@@ -495,13 +494,13 @@
                         clearInterval(pollInterval);
                         isDeploying = false;
                         queuePosition = null;
-                        alert("Policy created successfully!");
+                        alert($_('creation.success'));
                         window.location.href = "/dashboard";
                       } else if (statusData.status === "failed") {
                         clearInterval(pollInterval);
                         isDeploying = false;
                         queuePosition = null;
-                        alert(statusData.error || "Failed to create policy");
+                        alert(statusData.error || $_('creation.failed'));
                       } else {
                         // "waiting" or "processing"
                         queueStatus = statusData.status;
@@ -513,10 +512,10 @@
                   }, 2000);
                 } else if (result.type === "failure") {
                   isDeploying = false;
-                  alert(result.data?.error || "Failed to create policy");
+                  alert(result.data?.error || $_('creation.failed'));
                 } else if (result.type === "error") {
                   isDeploying = false;
-                  alert("An unexpected error occurred. Please try again.");
+                  alert($_('creation.error'));
                 } else {
                   isDeploying = false;
                 }
@@ -532,16 +531,16 @@
                 {#if isDeploying}
                   <Loader2 class="mr-2 h-5 w-5 animate-spin" />
                   {#if queueStatus === "processing"}
-                    Processing Configuration...
+                    {$_('creation.processing')}
                   {:else if queuePosition !== null}
-                    Waiting in Queue ({queuePosition - 1 > 0
-                      ? `${queuePosition - 1} people ahead of you`
-                      : "You are next!"})...
+                    {queuePosition - 1 > 0
+                      ? $_('creation.queue_waiting', { values: { position: queuePosition - 1 } })
+                      : $_('creation.queue_next')}
                   {:else}
-                    Queuing Configuration...
+                    {$_('creation.queuing')}
                   {/if}
                 {:else}
-                  <span class="font-bold">Deploy Configuration</span>
+                  <span class="font-bold">{$_('creation.deploy')}</span>
                 {/if}
               </Button>
             </div>
@@ -552,9 +551,9 @@
       <div
         class="relative z-10 text-center p-10 bg-white/60 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl max-w-4xl w-full"
       >
-        <h2 class="text-2xl font-bold mb-2 dark:text-white">Access Denied</h2>
+        <h2 class="text-2xl font-bold mb-2 dark:text-white">{$_('common.access_denied')}</h2>
         <p class="text-gray-600 dark:text-gray-400">
-          You do not have permission to access this page.
+          {$_('creation.access_denied_msg')}
         </p>
       </div>
     {/if}
@@ -562,9 +561,9 @@
     <div
       class="relative z-10 text-center p-10 bg-white/60 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl max-w-4xl w-full"
     >
-      <h2 class="text-2xl font-bold mb-2 dark:text-white">Access Denied</h2>
+      <h2 class="text-2xl font-bold mb-2 dark:text-white">{$_('common.access_denied')}</h2>
       <p class="text-gray-600 dark:text-gray-400">
-        Please log in to configure firewall policies.
+        {$_('creation.login_required_msg')}
       </p>
     </div>
   {/if}

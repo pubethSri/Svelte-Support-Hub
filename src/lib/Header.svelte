@@ -5,6 +5,7 @@
   import LogOutIcon from "@lucide/svelte/icons/log-out";
   import MenuIcon from "@lucide/svelte/icons/menu";
   import XIcon from "@lucide/svelte/icons/x";
+  import Languages from "@lucide/svelte/icons/languages";
 
   import { toggleMode } from "mode-watcher";
   import { Button } from "$lib/components/ui/button/index.js";
@@ -15,6 +16,13 @@
   import { browser } from "$app/environment";
   import { page } from "$app/stores";
   import { userState } from "$lib/userState.svelte";
+  import { _, locale } from "svelte-i18n";
+
+  function toggleLocale() {
+    const next = $locale === 'th' ? 'en' : 'th';
+    $locale = next;
+    if (browser) localStorage.setItem('locale', next);
+  }
 
   let isActiveNavigating = $state(false);
   let mobileMenuOpen = $state(false);
@@ -96,7 +104,7 @@
                 ? 'text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 shadow-sm'
                 : 'text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-white/10 hover:shadow-sm'}"
             >
-              Create Policy
+              {$_('header.create_policy')}
             </a>
             <a
               href="/dashboard"
@@ -107,7 +115,7 @@
                   ? 'text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 shadow-sm'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-white/10 hover:shadow-sm'}"
             >
-              {isActiveNavigating ? "Loading..." : "Dashboard"}
+              {isActiveNavigating ? $_('common.loading') : $_('header.dashboard')}
             </a>
             {#if isAdminRole(currentUser)}
               <a
@@ -117,7 +125,7 @@
                   ? 'text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 shadow-sm'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-white/10 hover:shadow-sm'}"
               >
-                Admin
+                {$_('header.admin')}
               </a>
             {/if}
           </div>
@@ -137,7 +145,18 @@
           <MoonIcon
             class="absolute h-5 w-5 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0 text-purple-300"
           />
-          <span class="sr-only">Toggle theme</span>
+          <span class="sr-only">{$_('common.toggle_theme')}</span>
+        </Button>
+
+        <Button
+          onclick={toggleLocale}
+          variant="ghost"
+          size="icon"
+          class="rounded-full hover:bg-gray-200/50 dark:hover:bg-white/10 transition-colors h-9 w-9 font-bold text-xs"
+          title={$locale === 'th' ? 'Switch to English' : 'เปลี่ยนเป็นภาษาไทย'}
+        >
+          <Languages class="h-5 w-5 text-purple-500 dark:text-purple-400" />
+          <span class="sr-only">{$locale === 'th' ? 'EN' : 'TH'}</span>
         </Button>
 
         {#if currentUser}
@@ -168,7 +187,7 @@
                 <div>
                   <span
                     class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider"
-                    >Full Name</span
+                    >{$_('header.full_name')}</span
                   >
                   <p class="text-sm font-bold text-gray-900 dark:text-gray-100">
                     {currentUser.name}
@@ -177,7 +196,7 @@
                 <div>
                   <span
                     class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider"
-                    >Role</span
+                    >{$_('header.role')}</span
                   >
                   <p class="text-sm font-bold text-gray-900 dark:text-gray-100">
                     {currentUser.role.toUpperCase()}
@@ -187,7 +206,7 @@
                   <div>
                     <span
                       class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider"
-                      >Special Role</span
+                      >{$_('header.special_role')}</span
                     >
                     <p
                       class="text-sm font-bold text-purple-600 dark:text-purple-400"
@@ -205,7 +224,7 @@
                 class="text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 cursor-pointer rounded-xl px-3 py-2.5 transition-colors focus:bg-red-50 dark:focus:bg-red-500/10 focus:text-red-600 font-medium"
               >
                 <LogOutIcon class="mr-2 h-4 w-4" />
-                <span>Log out session</span>
+                <span>{$_('header.logout')}</span>
               </DropdownMenu.Item>
             </DropdownMenu.Content>
           </DropdownMenu.Root>
@@ -214,7 +233,7 @@
             onclick={onLoginClick}
             class="rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white shadow-[0_4px_14px_0_rgba(0,118,255,0.39)] hover:shadow-[0_6px_20px_rgba(0,118,255,0.23)] hover:-translate-y-0.5 transition-all duration-300 font-bold px-4 md:px-6 text-sm"
           >
-            Login
+            {$_('header.login')}
           </Button>
         {/if}
 
@@ -249,7 +268,7 @@
             ? 'text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20'
             : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-white/10'}"
         >
-          Create Policy
+          {$_('header.create_policy')}
         </a>
         <a
           href="/dashboard"
@@ -263,7 +282,7 @@
               ? 'text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20'
               : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-white/10'}"
         >
-          {isActiveNavigating ? "Loading..." : "Active Policies"}
+          {isActiveNavigating ? $_('common.loading') : $_('header.active_policies')}
         </a>
         {#if isAdminRole(currentUser)}
           <a
@@ -274,7 +293,7 @@
               ? 'text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20'
               : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-white/10'}"
           >
-            Admin Panel
+            {$_('header.admin_panel')}
           </a>
         {/if}
       </div>
@@ -296,9 +315,9 @@
   {#if isActiveNavigating}
     <div class="mt-4 text-center">
       <h3 class="text-xl font-bold text-white tracking-wide">
-        Loading Dashboard...
+        {$_('header.loading_dashboard')}
       </h3>
-      <p class="text-gray-200 mt-2">Fetching active policies</p>
+      <p class="text-gray-200 mt-2">{$_('header.fetching_policies')}</p>
     </div>
   {/if}
 </div>

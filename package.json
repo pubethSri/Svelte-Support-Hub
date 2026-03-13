@@ -46,6 +46,7 @@
 		"@fortawesome/fontawesome-free": "^7.1.0",
 		"@sveltejs/enhanced-img": "^0.9.2",
 		"driver.js": "^1.4.0",
-		"mode-watcher": "^1.1.0"
+		"mode-watcher": "^1.1.0",
+		"svelte-i18n": "^4.0.1"
 	}
 }
