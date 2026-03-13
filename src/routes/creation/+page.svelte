@@ -11,6 +11,9 @@
   import { getLocalTimeZone, type CalendarDate } from "@internationalized/date";
   import { userState } from "$lib/userState.svelte";
   import Loader2 from "@lucide/svelte/icons/loader-2";
+  import HelpCircle from "@lucide/svelte/icons/help-circle";
+  import { driver } from "driver.js";
+  import "driver.js/dist/driver.css";
 
   type UrlFilterEntry = {
     id: number | null;
@@ -53,7 +56,7 @@
       .map((temp: any) => ({
         value: temp.name,
         name: temp.displayName || temp.name,
-      }))
+      })),
   );
 
   // When availableTemplates (i.e. serviceMode) changes, clear the selection and update dropdown
@@ -181,6 +184,50 @@
       })),
     };
   }
+
+  // --- 5. HOW TO USE TOUR (driver.js) ---
+  function startTour() {
+    const tour = driver({
+      showProgress: true,
+      animate: true,
+      steps: [
+        {
+          element: '#step-policy-details',
+          popover: {
+            title: 'Policy Details',
+            description: 'Start by giving your policy a descriptive name (e.g., CNI2025). Choose the rooms (source addresses) where this policy will apply.',
+            side: "top", align: 'start'
+          }
+        },
+        {
+          element: '#step-services',
+          popover: {
+            title: 'Services & Rules',
+            description: 'Select either Pass or Block mode. Pass mode blocks everything by default except what you select. Block mode passes everything except what you select.',
+            side: "top", align: 'start'
+          }
+        },
+        {
+          element: '#step-schedule',
+          popover: {
+            title: 'Schedule Your Deployment',
+            description: 'Determine when this policy should be active. Select the specific Date, Start Time, and End Time for the policy.',
+            side: "top", align: 'start'
+          }
+        },
+        {
+          element: '#step-deploy',
+          popover: {
+            title: 'Deploy Configuration',
+            description: 'Once all details are filled out, click here to deploy your configuration. It will be sent to the queue for processing.',
+            side: "top", align: 'start'
+          }
+        }
+      ]
+    });
+
+    tour.drive();
+  }
 </script>
 
 <div
@@ -213,6 +260,17 @@
         >Creation</span
       >
     </h1>
+    {#if userState.value?.isAllowed}
+      <Button
+        variant="outline"
+        size="sm"
+        class="flex items-center gap-2 bg-white/50 dark:bg-black/30 backdrop-blur-md border-purple-500/30 hover:bg-purple-50 dark:hover:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-medium transition-all"
+        onclick={startTour}
+      >
+        <HelpCircle class="w-4 h-4" />
+        <span class="hidden sm:inline">How to use</span>
+      </Button>
+    {/if}
   </div>
 
   {#if userState.value}
@@ -220,7 +278,7 @@
       <div
         class="relative z-10 w-full max-w-4xl bg-white/70 dark:bg-[#0f1420]/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl space-y-8"
       >
-        <div class="space-y-4">
+        <div class="space-y-4" id="step-policy-details">
           <h3
             class="text-xl font-bold border-b border-gray-200/50 dark:border-white/10 pb-2 dark:text-white text-gray-800"
           >
@@ -230,7 +288,11 @@
             <div class="col-span-2">
               <div class="flex items-center justify-between mb-2">
                 <Label>Policy Name</Label>
-                <span class="text-xs font-medium {17 - policyName.length <= 3 ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500'}">
+                <span
+                  class="text-xs font-medium {17 - policyName.length <= 3
+                    ? 'text-purple-600 dark:text-purple-400'
+                    : 'text-gray-400 dark:text-gray-500'}"
+                >
                   {17 - policyName.length} characters left
                 </span>
               </div>
@@ -261,7 +323,7 @@
           </div>
         </div>
 
-        <div class="space-y-4">
+        <div class="space-y-4" id="step-services">
           <h3
             class="text-xl font-bold border-b border-gray-200/50 dark:border-white/10 pb-2 dark:text-white text-gray-800"
           >
@@ -269,18 +331,30 @@
           </h3>
           <div>
             <div class="flex items-center gap-4 mb-4">
-              <div class="inline-flex rounded-lg border border-gray-200 dark:border-white/10 p-1 bg-gray-50 dark:bg-black/20">
+              <div
+                class="inline-flex rounded-lg border border-gray-200 dark:border-white/10 p-1 bg-gray-50 dark:bg-black/20"
+              >
                 <button
                   type="button"
-                  class="px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 {serviceMode === 'pass' ? 'bg-white dark:bg-white/10 shadow-sm text-purple-600 dark:text-purple-400' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}"
-                  onclick={() => { serviceMode = "pass"; }}
+                  class="px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 {serviceMode ===
+                  'pass'
+                    ? 'bg-white dark:bg-white/10 shadow-sm text-purple-600 dark:text-purple-400'
+                    : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}"
+                  onclick={() => {
+                    serviceMode = "pass";
+                  }}
                 >
                   Pass Mode
                 </button>
                 <button
                   type="button"
-                  class="px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 {serviceMode === 'block' ? 'bg-white dark:bg-white/10 shadow-sm text-red-600 dark:text-red-400' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}"
-                  onclick={() => { serviceMode = "block"; }}
+                  class="px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 {serviceMode ===
+                  'block'
+                    ? 'bg-white dark:bg-white/10 shadow-sm text-red-600 dark:text-red-400'
+                    : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}"
+                  onclick={() => {
+                    serviceMode = "block";
+                  }}
                 >
                   Block Mode
                 </button>
@@ -289,17 +363,29 @@
 
             <Label class="mb-2">
               {#if serviceMode === "pass"}
-                Pass Mode: Default will block everything. Select services to let them passthrough.
+                Pass Mode: Default will block everything. Select services to let
+                them passthrough.
               {:else}
-                Block Mode: Default will pass everything. Select specific services to block.
+                Block Mode: Default will pass everything. Select specific
+                services to block.
               {/if}
             </Label>
-            <MultiSelect items={urlTemplates} bind:value={selectedProfiles} placeholder={serviceMode === "pass" ? "Block everything" : "Pass everything"}/>
-            <p class="text-xs text-gray-500 mt-1">Select services to apply under {serviceMode === "pass" ? "Pass" : "Block"} mode.</p>
+            <MultiSelect
+              items={urlTemplates}
+              bind:value={selectedProfiles}
+              placeholder={serviceMode === "pass"
+                ? "Block everything"
+                : "Pass everything"}
+            />
+            <p class="text-xs text-gray-500 mt-1">
+              Select services to apply under {serviceMode === "pass"
+                ? "Pass"
+                : "Block"} mode.
+            </p>
           </div>
         </div>
 
-        <div class="space-y-4">
+        <div class="space-y-4" id="step-schedule">
           <h3
             class="text-xl font-bold border-b border-gray-200/50 dark:border-white/10 pb-2 dark:text-white text-gray-800"
           >
@@ -396,15 +482,15 @@
 
                 if (result.type === "success" && result.data?.success) {
                   const jobId = result.data.jobId;
-                  
+
                   // Start polling
                   const pollInterval = window.setInterval(async () => {
                     try {
                       const res = await fetch(`/api/queue/${jobId}`);
                       if (!res.ok) return;
-                      
+
                       const statusData = await res.json();
-                      
+
                       if (statusData.status === "completed") {
                         clearInterval(pollInterval);
                         isDeploying = false;
@@ -437,24 +523,28 @@
               };
             }}
           >
-            <Button
-              type="submit"
-              class="w-full text-lg h-14 rounded-full bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300 hover:-translate-y-0.5 mt-4"
-              disabled={isDeploying || srcRooms.length === 0}
-            >
-              {#if isDeploying}
-                <Loader2 class="mr-2 h-5 w-5 animate-spin" />
-                {#if queueStatus === 'processing'}
-                  Processing Configuration...
-                {:else if queuePosition !== null}
-                  Waiting in Queue ({queuePosition - 1 > 0 ? `${queuePosition - 1} people ahead of you` : 'You are next!'})...
+            <div id="step-deploy">
+              <Button
+                type="submit"
+                class="w-full text-lg h-14 rounded-full bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300 hover:-translate-y-0.5 mt-4"
+                disabled={isDeploying || srcRooms.length === 0}
+              >
+                {#if isDeploying}
+                  <Loader2 class="mr-2 h-5 w-5 animate-spin" />
+                  {#if queueStatus === "processing"}
+                    Processing Configuration...
+                  {:else if queuePosition !== null}
+                    Waiting in Queue ({queuePosition - 1 > 0
+                      ? `${queuePosition - 1} people ahead of you`
+                      : "You are next!"})...
+                  {:else}
+                    Queuing Configuration...
+                  {/if}
                 {:else}
-                  Queuing Configuration...
+                  <span class="font-bold">Deploy Configuration</span>
                 {/if}
-              {:else}
-                <span class="font-bold">Deploy Configuration</span>
-              {/if}
-            </Button>
+              </Button>
+            </div>
           </form>
         </div>
       </div>
