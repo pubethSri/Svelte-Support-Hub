@@ -99,5 +99,5 @@
   <link rel="icon" href={icon} />
 </svelte:head>
 
-<ModeWatcher />
+<ModeWatcher defaultMode="light" />
 {@render children()}

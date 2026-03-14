@@ -55,9 +55,9 @@
       const vanishX = w / 2; // center vanishing point
       const lineColor = "rgba(236, 72, 153, 0.5)";
       const lineColorFade = "rgba(236, 72, 153, 0.05)";
-      const numVerticals = 30; // total vertical lines spreading from center
+      const numVerticals = 100; // total vertical lines spreading from center
       const numHorizontals = 20; // horizontal lines
-      const speed = 0.4; // scroll speed
+      const speed = 0.02; // scroll speed
 
       c.lineWidth = 1.5;
 
@@ -83,7 +83,7 @@
       }
 
       // --- VERTICAL LINES (converge to vanishing point) ---
-      const spread = w * 1.5; // how wide the lines fan out at the bottom
+      const spread = w * 10; // how wide the lines fan out at the bottom
       for (let i = -numVerticals / 2; i <= numVerticals / 2; i++) {
         const bottomX = vanishX + (i / (numVerticals / 2)) * (spread / 2);
 

@@ -116,7 +116,9 @@
     </Button>
   </form>
 
-  <div class="relative flex py-2 items-center mt-4">
+  <!-- More login method implementation -->
+
+  <!-- <div class="relative flex py-2 items-center mt-4">
     <div class="flex-grow border-t border-gray-200"></div>
     <span
       class="flex-shrink-0 mx-4 text-gray-400 text-xs uppercase tracking-wider"
@@ -131,5 +133,5 @@
     >
       <Globe class="w-5 h-5 text-gray-600" />
     </button>
-  </div>
+  </div> -->
 </div>
