@@ -191,6 +191,14 @@
     const tour = driver({
       showProgress: true,
       animate: true,
+      allowClose: true,
+      onDestroyed: () => {
+        // Force cleanup of any lingering driver.js styles that might block scrolling
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+        // Scroll back to the top automatically after finishing/exiting the tour
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      },
       steps: [
         {
           element: '#step-policy-details',
@@ -232,7 +240,7 @@
 </script>
 
 <div
-  class="relative min-h-screen bg-[#fafafa] dark:bg-[#05080f] overflow-hidden selection:bg-purple-500/30 font-sans flex flex-col items-center gap-6 p-8 pt-32"
+  class="relative min-h-screen bg-[#fafafa] dark:bg-[#05080f] overflow-x-hidden selection:bg-purple-500/30 font-sans flex flex-col items-center gap-6 p-8 pt-32"
 >
   <!-- Abstract Ambient Background Orbs -->
   <div

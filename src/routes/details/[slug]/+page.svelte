@@ -279,7 +279,7 @@
 />
 
 <div
-  class="relative min-h-screen bg-[#fafafa] dark:bg-[#05080f] overflow-hidden selection:bg-purple-500/30 font-sans flex flex-col items-center gap-6 md:gap-8 px-4 md:px-8 pt-24 md:pt-32 pb-8"
+  class="relative min-h-screen bg-[#fafafa] dark:bg-[#05080f] overflow-x-hidden selection:bg-purple-500/30 font-sans flex flex-col items-center gap-6 md:gap-8 px-4 md:px-8 pt-24 md:pt-32 pb-8"
 >
   <!-- Abstract Ambient Background Orbs -->
   <div
@@ -583,7 +583,7 @@
 
     <div class="grid gap-6 md:grid-cols-2">
       <div
-        class="relative z-10 bg-white/70 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-2xl md:rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl p-4 sm:p-6 md:p-8"
+        class="relative z-999999 bg-white/70 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-2xl md:rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl p-4 sm:p-6 md:p-8"
       >
         <h2
           class="text-lg font-semibold mb-4 flex items-center gap-2 dark:text-white"
