@@ -51,7 +51,7 @@
     return new Date(dateStr).toLocaleString('en-GB', {
       day: '2-digit', month: 'long', year: '2-digit',
       hour: '2-digit', minute: '2-digit',
-      timeZone: 'Asia/Bangkok'
+      timeZone: 'UTC'
     });
   }
 
