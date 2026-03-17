@@ -22,7 +22,7 @@
   },
 
   "header": {
-    "create_policy": "สร้างนโยบาย",
+    "create_policy": "สร้างนโยบายบล็อกเน็ต",
     "dashboard": "แดชบอร์ด",
     "admin": "ผู้ดูแล",
     "admin_panel": "แผงผู้ดูแล",
@@ -48,7 +48,7 @@
   },
 
   "landing": {
-    "create_policy": "สร้างนโยบาย",
+    "create_policy": "สร้างนโยบายบล็อกเน็ต",
     "go_to_dashboard": "ไปที่แดชบอร์ด",
     "get_started": "เริ่มต้น - เข้าสู่ระบบ",
     "loading_dashboard": "กำลังโหลดแดชบอร์ด...",
@@ -57,7 +57,7 @@
 
   "creation": {
     "title_policy": "สร้าง",
-    "title_creation": "นโยบาย",
+    "title_creation": "นโยบายการบล็อกเน็ต",
     "how_to_use": "วิธีใช้",
     "policy_details": "1. รายละเอียดนโยบาย",
     "policy_name": "ชื่อนโยบาย",
@@ -68,14 +68,14 @@
     "room_required": "⚠️ ต้องเลือกอย่างน้อยหนึ่งห้อง",
     "room_hint": "เลือกห้องที่ต้องการใช้งาน",
     "services": "2. บริการ",
-    "pass_mode": "โหมด Pass",
-    "block_mode": "โหมด Block",
-    "pass_mode_desc": "โหมด Pass: จะบล็อกทุกอย่างเป็นค่าเริ่มต้น เลือกบริการที่ต้องการให้ผ่าน",
-    "block_mode_desc": "โหมด Block: จะให้ผ่านทุกอย่างเป็นค่าเริ่มต้น เลือกบริการที่ต้องการบล็อก",
+    "pass_mode": "โหมด Block",
+    "block_mode": "โหมด Pass",
+    "pass_mode_desc": "โหมด Block: จะบล็อกทุกอย่างเป็นค่าเริ่มต้น เลือก Websites ที่ต้องการให้ผ่าน",
+    "block_mode_desc": "โหมด Pass: จะให้ผ่านทุกอย่างเป็นค่าเริ่มต้น เลือกบริการที่ต้องการบล็อก",
     "block_everything": "บล็อกทุกอย่าง",
     "pass_everything": "ให้ผ่านทุกอย่าง",
-    "services_hint_pass": "เลือกบริการที่ต้องการใช้ในโหมด Pass",
-    "services_hint_block": "เลือกบริการที่ต้องการใช้ในโหมด Block",
+    "services_hint_pass": "เลือกบริการที่ต้องการใช้ในโหมด Block",
+    "services_hint_block": "เลือกบริการที่ต้องการใช้ในโหมด Pass",
     "schedule": "3. กำหนดเวลา",
     "date": "วันที่",
     "select_date": "เลือกวันที่",

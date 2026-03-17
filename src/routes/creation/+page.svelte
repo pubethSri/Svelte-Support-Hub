@@ -368,7 +368,7 @@
                   type="button"
                   class="px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 {serviceMode ===
                   'pass'
-                    ? 'bg-white dark:bg-white/10 shadow-sm text-purple-600 dark:text-purple-400'
+                    ? 'bg-white dark:bg-white/10 shadow-sm text-red-600 dark:text-red-400'
                     : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}"
                   onclick={() => {
                     serviceMode = "pass";
@@ -380,7 +380,7 @@
                   type="button"
                   class="px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 {serviceMode ===
                   'block'
-                    ? 'bg-white dark:bg-white/10 shadow-sm text-red-600 dark:text-red-400'
+                    ? 'bg-white dark:bg-white/10 shadow-sm text-green-600 dark:text-green-400'
                     : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}"
                   onclick={() => {
                     serviceMode = "block";
