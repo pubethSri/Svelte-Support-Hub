@@ -106,7 +106,9 @@
       "deploy_title": "Deploy Configuration",
       "deploy_desc": "Once all details are filled out, click here to deploy your configuration. It will be sent to the queue for processing."
     },
+    "success_title": "Success",
     "success": "Policy created successfully!",
+    "error_title": "Operation Failed",
     "failed": "Failed to create policy",
     "error": "An unexpected error occurred. Please try again."
   },

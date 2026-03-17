@@ -15,6 +15,9 @@
   import { driver } from "driver.js";
   import "driver.js/dist/driver.css";
   import { _ } from "svelte-i18n";
+  import { fade } from "svelte/transition";
+  import XCircle from "@lucide/svelte/icons/x-circle";
+  import CheckCircle from "@lucide/svelte/icons/check-circle";
 
   type UrlFilterEntry = {
     id: number | null;
@@ -30,6 +33,24 @@
   let isDeploying = $state(false);
   let queuePosition = $state<number | null>(null);
   let queueStatus = $state<string>("");
+
+  // Notification state
+  let showSuccessModal = $state(false);
+  let successMessage = $state("");
+  let showErrorModal = $state(false);
+  let errorMessage = $state("");
+  let successTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  function showSuccess(msg: string) {
+    successMessage = msg;
+    showSuccessModal = true;
+    if (successTimeout) clearTimeout(successTimeout);
+  }
+
+  function showError(msg: string) {
+    errorMessage = msg;
+    showErrorModal = true;
+  }
 
   // --- 1. STATE: FORM DATA ---
   let policyName = $state("");
@@ -442,36 +463,36 @@
             use:enhance={({ cancel, formData }) => {
               // Client-side validation
               if (policyName.trim() === "") {
-                alert($_('creation.validation.name_required'));
+                showError($_('creation.validation.name_required') as string);
                 cancel();
                 return;
               }
               if (!/^[A-Za-z0-9 ]+$/.test(policyName)) {
-                alert(
-                  $_('creation.validation.name_english_only'),
+                showError(
+                  $_('creation.validation.name_english_only') as string,
                 );
                 cancel();
                 return;
               }
               if (policyName.length > 17) {
-                alert($_('creation.validation.name_too_long'));
+                showError($_('creation.validation.name_too_long') as string);
                 cancel();
                 return;
               }
               if (!srcRooms || srcRooms.length === 0) {
-                alert(
-                  $_('creation.validation.room_required'),
+                showError(
+                  $_('creation.validation.room_required') as string,
                 );
                 cancel();
                 return;
               }
               if (!dateValue || !startTime || !endTime) {
-                alert($_('creation.validation.schedule_required'));
+                showError($_('creation.validation.schedule_required') as string);
                 cancel();
                 return;
               }
               if (startTime >= endTime) {
-                alert($_('creation.validation.time_order'));
+                showError($_('creation.validation.time_order') as string);
                 cancel();
                 return;
               }
@@ -502,13 +523,15 @@
                         clearInterval(pollInterval);
                         isDeploying = false;
                         queuePosition = null;
-                        alert($_('creation.success'));
-                        window.location.href = "/dashboard";
+                        showSuccess($_('creation.success') as string);
+                        setTimeout(() => {
+                           window.location.href = "/dashboard";
+                        }, 2000);
                       } else if (statusData.status === "failed") {
                         clearInterval(pollInterval);
                         isDeploying = false;
                         queuePosition = null;
-                        alert(statusData.error || $_('creation.failed'));
+                        showError(statusData.error || String($_('creation.failed')));
                       } else {
                         // "waiting" or "processing"
                         queueStatus = statusData.status;
@@ -520,10 +543,10 @@
                   }, 2000);
                 } else if (result.type === "failure") {
                   isDeploying = false;
-                  alert(result.data?.error || $_('creation.failed'));
+                  showError(result.data?.error || ($_('creation.failed') as any));
                 } else if (result.type === "error") {
                   isDeploying = false;
-                  alert($_('creation.error'));
+                  showError($_('creation.error') as string);
                 } else {
                   isDeploying = false;
                 }
@@ -539,16 +562,16 @@
                 {#if isDeploying}
                   <Loader2 class="mr-2 h-5 w-5 animate-spin" />
                   {#if queueStatus === "processing"}
-                    {$_('creation.processing')}
+                    {String($_('creation.processing'))}
                   {:else if queuePosition !== null}
                     {queuePosition - 1 > 0
-                      ? $_('creation.queue_waiting', { values: { position: queuePosition - 1 } })
-                      : $_('creation.queue_next')}
+                      ? String($_('creation.queue_waiting', { values: { position: queuePosition - 1 } }))
+                      : String($_('creation.queue_next'))}
                   {:else}
-                    {$_('creation.queuing')}
+                    {String($_('creation.queuing'))}
                   {/if}
                 {:else}
-                  <span class="font-bold">{$_('creation.deploy')}</span>
+                  <span class="font-bold">{String($_('creation.deploy'))}</span>
                 {/if}
               </Button>
             </div>
@@ -559,9 +582,9 @@
       <div
         class="relative z-10 text-center p-10 bg-white/60 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl max-w-4xl w-full"
       >
-        <h2 class="text-2xl font-bold mb-2 dark:text-white">{$_('common.access_denied')}</h2>
+        <h2 class="text-2xl font-bold mb-2 dark:text-white">{$_('common.access_denied') as string}</h2>
         <p class="text-gray-600 dark:text-gray-400">
-          {$_('creation.access_denied_msg')}
+          {$_('creation.access_denied_msg') as string}
         </p>
       </div>
     {/if}
@@ -569,13 +592,111 @@
     <div
       class="relative z-10 text-center p-10 bg-white/60 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl max-w-4xl w-full"
     >
-      <h2 class="text-2xl font-bold mb-2 dark:text-white">{$_('common.access_denied')}</h2>
+      <h2 class="text-2xl font-bold mb-2 dark:text-white">{$_('common.access_denied') as string}</h2>
       <p class="text-gray-600 dark:text-gray-400">
-        {$_('creation.login_required_msg')}
+        {$_('creation.login_required_msg') as string}
       </p>
     </div>
   {/if}
 </div>
+
+<!-- Transaction Complete Modal -->
+{#if showSuccessModal}
+  <div
+    transition:fade={{ duration: 200 }}
+    class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-md p-4"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div
+      class="transaction-card bg-white/95 dark:bg-[#0f1420]/95 backdrop-blur-2xl rounded-[2rem] border border-white/40 dark:border-white/10 shadow-2xl w-full max-w-md p-8 flex flex-col items-center gap-5 relative overflow-hidden"
+    >
+      <!-- Animated SVG Checkmark -->
+      <div class="check-container w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400 to-green-600 dark:from-emerald-500 dark:to-green-700 flex items-center justify-center shadow-lg shadow-green-500/30">
+        <svg class="check-svg w-10 h-10" viewBox="0 0 24 24" fill="none">
+          <path
+            class="check-path"
+            d="M4 12.5L9.5 18L20 6"
+            stroke="white"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+
+      <!-- Title -->
+      <div class="text-center space-y-1">
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+          {$_('creation.success_title') as string}
+        </h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          {successMessage}
+        </p>
+      </div>
+
+      <!-- Receipt-style details -->
+      <div class="w-full space-y-3 px-2">
+        <div class="flex justify-between items-center">
+          <span class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Policy</span>
+          <span class="text-sm font-semibold text-gray-800 dark:text-gray-200 font-mono">{policyName || '—'}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Rooms</span>
+          <span class="text-sm font-semibold text-gray-800 dark:text-gray-200 font-mono">{srcRooms.length > 0 ? srcRooms.join(', ') : '—'}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Mode</span>
+          <span class="text-sm font-semibold text-gray-800 dark:text-gray-200 font-mono capitalize">{serviceMode}</span>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="absolute bottom-0 left-0 right-0 h-1.5 bg-gray-100 dark:bg-gray-800">
+        <div
+          class="h-full bg-gradient-to-r from-emerald-400 to-green-500"
+          style="animation: shrink 2.5s linear forwards"
+        ></div>
+      </div>
+    </div>
+  </div>
+{/if}
+
+<!-- Error Modal (requires click) -->
+{#if showErrorModal}
+  <div
+    transition:fade={{ duration: 150 }}
+    class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div
+      class="bg-white/95 dark:bg-[#0f1420]/95 backdrop-blur-2xl rounded-[2rem] border border-white/40 dark:border-white/10 shadow-2xl w-full max-w-sm p-6 flex flex-col items-center gap-4"
+    >
+      <div
+        class="w-14 h-14 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center"
+      >
+        <XCircle class="w-7 h-7 text-red-600 dark:text-red-400" />
+      </div>
+      <div class="text-center">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+          {$_('creation.error_title') as string}
+        </h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
+          {errorMessage}
+        </p>
+      </div>
+      <Button
+        onclick={() => {
+          showErrorModal = false;
+        }}
+        class="w-full mt-2 bg-red-600 hover:bg-red-700 text-white rounded-full"
+      >
+        OK
+      </Button>
+    </div>
+  </div>
+{/if}
 
 <style>
   @keyframes blob {
@@ -590,6 +711,53 @@
     }
     100% {
       transform: translate(0px, 0px) scale(1);
+    }
+  }
+
+  /* Transaction Complete animations */
+  .transaction-card {
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+
+  @keyframes popIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.85) translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  .check-container {
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s both;
+  }
+
+  .check-path {
+    stroke-dasharray: 28;
+    stroke-dashoffset: 28;
+    animation: drawCheck 0.5s ease-out 0.5s forwards;
+  }
+
+  @keyframes drawCheck {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .status-badge {
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.7s both;
+  }
+
+  :global {
+    @keyframes shrink {
+      from {
+        width: 100%;
+      }
+      to {
+        width: 0%;
+      }
     }
   }
 </style>
