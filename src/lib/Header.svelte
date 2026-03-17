@@ -21,7 +21,10 @@
   function toggleLocale() {
     const next = $locale === 'th' ? 'en' : 'th';
     $locale = next;
-    if (browser) localStorage.setItem('locale', next);
+    if (browser) {
+      localStorage.setItem('locale', next);
+      document.cookie = `locale=${next}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+    }
   }
 
   let isActiveNavigating = $state(false);

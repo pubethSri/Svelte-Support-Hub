@@ -3,6 +3,7 @@ import type { LayoutServerLoad } from "./$types";
 
 export const load: LayoutServerLoad = async ({ cookies, url }) => {
     const token = cookies.get("authToken");
+    const locale = cookies.get("locale") || 'th';
     // console.log(`[Layout] path=${url.pathname}, hasToken=${!!token}`);
     
     // Public routes that don't require authentication
@@ -35,7 +36,7 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
                 if (!isPublicRoute) {
                     throw redirect(302, '/');
                 }
-                return { user: null };
+                return { user: null, locale };
             }
             
             // Check if user is actually authorized to use the app
@@ -51,7 +52,8 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
                     role: payload.role || '',
                     dbRole: payload.dbRole || null,
                     isAllowed: payload.isAllowed || false
-                }
+                },
+                locale
             };
         } catch (err) {
             // Check if the error is a SvelteKit redirect
@@ -68,6 +70,7 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
     }
     
     return {
-        user: null
+        user: null,
+        locale
     };
 };

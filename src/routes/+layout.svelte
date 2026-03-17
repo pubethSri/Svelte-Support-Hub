@@ -10,8 +10,23 @@
   import { userState } from "$lib/userState.svelte";
   import { invalidateAll } from "$app/navigation";
   import { browser } from "$app/environment";
+  import { locale } from "svelte-i18n";
 
   let { children, data } = $props();
+
+  // Set locale from server cookie BEFORE first render to prevent flash
+  if (data?.locale) {
+    locale.set(data.locale);
+  }
+
+  // Sync localStorage → cookie for returning users who already had a saved locale
+  if (browser) {
+    const savedLocale = localStorage.getItem('locale');
+    if (savedLocale && savedLocale !== data?.locale) {
+      locale.set(savedLocale);
+      document.cookie = `locale=${savedLocale}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+    }
+  }
 
   // Initialize server data directly to global store to prevent SSR flash
   if (data?.user) {
