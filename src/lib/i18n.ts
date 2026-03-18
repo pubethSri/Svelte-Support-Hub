@@ -8,6 +8,6 @@ addMessages('en', en);
 addMessages('th', th);
 
 init({
-  fallbackLocale: 'th',
-  initialLocale: browser ? (localStorage.getItem('locale') || 'th') : 'th',
+  fallbackLocale: 'en',
+  initialLocale: browser ? (localStorage.getItem('locale') || 'en') : 'en',
 });

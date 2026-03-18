@@ -50,7 +50,7 @@ export const load = async ({ params, cookies, fetch, depends }) => {
 
         // 3. Parallel Fetch for Schedule, Webfilter, and Owner
         // Add timestamp to URLs
-        const [scheduleRes, webfilterRes, ownerRes] = await Promise.all([
+        const [scheduleRes, webfilterRes, ownerRes, templatesRes] = await Promise.all([
             // Fetch Schedule (Use policy.schedule as the reference)
             fetch(`${BACKEND_URL}/firewall/schedule/onetime/${encodeURIComponent(policy.schedule)}?t=${timestamp}`, { 
                 headers,
@@ -67,12 +67,19 @@ export const load = async ({ params, cookies, fetch, depends }) => {
             fetch(`${BACKEND_URL}/audit/owner/${encodeURIComponent(policy.name)}?t=${timestamp}`, {
                 headers,
                 cache: 'no-store'
+            }),
+            
+            // Fetch all URL templates
+            fetch(`${BACKEND_URL}/templates?t=${timestamp}`, {
+                headers,
+                cache: 'no-store'
             })
         ]);
 
         let schedule = null;
         let webfilter = null;
         let owner = 'unknown';
+        let templates = [];
 
         if (scheduleRes.ok) {
             const sData = await scheduleRes.json();
@@ -90,6 +97,10 @@ export const load = async ({ params, cookies, fetch, depends }) => {
                 owner = oData.owner;
             }
         }
+        
+        if (templatesRes.ok) {
+            templates = await templatesRes.json();
+        }
 
         return {
             policyId,
@@ -97,6 +108,7 @@ export const load = async ({ params, cookies, fetch, depends }) => {
             schedule,
             webfilter,
             owner,
+            templates, // Included so we can find default-urlfilter later
             timestamp // Include timestamp to make data unique
         };
 

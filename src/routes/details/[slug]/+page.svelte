@@ -26,8 +26,6 @@
   import XCircle from "@lucide/svelte/icons/x-circle";
   import { _ } from "svelte-i18n";
 
-  import defaultUrlFilter from "$lib/data/default-urlfilter.json";
-
   // Notification state
   let showSuccessToast = $state(false);
   let successMessage = $state("");
@@ -59,6 +57,7 @@
   const schedule = $derived(data.schedule);
   const webfilter = $derived(data.webfilter);
   const owner = $derived(data.owner);
+  const templates = $derived(data.templates || []);
 
   // --- LOADER LOGIC ---
   let isDeleting = $state(false);
@@ -110,7 +109,9 @@
 
   function isDefaultUrl(url: string) {
     // Treat any URL found in the default list as un-removable
-    return defaultUrlFilter.urlfilter.some((d: any) => d.url === url);
+    const defaultTemplate = templates.find((t: any) => t.name === "default-urlfilter");
+    if (!defaultTemplate || !defaultTemplate.entries) return false;
+    return defaultTemplate.entries.some((d: any) => d.url === url);
   }
 
   // --- EXPAND/COLLAPSE LOGIC ---

@@ -3,7 +3,7 @@ import type { LayoutServerLoad } from "./$types";
 
 export const load: LayoutServerLoad = async ({ cookies, url }) => {
     const token = cookies.get("authToken");
-    const locale = cookies.get("locale") || 'th';
+    const locale = cookies.get("locale") || 'en';
     // console.log(`[Layout] path=${url.pathname}, hasToken=${!!token}`);
     
     // Public routes that don't require authentication

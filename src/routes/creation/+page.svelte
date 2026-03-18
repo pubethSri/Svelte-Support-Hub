@@ -61,7 +61,7 @@
   let startTime = $state("");
   let endTime = $state("");
   let selectedProfiles = $state<string[]>([]);
-  let serviceMode = $state<"pass" | "block">("pass");
+  let serviceMode = $state<"pass" | "block">("block");
 
   // --- 2. STATE: DROPDOWN OPTIONS (Fetched) ---
   let { data } = $props();
@@ -189,8 +189,8 @@
       }
     }
 
-    // Auto-inject default URL filter ONLY if they are in "pass" mode
-    if (serviceMode === "pass") {
+    // Auto-inject default URL filter ONLY if they are in "block" mode
+    if (serviceMode === "block") {
       const defaultFilterTemplate = templates.find(
         (t: any) => t.name === "default-urlfilter",
       );
@@ -367,26 +367,26 @@
                 <button
                   type="button"
                   class="px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 {serviceMode ===
-                  'pass'
-                    ? 'bg-white dark:bg-white/10 shadow-sm text-red-600 dark:text-red-400'
-                    : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}"
-                  onclick={() => {
-                    serviceMode = "pass";
-                  }}
-                >
-                  {$_('creation.pass_mode')}
-                </button>
-                <button
-                  type="button"
-                  class="px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 {serviceMode ===
                   'block'
-                    ? 'bg-white dark:bg-white/10 shadow-sm text-green-600 dark:text-green-400'
+                    ? 'bg-white dark:bg-white/10 shadow-sm text-red-600 dark:text-red-400'
                     : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}"
                   onclick={() => {
                     serviceMode = "block";
                   }}
                 >
                   {$_('creation.block_mode')}
+                </button>
+                <button
+                  type="button"
+                  class="px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 {serviceMode ===
+                  'pass'
+                    ? 'bg-white dark:bg-white/10 shadow-sm text-green-600 dark:text-green-400'
+                    : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}"
+                  onclick={() => {
+                    serviceMode = "pass";
+                  }}
+                >
+                  {$_('creation.pass_mode')}
                 </button>
               </div>
             </div>
@@ -402,8 +402,8 @@
               items={urlTemplates}
               bind:value={selectedProfiles}
               placeholder={serviceMode === "pass"
-                ? $_('creation.block_everything')
-                : $_('creation.pass_everything')}
+                ? $_('creation.pass_everything')
+                : $_('creation.block_everything')}
             />
             <p class="text-xs text-gray-500 mt-1">
               {serviceMode === "pass"
@@ -655,7 +655,7 @@
       <div class="absolute bottom-0 left-0 right-0 h-1.5 bg-gray-100 dark:bg-gray-800">
         <div
           class="h-full bg-gradient-to-r from-emerald-400 to-green-500"
-          style="animation: shrink 2.5s linear forwards"
+          style="animation: shrink 1.5s linear forwards"
         ></div>
       </div>
     </div>

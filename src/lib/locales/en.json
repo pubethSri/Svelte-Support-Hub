@@ -22,7 +22,7 @@
   },
 
   "header": {
-    "create_policy": "Create Policy",
+    "create_policy": "Create Internet Policy",
     "dashboard": "Dashboard",
     "admin": "Admin",
     "admin_panel": "Admin Panel",
@@ -48,7 +48,7 @@
   },
 
   "landing": {
-    "create_policy": "Create Policy",
+    "create_policy": "Create Internet Policy",
     "go_to_dashboard": "Go to Dashboard",
     "get_started": "Get Started - Login",
     "loading_dashboard": "Loading Dashboard...",
@@ -56,7 +56,7 @@
   },
 
   "creation": {
-    "title_policy": "Policy",
+    "title_policy": "Internet Policy",
     "title_creation": "Creation",
     "how_to_use": "How to use",
     "policy_details": "1. Policy Details",
@@ -64,18 +64,18 @@
     "policy_name_placeholder": "ex. CNI2025, Functional Prog",
     "characters_left": "{count} characters left",
     "name_restriction": "Name cannot be in Thai and No special characters",
-    "room": "Room",
+    "room": "Room (Multiple Selection Allowed)",
     "room_required": "⚠️ At least one room must be selected",
     "room_hint": "Select one or more rooms to apply.",
     "services": "2. Services",
-    "pass_mode": "Block Mode",
-    "block_mode": "Pass Mode",
-    "pass_mode_desc": "Block Mode: Default will block everything. Select services to let them passthrough.",
-    "block_mode_desc": "Pass Mode: Default will pass everything. Select specific services to block.",
+    "pass_mode": "Pass Mode",
+    "block_mode": "Block Mode",
+    "pass_mode_desc": "Pass Mode: Default will pass everything. Select specific services to block.",
+    "block_mode_desc": "Block Mode: Default will block everything. Select services to let them passthrough.",
     "block_everything": "Block everything",
     "pass_everything": "Pass everything",
-    "services_hint_pass": "Select services to apply under Block mode.",
-    "services_hint_block": "Select services to apply under Pass mode.",
+    "services_hint_pass": "Select services to apply under Pass mode.",
+    "services_hint_block": "Select services to apply under Block mode.",
     "schedule": "3. Schedule",
     "date": "Date",
     "select_date": "Select date",
