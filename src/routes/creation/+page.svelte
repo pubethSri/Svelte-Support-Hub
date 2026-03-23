@@ -16,6 +16,8 @@
   import "driver.js/dist/driver.css";
   import { _ } from "svelte-i18n";
   import { fade } from "svelte/transition";
+  import M3TimePicker from "$lib/components/M3TimePicker.svelte";
+  import M3DatePicker from "$lib/components/M3DatePicker.svelte";
   import XCircle from "@lucide/svelte/icons/x-circle";
   import CheckCircle from "@lucide/svelte/icons/check-circle";
 
@@ -58,8 +60,12 @@
 
   // Schedule State
   let dateValue = $state<CalendarDate | undefined>();
-  let startTime = $state("");
-  let endTime = $state("");
+  let startHour = $state("00");
+  let startMinute = $state("00");
+  let endHour = $state("00");
+  let endMinute = $state("00");
+  const startTime = $derived(`${startHour}:${startMinute}`);
+  const endTime = $derived(`${endHour}:${endMinute}`);
   let selectedProfiles = $state<string[]>([]);
   let serviceMode = $state<"pass" | "block">("block");
 
@@ -215,45 +221,49 @@
       allowClose: true,
       onDestroyed: () => {
         // Force cleanup of any lingering driver.js styles that might block scrolling
-        document.body.style.overflow = '';
-        document.documentElement.style.overflow = '';
+        document.body.style.overflow = "";
+        document.documentElement.style.overflow = "";
         // Scroll back to the top automatically after finishing/exiting the tour
         window.scrollTo({ top: 0, behavior: "smooth" });
       },
       steps: [
         {
-          element: '#step-policy-details',
+          element: "#step-policy-details",
           popover: {
-            title: $_('creation.tour.policy_details_title'),
-            description: $_('creation.tour.policy_details_desc'),
-            side: "top", align: 'start'
-          }
+            title: $_("creation.tour.policy_details_title"),
+            description: $_("creation.tour.policy_details_desc"),
+            side: "top",
+            align: "start",
+          },
         },
         {
-          element: '#step-services',
+          element: "#step-services",
           popover: {
-            title: $_('creation.tour.services_title'),
-            description: $_('creation.tour.services_desc'),
-            side: "top", align: 'start'
-          }
+            title: $_("creation.tour.services_title"),
+            description: $_("creation.tour.services_desc"),
+            side: "top",
+            align: "start",
+          },
         },
         {
-          element: '#step-schedule',
+          element: "#step-schedule",
           popover: {
-            title: $_('creation.tour.schedule_title'),
-            description: $_('creation.tour.schedule_desc'),
-            side: "top", align: 'start'
-          }
+            title: $_("creation.tour.schedule_title"),
+            description: $_("creation.tour.schedule_desc"),
+            side: "top",
+            align: "start",
+          },
         },
         {
-          element: '#step-deploy',
+          element: "#step-deploy",
           popover: {
-            title: $_('creation.tour.deploy_title'),
-            description: $_('creation.tour.deploy_desc'),
-            side: "top", align: 'start'
-          }
-        }
-      ]
+            title: $_("creation.tour.deploy_title"),
+            description: $_("creation.tour.deploy_desc"),
+            side: "top",
+            align: "start",
+          },
+        },
+      ],
     });
 
     tour.drive();
@@ -285,9 +295,10 @@
     <h1
       class="text-4xl md:text-5xl font-black tracking-tight text-gray-900 dark:text-white drop-shadow-sm"
     >
-      {$_('creation.title_policy')} <span
+      {$_("creation.title_policy")}
+      <span
         class="bg-gradient-to-r from-purple-500 via-fuchsia-500 to-indigo-600 dark:from-purple-400 dark:via-fuchsia-500 dark:to-indigo-500 bg-clip-text text-transparent"
-        >{$_('creation.title_creation')}</span
+        >{$_("creation.title_creation")}</span
       >
     </h1>
     {#if userState.value?.isAllowed}
@@ -298,7 +309,7 @@
         onclick={startTour}
       >
         <HelpCircle class="w-4 h-4" />
-        <span class="hidden sm:inline">{$_('creation.how_to_use')}</span>
+        <span class="hidden sm:inline">{$_("creation.how_to_use")}</span>
       </Button>
     {/if}
   </div>
@@ -312,41 +323,43 @@
           <h3
             class="text-xl font-bold border-b border-gray-200/50 dark:border-white/10 pb-2 dark:text-white text-gray-800"
           >
-            {$_('creation.policy_details')}
+            {$_("creation.policy_details")}
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="col-span-2">
               <div class="flex items-center justify-between mb-2">
-                <Label>{$_('creation.policy_name')}</Label>
+                <Label>{$_("creation.policy_name")}</Label>
                 <span
                   class="text-xs font-medium {17 - policyName.length <= 3
                     ? 'text-purple-600 dark:text-purple-400'
                     : 'text-gray-400 dark:text-gray-500'}"
                 >
-                  {$_('creation.characters_left', { values: { count: 17 - policyName.length } })}
+                  {$_("creation.characters_left", {
+                    values: { count: 17 - policyName.length },
+                  })}
                 </span>
               </div>
               <Input
                 type="text"
                 maxlength={17}
-                placeholder={$_('creation.policy_name_placeholder')}
+                placeholder={$_("creation.policy_name_placeholder")}
                 bind:value={policyName}
               />
               <p class="text-xs text-gray-500 mt-1">
-                {$_('creation.name_restriction')}
+                {$_("creation.name_restriction")}
               </p>
             </div>
 
             <div class="col-span-2">
-              <Label class="mb-2">{$_('creation.room')}</Label>
+              <Label class="mb-2">{$_("creation.room")}</Label>
               <MultiSelect items={addresses} bind:value={srcRooms} />
               {#if srcRooms.length === 0}
                 <p class="text-xs text-red-600 dark:text-red-400 mt-1">
-                  {$_('creation.room_required')}
+                  {$_("creation.room_required")}
                 </p>
               {:else}
                 <p class="text-xs text-gray-500 mt-1">
-                  {$_('creation.room_hint')}
+                  {$_("creation.room_hint")}
                 </p>
               {/if}
             </div>
@@ -357,7 +370,7 @@
           <h3
             class="text-xl font-bold border-b border-gray-200/50 dark:border-white/10 pb-2 dark:text-white text-gray-800"
           >
-            {$_('creation.services')}
+            {$_("creation.services")}
           </h3>
           <div>
             <div class="flex items-center gap-4 mb-4">
@@ -374,7 +387,7 @@
                     serviceMode = "block";
                   }}
                 >
-                  {$_('creation.block_mode')}
+                  {$_("creation.block_mode")}
                 </button>
                 <button
                   type="button"
@@ -386,29 +399,29 @@
                     serviceMode = "pass";
                   }}
                 >
-                  {$_('creation.pass_mode')}
+                  {$_("creation.pass_mode")}
                 </button>
               </div>
             </div>
 
             <Label class="mb-2">
               {#if serviceMode === "pass"}
-                {$_('creation.pass_mode_desc')}
+                {$_("creation.pass_mode_desc")}
               {:else}
-                {$_('creation.block_mode_desc')}
+                {$_("creation.block_mode_desc")}
               {/if}
             </Label>
             <MultiSelect
               items={urlTemplates}
               bind:value={selectedProfiles}
               placeholder={serviceMode === "pass"
-                ? $_('creation.pass_everything')
-                : $_('creation.block_everything')}
+                ? $_("creation.pass_everything")
+                : $_("creation.block_everything")}
             />
             <p class="text-xs text-gray-500 mt-1">
               {serviceMode === "pass"
-                ? $_('creation.services_hint_pass')
-                : $_('creation.services_hint_block')}
+                ? $_("creation.services_hint_pass")
+                : $_("creation.services_hint_block")}
             </p>
           </div>
         </div>
@@ -417,41 +430,22 @@
           <h3
             class="text-xl font-bold border-b border-gray-200/50 dark:border-white/10 pb-2 dark:text-white text-gray-800"
           >
-            {$_('creation.schedule')}
+            {$_("creation.schedule")}
           </h3>
           <div class="flex flex-wrap gap-4 items-end">
             <div class="flex flex-col gap-2">
-              <Label>{$_('creation.date')}</Label>
-              <Popover.Root>
-                <Popover.Trigger>
-                  {#snippet child({ props })}
-                    <div
-                      {...props}
-                      class="inline-flex items-center justify-between w-[200px] h-10 px-3 py-2 text-sm font-normal rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground cursor-pointer"
-                    >
-                      {dateValue
-                        ? dateValue
-                            .toDate(getLocalTimeZone())
-                            .toLocaleDateString()
-                        : $_('creation.select_date')}
-                      <ChevronDownIcon class="h-4 w-4 opacity-50" />
-                    </div>
-                  {/snippet}
-                </Popover.Trigger>
-                <Popover.Content class="w-auto p-0">
-                  <Calendar type="single" bind:value={dateValue} />
-                </Popover.Content>
-              </Popover.Root>
+              <Label>{$_("creation.date")}</Label>
+              <M3DatePicker bind:dateValue label={$_("creation.select_date") as string} />
             </div>
 
             <div class="flex flex-col gap-2">
-              <Label>{$_('creation.start_time')}</Label>
-              <Input type="time" bind:value={startTime} class="w-32" />
+              <Label>{$_("creation.start_time")}</Label>
+              <M3TimePicker bind:hour={startHour} bind:minute={startMinute} label="Start Time" />
             </div>
 
             <div class="flex flex-col gap-2">
-              <Label>{$_('creation.end_time')}</Label>
-              <Input type="time" bind:value={endTime} class="w-32" />
+              <Label>{$_("creation.end_time")}</Label>
+              <M3TimePicker bind:hour={endHour} bind:minute={endMinute} label="End Time" />
             </div>
           </div>
         </div>
@@ -463,36 +457,36 @@
             use:enhance={({ cancel, formData }) => {
               // Client-side validation
               if (policyName.trim() === "") {
-                showError($_('creation.validation.name_required') as string);
+                showError($_("creation.validation.name_required") as string);
                 cancel();
                 return;
               }
               if (!/^[A-Za-z0-9 ]+$/.test(policyName)) {
                 showError(
-                  $_('creation.validation.name_english_only') as string,
+                  $_("creation.validation.name_english_only") as string,
                 );
                 cancel();
                 return;
               }
               if (policyName.length > 17) {
-                showError($_('creation.validation.name_too_long') as string);
+                showError($_("creation.validation.name_too_long") as string);
                 cancel();
                 return;
               }
               if (!srcRooms || srcRooms.length === 0) {
-                showError(
-                  $_('creation.validation.room_required') as string,
-                );
+                showError($_("creation.validation.room_required") as string);
                 cancel();
                 return;
               }
               if (!dateValue || !startTime || !endTime) {
-                showError($_('creation.validation.schedule_required') as string);
+                showError(
+                  $_("creation.validation.schedule_required") as string,
+                );
                 cancel();
                 return;
               }
               if (startTime >= endTime) {
-                showError($_('creation.validation.time_order') as string);
+                showError($_("creation.validation.time_order") as string);
                 cancel();
                 return;
               }
@@ -523,15 +517,17 @@
                         clearInterval(pollInterval);
                         isDeploying = false;
                         queuePosition = null;
-                        showSuccess($_('creation.success') as string);
+                        showSuccess($_("creation.success") as string);
                         setTimeout(() => {
-                           window.location.href = "/dashboard";
+                          window.location.href = "/dashboard";
                         }, 2000);
                       } else if (statusData.status === "failed") {
                         clearInterval(pollInterval);
                         isDeploying = false;
                         queuePosition = null;
-                        showError(statusData.error || String($_('creation.failed')));
+                        showError(
+                          statusData.error || String($_("creation.failed")),
+                        );
                       } else {
                         // "waiting" or "processing"
                         queueStatus = statusData.status;
@@ -543,10 +539,12 @@
                   }, 2000);
                 } else if (result.type === "failure") {
                   isDeploying = false;
-                  showError(result.data?.error || ($_('creation.failed') as any));
+                  showError(
+                    result.data?.error || ($_("creation.failed") as any),
+                  );
                 } else if (result.type === "error") {
                   isDeploying = false;
-                  showError($_('creation.error') as string);
+                  showError($_("creation.error") as string);
                 } else {
                   isDeploying = false;
                 }
@@ -562,16 +560,20 @@
                 {#if isDeploying}
                   <Loader2 class="mr-2 h-5 w-5 animate-spin" />
                   {#if queueStatus === "processing"}
-                    {String($_('creation.processing'))}
+                    {String($_("creation.processing"))}
                   {:else if queuePosition !== null}
                     {queuePosition - 1 > 0
-                      ? String($_('creation.queue_waiting', { values: { position: queuePosition - 1 } }))
-                      : String($_('creation.queue_next'))}
+                      ? String(
+                          $_("creation.queue_waiting", {
+                            values: { position: queuePosition - 1 },
+                          }),
+                        )
+                      : String($_("creation.queue_next"))}
                   {:else}
-                    {String($_('creation.queuing'))}
+                    {String($_("creation.queuing"))}
                   {/if}
                 {:else}
-                  <span class="font-bold">{String($_('creation.deploy'))}</span>
+                  <span class="font-bold">{String($_("creation.deploy"))}</span>
                 {/if}
               </Button>
             </div>
@@ -582,9 +584,11 @@
       <div
         class="relative z-10 text-center p-10 bg-white/60 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl max-w-4xl w-full"
       >
-        <h2 class="text-2xl font-bold mb-2 dark:text-white">{$_('common.access_denied') as string}</h2>
+        <h2 class="text-2xl font-bold mb-2 dark:text-white">
+          {$_("common.access_denied") as string}
+        </h2>
         <p class="text-gray-600 dark:text-gray-400">
-          {$_('creation.access_denied_msg') as string}
+          {$_("creation.access_denied_msg") as string}
         </p>
       </div>
     {/if}
@@ -592,9 +596,11 @@
     <div
       class="relative z-10 text-center p-10 bg-white/60 dark:bg-[#0f1420]/80 backdrop-blur-xl rounded-[2rem] border border-white/40 dark:border-white/5 shadow-2xl max-w-4xl w-full"
     >
-      <h2 class="text-2xl font-bold mb-2 dark:text-white">{$_('common.access_denied') as string}</h2>
+      <h2 class="text-2xl font-bold mb-2 dark:text-white">
+        {$_("common.access_denied") as string}
+      </h2>
       <p class="text-gray-600 dark:text-gray-400">
-        {$_('creation.login_required_msg') as string}
+        {$_("creation.login_required_msg") as string}
       </p>
     </div>
   {/if}
@@ -612,7 +618,9 @@
       class="transaction-card bg-white/95 dark:bg-[#0f1420]/95 backdrop-blur-2xl rounded-[2rem] border border-white/40 dark:border-white/10 shadow-2xl w-full max-w-md p-8 flex flex-col items-center gap-5 relative overflow-hidden"
     >
       <!-- Animated SVG Checkmark -->
-      <div class="check-container w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400 to-green-600 dark:from-emerald-500 dark:to-green-700 flex items-center justify-center shadow-lg shadow-green-500/30">
+      <div
+        class="check-container w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400 to-green-600 dark:from-emerald-500 dark:to-green-700 flex items-center justify-center shadow-lg shadow-green-500/30"
+      >
         <svg class="check-svg w-10 h-10" viewBox="0 0 24 24" fill="none">
           <path
             class="check-path"
@@ -627,8 +635,10 @@
 
       <!-- Title -->
       <div class="text-center space-y-1">
-        <h3 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
-          {$_('creation.success_title') as string}
+        <h3
+          class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight"
+        >
+          {$_("creation.success_title") as string}
         </h3>
         <p class="text-sm text-gray-500 dark:text-gray-400">
           {successMessage}
@@ -638,21 +648,41 @@
       <!-- Receipt-style details -->
       <div class="w-full space-y-3 px-2">
         <div class="flex justify-between items-center">
-          <span class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Policy</span>
-          <span class="text-sm font-semibold text-gray-800 dark:text-gray-200 font-mono">{policyName || '—'}</span>
+          <span
+            class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider"
+            >Policy</span
+          >
+          <span
+            class="text-sm font-semibold text-gray-800 dark:text-gray-200 font-mono"
+            >{policyName || "—"}</span
+          >
         </div>
         <div class="flex justify-between items-center">
-          <span class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Rooms</span>
-          <span class="text-sm font-semibold text-gray-800 dark:text-gray-200 font-mono">{srcRooms.length > 0 ? srcRooms.join(', ') : '—'}</span>
+          <span
+            class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider"
+            >Rooms</span
+          >
+          <span
+            class="text-sm font-semibold text-gray-800 dark:text-gray-200 font-mono"
+            >{srcRooms.length > 0 ? srcRooms.join(", ") : "—"}</span
+          >
         </div>
         <div class="flex justify-between items-center">
-          <span class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Mode</span>
-          <span class="text-sm font-semibold text-gray-800 dark:text-gray-200 font-mono capitalize">{serviceMode}</span>
+          <span
+            class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider"
+            >Mode</span
+          >
+          <span
+            class="text-sm font-semibold text-gray-800 dark:text-gray-200 font-mono capitalize"
+            >{serviceMode}</span
+          >
         </div>
       </div>
 
       <!-- Progress bar -->
-      <div class="absolute bottom-0 left-0 right-0 h-1.5 bg-gray-100 dark:bg-gray-800">
+      <div
+        class="absolute bottom-0 left-0 right-0 h-1.5 bg-gray-100 dark:bg-gray-800"
+      >
         <div
           class="h-full bg-gradient-to-r from-emerald-400 to-green-500"
           style="animation: shrink 1.5s linear forwards"
@@ -680,7 +710,7 @@
       </div>
       <div class="text-center">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          {$_('creation.error_title') as string}
+          {$_("creation.error_title") as string}
         </h3>
         <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
           {errorMessage}
