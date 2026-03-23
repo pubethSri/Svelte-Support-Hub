@@ -3,9 +3,13 @@
   import { Button, buttonVariants } from "$lib/components/ui/button/index.js";
   import Loader2 from "@lucide/svelte/icons/loader-2";
   import RefreshCw from "@lucide/svelte/icons/refresh-cw";
-  import { goto, invalidateAll } from "$app/navigation"; // Used to re-run the load function
+  import Timer from "@lucide/svelte/icons/timer";
+  import ChevronDown from "@lucide/svelte/icons/chevron-down";
+  import { goto, invalidateAll } from "$app/navigation";
   import { enhance } from "$app/forms";
   import { fade } from "svelte/transition";
+  import { browser } from "$app/environment";
+  import { onDestroy } from "svelte";
   import loaderFull from "$lib/loader/loader_full.webp";
   import Eye from "@lucide/svelte/icons/eye";
   import Plus from "@lucide/svelte/icons/plus";
@@ -26,6 +30,102 @@
   let isLoading = $state(false);
   let deletingPolicyName = $state<string | null>(null);
 
+  // --- AUTO-REFRESH ---
+  const refreshOptions = [
+    { label: 'Off', value: 0 },
+    { label: '30s', value: 30 },
+    { label: '1m', value: 60 },
+    { label: '5m', value: 300 },
+    { label: '1h', value: 3600 },
+  ];
+
+  let refreshInterval = $state(
+    browser ? parseInt(localStorage.getItem('dashboard-refresh') || '0') : 0
+  );
+  let countdown = $state(0);
+  let intervalId: ReturnType<typeof setInterval> | null = null;
+  let countdownId: ReturnType<typeof setInterval> | null = null;
+  let showRefreshDropdown = $state(false);
+
+  function setRefreshInterval(seconds: number) {
+    refreshInterval = seconds;
+    showRefreshDropdown = false;
+    if (browser) localStorage.setItem('dashboard-refresh', String(seconds));
+    startAutoRefresh();
+  }
+
+  function startAutoRefresh() {
+    // Clear existing timers
+    if (intervalId) clearInterval(intervalId);
+    if (countdownId) clearInterval(countdownId);
+    intervalId = null;
+    countdownId = null;
+
+    if (refreshInterval <= 0) {
+      countdown = 0;
+      return;
+    }
+
+    countdown = refreshInterval;
+
+    // Countdown ticker (every second)
+    countdownId = setInterval(() => {
+      countdown--;
+      if (countdown < 0) countdown = refreshInterval;
+    }, 1000);
+
+    // Actual refresh
+    intervalId = setInterval(async () => {
+      await handleRefresh();
+      countdown = refreshInterval;
+    }, refreshInterval * 1000);
+  }
+
+  // Start auto-refresh on mount if configured
+  $effect(() => {
+    if (browser && refreshInterval > 0) {
+      startAutoRefresh();
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+      if (countdownId) clearInterval(countdownId);
+    };
+  });
+
+  // Close dropdown on outside click
+  function handleClickOutside(e: MouseEvent) {
+    const target = e.target as HTMLElement;
+    if (!target.closest('#refresh-dropdown-container')) {
+      showRefreshDropdown = false;
+    }
+  }
+
+  $effect(() => {
+    if (browser) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  });
+
+  // Format countdown for display
+  function formatCountdown(sec: number): string {
+    if (sec >= 3600) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+    if (sec >= 60) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+    return `${sec}s`;
+  }
+
+  const currentRefreshLabel = $derived(
+    refreshOptions.find(o => o.value === refreshInterval)?.label || 'Off'
+  );
+
   // Helper: Format Address (View Logic stays here)
   function formatAddr(addrs: { name: string }[]) {
     return addrs
@@ -41,7 +141,6 @@
   // Helper: Refresh Data
   async function handleRefresh() {
     isLoading = true;
-    // invalidateAll re-runs the `load` function in +page.server.ts
     await invalidateAll();
     isLoading = false;
   }
@@ -128,7 +227,7 @@
     {/if}
   </div>
 
-  <div class="w-full max-w-6xl flex justify-between items-center relative z-10">
+  <div class="w-full max-w-6xl flex justify-between items-center relative z-20">
     <h1
       class="text-3xl md:text-4xl font-black tracking-tight text-gray-900 dark:text-white drop-shadow-sm"
     >
@@ -166,6 +265,42 @@
           >
         {/if}
       </Button>
+
+      <!-- Auto-Refresh Dropdown -->
+      <div id="refresh-dropdown-container" class="relative">
+        <button
+          type="button"
+          onclick={() => showRefreshDropdown = !showRefreshDropdown}
+          class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-full border border-gray-300 dark:border-white/20 bg-white/50 dark:bg-black/50 backdrop-blur-md hover:bg-purple-50 dark:hover:bg-white/10 text-gray-700 dark:text-gray-200 transition-all duration-300"
+        >
+          <Timer class="h-4 w-4 text-purple-600 dark:text-purple-400" />
+          <span class="font-semibold">{currentRefreshLabel}</span>
+          {#if refreshInterval > 0}
+            <span class="text-xs text-gray-400 dark:text-gray-500 tabular-nums">({formatCountdown(countdown)})</span>
+          {/if}
+          <ChevronDown class="h-3 w-3 text-gray-400" />
+        </button>
+
+        {#if showRefreshDropdown}
+          <div
+            transition:fade={{ duration: 100 }}
+            class="absolute right-0 mt-2 w-36 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1f2e] shadow-xl backdrop-blur-xl z-50 overflow-hidden"
+          >
+            {#each refreshOptions as opt}
+              <button
+                type="button"
+                onclick={() => setRefreshInterval(opt.value)}
+                class="w-full px-4 py-2.5 text-sm text-left transition-colors duration-150
+                  {refreshInterval === opt.value
+                    ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-semibold'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'}"
+              >
+                {opt.label}
+              </button>
+            {/each}
+          </div>
+        {/if}
+      </div>
     </div>
   </div>
 
